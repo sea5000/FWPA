@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Study Timer + Streaks</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8f9fa; }
+    .timer-display { font-size: 3rem; font-weight: bold; }
+  </style>
+</head>
+<body class="d-flex flex-column align-items-center justify-content-center min-vh-100">
+
+  <div class="container text-center">
+    <h1 class="mb-3">📚 Study Timer</h1>
+
+    <!-- Total and streak -->
+    <p class="text-muted mb-1">Total Study Time: <span id="totalTime">0</span> min</p>
+    <p class="fw-bold text-primary">🔥 Current Streak: <span id="streak">0</span> days</p>
+
+    <!-- Mode Selector -->
+    <div class="btn-group mb-4">
+      <button id="timerMode" class="btn btn-primary">Timer</button>
+      <button id="stopwatchMode" class="btn btn-outline-primary">Stopwatch</button>
+    </div>
+
+    <!-- Timer Controls -->
+    <div id="timerControls" class="mb-3">
+      <input type="number" id="minutesInput" class="form-control mb-3" placeholder="Enter minutes (e.g. 25)">
+      <button id="startTimer" class="btn btn-success">Start Timer</button>
+      <button id="stopTimer" class="btn btn-danger" disabled>Stop</button>
+    </div>
+
+    <!-- Stopwatch Controls -->
+    <div id="stopwatchControls" class="mb-3 d-none">
+      <button id="startStopwatch" class="btn btn-success">Start Stopwatch</button>
+      <button id="stopStopwatch" class="btn btn-danger" disabled>Stop</button>
+    </div>
+
+    <!-- Display -->
+    <div class="timer-display my-4" id="display">00:00</div>
+  </div>
+
+  <script>
+    // === VARIABLES ===
+    let timerInterval, stopwatchInterval;
+    let stopwatchSeconds = 0;
+
+    // Load saved data
+    let totalStudyTime = parseInt(localStorage.getItem("totalStudyTime")) || 0;
+    let streak = parseInt(localStorage.getItem("streak")) || 0;
+    let lastStudyDate = localStorage.getItem("lastStudyDate") || null;
+    document.getElementById("totalTime").textContent = totalStudyTime;
+    document.getElementById("streak").textContent = streak;
+
+    const display = document.getElementById("display");
+
+    // === TIMER MODE ===
+    document.getElementById("startTimer").addEventListener("click", () => {
+      const mins = parseInt(document.getElementById("minutesInput").value);
+      if (!mins || mins <= 0) return alert("Enter a valid number of minutes.");
+
+      let timeLeft = mins * 60;
+      display.textContent = formatTime(timeLeft);
+
+      document.getElementById("startTimer").disabled = true;
+      document.getElementById("stopTimer").disabled = false;
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        display.textContent = formatTime(timeLeft);
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          alert("🎉 Time's up! Great job!");
+          finishStudySession(mins);
+          resetButtons("timer");
+        }
+      }, 1000);
+    });
+
+    document.getElementById("stopTimer").addEventListener("click", () => {
+      clearInterval(timerInterval);
+      resetButtons("timer");
+    });
+
+    // === STOPWATCH MODE ===
+    document.getElementById("startStopwatch").addEventListener("click", () => {
+      document.getElementById("startStopwatch").disabled = true;
+      document.getElementById("stopStopwatch").disabled = false;
+
+      stopwatchInterval = setInterval(() => {
+        stopwatchSeconds++;
+        display.textContent = formatTime(stopwatchSeconds);
+      }, 1000);
+    });
+
+    document.getElementById("stopStopwatch").addEventListener("click", () => {
+      clearInterval(stopwatchInterval);
+      const mins = Math.floor(stopwatchSeconds / 60);
+      if (mins > 0) finishStudySession(mins);
+
+      stopwatchSeconds = 0;
+      display.textContent = "00:00";
+      resetButtons("stopwatch");
+    });
+
+    // === MODE SWITCH ===
+    document.getElementById("timerMode").addEventListener("click", () => switchMode("timer"));
+    document.getElementById("stopwatchMode").addEventListener("click", () => switchMode("stopwatch"));
+
+    function switchMode(mode) {
+      if (mode === "timer") {
+        document.getElementById("timerControls").classList.remove("d-none");
+        document.getElementById("stopwatchControls").classList.add("d-none");
+        document.getElementById("timerMode").classList.replace("btn-outline-primary", "btn-primary");
+        document.getElementById("stopwatchMode").classList.replace("btn-primary", "btn-outline-primary");
+      } else {
+        document.getElementById("stopwatchControls").classList.remove("d-none");
+        document.getElementById("timerControls").classList.add("d-none");
+        document.getElementById("stopwatchMode").classList.replace("btn-outline-primary", "btn-primary");
+        document.getElementById("timerMode").classList.replace("btn-primary", "btn-outline-primary");
+      }
+      display.textContent = "00:00";
+    }
+
+    // === HELPERS ===
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    }
+
+    function resetButtons(mode) {
+      if (mode === "timer") {
+        document.getElementById("startTimer").disabled = false;
+        document.getElementById("stopTimer").disabled = true;
+      } else {
+        document.getElementById("startStopwatch").disabled = false;
+        document.getElementById("stopStopwatch").disabled = true;
+      }
+    }
+
+    // === STUDY SESSION COMPLETE ===
+    function finishStudySession(mins) {
+      totalStudyTime += mins;
+      localStorage.setItem("totalStudyTime", totalStudyTime);
+      document.getElementById("totalTime").textContent = totalStudyTime;
+
+      updateStreak(mins);
+    }
+
+    // === STREAK LOGIC ===
+    function updateStreak(mins) {
+      if (mins < 30) return; // only count real study sessions
+
+      const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+
+      if (lastStudyDate === today) return; // already counted today
+
+      if (lastStudyDate) {
+        const lastDate = new Date(lastStudyDate);
+        const diffDays = (new Date(today) - lastDate) / (1000 * 60 * 60 * 24);
+
+        if (diffDays === 1) streak++; // continued streak
+        else if (diffDays > 1) streak = 1; // broke streak, reset
+      } else {
+        streak = 1; // first study ever
+      }
+
+      lastStudyDate = today;
+
+      localStorage.setItem("streak", streak);
+      localStorage.setItem("lastStudyDate", lastStudyDate);
+      document.getElementById("streak").textContent = streak;
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect">
+    <link as="style"
+        href="https://fonts.googleapis.com/css2?display=swap&amp;family=Plus+Jakarta+Sans%3Awght%40400%3B500%3B700%3B800"
+        onload="this.rel='stylesheet'" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <title>Bookme Community</title>
+    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon">
+</head>
+  <style>
+    :root {
+      --primary: #2badee;
+      --bg-light: #f6f7f8;
+      --bg-dark: #101c22;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-light);
+      color: #333;
+    }
+
+    body.dark-mode {
+      background-color: var(--bg-dark);
+      color: #ddd;
+    }
+
+    .navbar {
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      background-color: var(--bg-light);
+    }
+
+    .dark-mode .navbar {
+      background-color: var(--bg-dark);
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    .nav-link.active {
+      color: var(--primary) !important;
+      font-weight: 700;
+    }
+
+    .card {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      background-color: #fff;
+    }
+
+    .dark-mode .card {
+      background-color: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .post-header img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .post-actions button {
+      background: none;
+      border: none;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .post-actions button:hover {
+      color: var(--primary);
+    }
+
+    footer {
+      border-top: 1px solid rgba(0,0,0,0.1);
+      background-color: var(--bg-light);
+    }
+
+    .dark-mode footer {
+      background-color: var(--bg-dark);
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+    .btn-primary:hover {
+      background-color: #1b8ecb;
+    }
+  </style>
+<body class="bg-light text-dark">
+    <div class="d-flex flex-column min-vh-100">
+        <header class="w-100 site-header">
+            <div class="container d-flex align-items-center justify-content-between py-3">
+                <div class="d-flex align-items-center">
+                    <div class="me-2" style="width:40px;height:40px;color:var(--bs-primary);">
+                        <span class="material-symbols-outlined fs-3 text-primary">book</span>
+                    </div>
+                    <h1 class="h5 mb-0 ms-2">Bookme</h1>
+                </div>
+                <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
+                    <a class="btn btn-sm btn-light rounded-pill" href="../dashboard/index.html">Home</a>
+                    <a class="btn btn-sm btn-light rounded-pill" href="../study/index.html">Study</a>
+                    <a class="btn btn-sm btn-primary rounded-pill text-white" href="../community/index.html">Community</a>
+                    <a class="btn btn-sm btn-light rounded-pill" href="../challenges/index.html">Challenge</a>
+                </nav>
+                <div class="d-none d-md-flex align-items-center header-actions">
+                    <button type="button" class="btn btn-link text-muted p-0" aria-label="Notifications" title="Notifications">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+                    <button type="button" class="btn btn-link text-muted p-0" aria-label="Profile" title="Profile">
+                        <span class="material-symbols-outlined fs-3">account_circle</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <main class="flex-grow-1">
+            <div class="container my-5">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h2 class="h3 mb-0">Community</h2><small class="text-muted">Connect with others</small>
+                </div>
+
+        <ul class="nav nav-tabs mb-4" role="tablist">
+                    <li class="nav-item" role="presentation"><a class="nav-link" href="index.html" id="notes-tab" aria-controls="notes"
+                      aria-selected="false">Notes</a></button></li>
+                    <li class="nav-item" role="presentation"><button class="nav-link" id="friends-tab"
+                            data-bs-toggle="tab" data-bs-target="#friends" type="button" role="tab"
+                            aria-controls="friends" aria-selected="false">Friends</button></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" href="feed.html" id="feed-tab" aria-controls="feed" 
+                      aria-selected="false">Feed</a></button></li>
+                </ul>
+
+
+<!-- Feed Section -->
+  <main class="container my-5">
+    <h2 class="fw-bold display-6 mb-4">Feed</h2>
+
+    <!-- Post Input -->
+    <div class="card p-4 mb-5">
+      <div class="d-flex align-items-center mb-3">
+        <img src="https://i.pravatar.cc/60?img=8" class="rounded-circle me-3" width="50" height="50" alt="user">
+        <input type="text" class="form-control rounded-pill" placeholder="Share a note, thought, or photo...">
+      </div>
+      <div class="d-flex justify-content-between">
+        <button class="btn btn-light btn-sm">📸 Add Photo</button>
+        <button class="btn btn-primary btn-sm">Post</button>
+      </div>
+    </div>
+
+    <!-- Post 1 -->
+    <div class="card p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3 post-header">
+        <div class="d-flex align-items-center gap-3">
+          <img src="https://i.pravatar.cc/60?img=5" alt="profile">
+          <div>
+            <h6 class="mb-0 fw-bold">Alice Chen</h6>
+            <small class="text-muted">2 hours ago</small>
+          </div>
+        </div>
+        <div>
+          <button class="btn btn-outline-primary btn-sm me-2">Follow</button>
+          <button class="btn btn-outline-secondary btn-sm">View Profile</button>
+        </div>
+      </div>
+      <p>Studying machine learning today! Here’s a visual summary of the gradient descent process 🧠📉</p>
+      <img src="https://www.kdnuggets.com/wp-content/uploads/gradient-descent.jpg" class="img-fluid rounded mb-3" alt="post content">
+      <div class="d-flex justify-content-between text-muted post-actions">
+        <button>👍 Like</button>
+        <button>💬 Comment</button>
+        <button>↗️ Share</button>
+      </div>
+    </div>
+
+    <!-- Post 2 -->
+    <div class="card p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3 post-header">
+        <div class="d-flex align-items-center gap-3">
+          <img src="https://i.pravatar.cc/60?img=12" alt="profile">
+          <div>
+            <h6 class="mb-0 fw-bold">James Miller</h6>
+            <small class="text-muted">5 hours ago</small>
+          </div>
+        </div>
+        <div>
+          <button class="btn btn-outline-primary btn-sm me-2">Add Friend</button>
+          <button class="btn btn-outline-secondary btn-sm">View Profile</button>
+        </div>
+      </div>
+      <p>Here’s my summary of the <b>Photosynthesis process</b> 🌿 — feel free to save and use it for your notes!</p>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Photosynthesis_en.svg" class="img-fluid rounded mb-3" alt="notes">
+      <div class="d-flex justify-content-between text-muted post-actions">
+        <button>👍 Like</button>
+        <button>💬 Comment</button>
+        <button>↗️ Share</button>
+      </div>
+    </div>
+
+    <!-- Post 3 -->
+    <div class="card p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3 post-header">
+        <div class="d-flex align-items-center gap-3">
+          <img src="https://i.pravatar.cc/60?img=16" alt="profile">
+          <div>
+            <h6 class="mb-0 fw-bold">Sophia Nguyen</h6>
+            <small class="text-muted">Yesterday</small>
+          </div>
+        </div>
+        <div>
+          <button class="btn btn-outline-primary btn-sm me-2">Follow</button>
+          <button class="btn btn-outline-secondary btn-sm">View Profile</button>
+        </div>
+      </div>
+      <p>Had a group study session today on Calculus — amazing collaboration and focus! Here are my notes 🧮</p>
+      <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80" class="img-fluid rounded mb-3" alt="study photo">
+      <div class="d-flex justify-content-between text-muted post-actions">
+        <button>👍 Like</button>
+        <button>💬 Comment</button>
+        <button>↗️ Share</button>
+      </div>
+    </div>
+
+  </main>
+  <!-- Footer -->
+  <footer class="d-md-none py-3">
+    <div class="container d-flex justify-content-around text-center">
+      <a href="#" class="text-decoration-none text-muted"><small>Study</small></a>
+      <a href="#" class="text-decoration-none text-muted"><small>Community</small></a>
+      <a href="#" class="text-decoration-none text-primary fw-bold"><small>Feed</small></a>
+    </div>
+  </footer>
+
+ 
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            try {
+                const navAreas = [];
+                const header = document.querySelector('header');
+                if (header) navAreas.push(header);
+                const footers = Array.from(document.querySelectorAll('footer'));
+                navAreas.push(...footers);
+                const parts = location.pathname.split('/').filter(Boolean);
+                const currentSlug = parts.length >= 2 ? parts[parts.length - 2] : (parts[0] || 'home');
+
+                navAreas.forEach(area => {
+                    const links = Array.from(area.querySelectorAll('a[href]'));
+                    links.forEach(a => {
+                        try {
+                            const url = new URL(a.getAttribute('href'), location.origin);
+                            const linkParts = url.pathname.split('/').filter(Boolean);
+                            const linkSlug = linkParts.length >= 2 ? linkParts[linkParts.length - 2] : (linkParts[0] || 'home');
+
+                            a.classList.remove('active', 'text-primary', 'fw-bold', 'text-white', 'btn-primary');
+
+                            if (linkSlug === currentSlug) {
+                                if (a.classList.contains('btn')) {
+                                    a.classList.remove('btn-light');
+                                    a.classList.add('btn-primary', 'text-white');
+                                } else {
+                                    a.classList.add('text-primary', 'fw-bold');
+                                }
+                                a.classList.add('active');
+                            } else {
+                                if (!a.classList.contains('btn')) {
+                                    a.classList.remove('text-primary', 'fw-bold');
+                                    a.classList.add('text-muted');
+                                }
+                                if (a.classList.contains('btn') && !a.classList.contains('btn-light')) {
+                                    a.classList.add('btn-light');
+                                }
+                            }
+                        } catch (e) { }
+                    });
+                });
+            } catch (e) { }
+        });
+    </script>
+</body>
+</html>

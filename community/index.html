@@ -54,77 +54,125 @@
                     <li class="nav-item" role="presentation"><button class="nav-link" id="friends-tab"
                             data-bs-toggle="tab" data-bs-target="#friends" type="button" role="tab"
                             aria-controls="friends" aria-selected="false">Friends</button></li>
-                    <li class="nav-item" role="presentation"><button class="nav-link" id="feed-tab" data-bs-toggle="tab"
-                            data-bs-target="#feed" type="button" role="tab" aria-controls="feed"
-                            aria-selected="false">Feed</button></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" href="feed.html" id="feed-tab" aria-controls="feed" 
+                      aria-selected="false">Feed</a></li>
                 </ul>
-                <div class="tab-content">
-                    <div class="tab-pane fade show active" id="notes" role="tabpanel" aria-labelledby="notes-tab">
-                        <h4 class="mb-3">My Notes</h4>
-                        <div class="row g-4 mb-5">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="row g-0 align-items-center">
-                                        <div class="col-md-8 p-3">
-                                            <small class="text-muted">2024-01-15</small>
-                                            <h5 class="mt-2">The Impact of AI on Education</h5>
-                                            <p class="mb-0 text-muted">Explore how artificial intelligence is reshaping
-                                                learning environments and teaching methodologies.</p>
-                                        </div>
-                                        <div class="col-md-4"
-                                            style="min-height:140px; background-size:cover; background-position:center; background-image:url('https://lh3.googleusercontent.com/aida-public/AB6AXuBP440HLzhGeqJzwaaO6QkkMdODn6Bdy2aNAAxhvnSWPdr8mxddh0e3SbDby3w31VSi33HYeRHQazt-hGNtmHvKV1CtFtC3lOckEE7iwvXaC2KKnEc00w_gD4WDgElVgwswyJ1a5tkBVysqKp9p1Qi6095Nse3UiFlW9DOj9oJd9e6qOnItn8ChBevr8rsI2dWh9LR_WK9iSwSHhCOeR6HFVCAMp7x2Nxlck_qMsFKr9HVPPQN_cmu-AoZBtqQrcIHcTnqKjD_bGDwA');">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="row g-0 align-items-center">
-                                        <div class="col-md-8 p-3">
-                                            <small class="text-muted">2024-01-10</small>
-                                            <h5 class="mt-2">Effective Study Techniques</h5>
-                                            <p class="mb-0 text-muted">Discover proven strategies to enhance your study
-                                                sessions and improve knowledge retention.</p>
-                                        </div>
-                                        <div class="col-md-4"
-                                            style="min-height:140px; background-size:cover; background-position:center; background-image:url('https://lh3.googleusercontent.com/aida-public/AB6AXuC6F9A1MGuohVawdprPj_stl2XvjDV1Vyg0nd5UOKW5QQkyRgaw3BQLNEpvmA0fEiGyqKohOnx8yH8xUnrY5gL3V38EXTqCftAfxREVXkNQZlejRwVgb_DAnHXmUhkep1YSPMo6FKEdZ0vc81lVVeGO5TRk55hqihkFqhg88C9vFoD4hUXiU1DPJQ-lGiU_Cv70ePFikQdS7LSCw4fJUpMSzzHkWdRZkIuLQEdxBnPpb7ofB2Yk_zIaVwWI6TyXd3aTGMbn0Gi4udSL');">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <h4 class="mb-3">Shared Notes</h4>
-                        <div class="row g-4">
-                            <div class="col-12 col-md-6">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <small class="text-muted">Shared by Alex</small>
-                                        <h5 class="mt-2">Understanding Quantum Physics</h5>
-                                        <p class="text-muted mb-0">A comprehensive guide to the principles and
-                                            applications of quantum mechanics.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <small class="text-muted">Shared by Sarah</small>
-                                        <h5 class="mt-2">The History of Ancient Civilizations</h5>
-                                        <p class="text-muted mb-0">An overview of the rise and fall of major ancient
-                                            civilizations around the world.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="friends" role="tabpanel" aria-labelledby="friends-tab">
-                        <p class="text-muted">Your friends and connections will appear here. (Placeholder)</p>
-                    </div>
-                    <div class="tab-pane fade" id="feed" role="tabpanel" aria-labelledby="feed-tab">
-                        <p class="text-muted">Community feed and activity stream. (Placeholder)</p>
-                    </div>
-                </div>
+        <!-- Subject Folders -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold display-6">Study Content</h2>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">+ Add New Note</button>
+    </div>
+
+    
+    <h4 class="fw-bold mb-3">Your Folders</h4>
+    <div class="row g-4 mb-5">
+      <div class="col-6 col-md-4 col-lg-3">
+        <div class="card folder-card p-3 text-center">
+          <div class="folder-icon mb-2">📘</div>
+          <h6 class="fw-bold mb-1">Mathematics</h6>
+          <p class="text-muted small mb-0">8 notes</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-lg-3">
+        <div class="card folder-card p-3 text-center">
+          <div class="folder-icon mb-2">🧬</div>
+          <h6 class="fw-bold mb-1">Biology</h6>
+          <p class="text-muted small mb-0">5 notes</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-lg-3">
+        <div class="card folder-card p-3 text-center">
+          <div class="folder-icon mb-2">💻</div>
+          <h6 class="fw-bold mb-1">Programming</h6>
+          <p class="text-muted small mb-0">12 notes</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-lg-3">
+        <div class="card folder-card p-3 text-center">
+          <div class="folder-icon mb-2">🧠</div>
+          <h6 class="fw-bold mb-1">Psychology</h6>
+          <p class="text-muted small mb-0">3 notes</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Notes -->
+    <h4 class="fw-bold mb-3">Recent Notes</h4>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="note-card p-3">
+          <h6 class="fw-bold">Derivatives Rules</h6>
+          <p class="text-muted small">Mathematics</p>
+          <p>Quick summary of differentiation formulas for test prep. 📖</p>
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-sm btn-outline-primary">View</button>
+            <button class="btn btn-sm btn-outline-secondary">Edit</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="note-card p-3">
+          <h6 class="fw-bold">Cell Division Overview</h6>
+          <p class="text-muted small">Biology</p>
+          <p>Diagram and steps of mitosis and meiosis 🧬</p>
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-sm btn-outline-primary">View</button>
+            <button class="btn btn-sm btn-outline-secondary">Edit</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="note-card p-3">
+          <h6 class="fw-bold">Python Basics</h6>
+          <p class="text-muted small">Programming</p>
+          <p>Variables, loops, and conditionals — beginner-friendly!</p>
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-sm btn-outline-primary">View</button>
+            <button class="btn btn-sm btn-outline-secondary">Edit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Note Modal -->
+  <div class="modal fade" id="addNoteModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form>
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold">Add New Note</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="noteTitle" class="form-label">Title</label>
+              <input type="text" id="noteTitle" class="form-control" placeholder="Enter note title" required>
             </div>
+            <div class="mb-3">
+              <label for="noteSubject" class="form-label">Subject</label>
+              <select id="noteSubject" class="form-select" required>
+                <option selected disabled>Choose folder...</option>
+                <option>Mathematics</option>
+                <option>Biology</option>
+                <option>Programming</option>
+                <option>Psychology</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="noteContent" class="form-label">Content</label>
+              <textarea id="noteContent" class="form-control" rows="4" placeholder="Write your note here..." required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Save Note</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+                
         </main>
         <footer class="d-md-none fixed-bottom bg-white border-top">
             <nav class="nav justify-content-around py-2">

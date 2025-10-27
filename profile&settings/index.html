@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0" />
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <title>Bookme - Profile & Settings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <style>
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-light text-dark">
+    <div class="d-flex flex-column min-vh-100">
+      <header class="w-100 site-header bg-white shadow-sm">
+        <div class="container d-flex align-items-center justify-content-between py-3">
+          <div class="d-flex align-items-center">
+            <div class="me-2" style="width:40px;height:40px;color:var(--bs-primary);">
+              <span class="material-symbols-outlined fs-3 text-primary">book</span>
+            </div>
+            <h1 class="h5 mb-0 ms-2">Bookme</h1>
+          </div>
+          <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
+            <a class="btn btn-sm btn-light rounded-pill" href="../home/index.html">Home</a>
+            <a class="btn btn-sm btn-light rounded-pill" href="../study/index.html">Study</a>
+            <a class="btn btn-sm btn-light rounded-pill" href="../community/feed.html">Community</a>
+            <a class="btn btn-sm btn-primary rounded-pill text-white" href="../challenges/index.html">Challenge</a>
+          </nav>
+          <div class="d-none d-md-flex align-items-center header-actions">
+            <a href="#" class="btn btn-link text-muted p-0" aria-label="Notifications" title="Notifications">
+              <span class="material-symbols-outlined">notifications</span>
+            </a>
+            <a href="#" class="btn btn-link text-primary p-0 ms-3" aria-label="Profile" title="Profile" aria-current="page">
+              <span class="material-symbols-outlined fs-3">account_circle</span>
+            </a>
+          </div>
+        </div>
+      </header>
+    <div class="settings-container py-4">
+        <!-- Profile Section -->
+        <section class="settings-section mb-4">
+            <h2>Profile Information</h2>
+            <div class="profile-info">
+                <div class="profile-picture-container">
+                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=0D6EFD&color=fff&size=200" alt="Profile Picture" class="profile-picture">
+                    <span class="status-indicator online"></span>
+                </div>
+                <div class="profile-details">
+                    <h3>Sarah Doe <span class="username">@sarahdoe</span></h3>
+                    <span class="email">Sarah.doe@example.com</span>
+                    <button class="btn btn-outline-primary btn-sm mt-2">
+                        <span class="material-symbols-outlined align-middle me-1" style="font-size: 1rem;">edit</span>
+                        Edit Profile
+                    </button>
+                </div>
+            </div>
+        </section>
+
+            <!-- Preferences Section -->
+            <section class="settings-section mb-4">
+                <h2>Preferences</h2>
+                <div class="preference-item">
+                    <div class="preference-info">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <div class="content">
+                            <h4>Email Notifications</h4>
+                            <p>Receive email notifications for important updates</p>
+                        </div>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="notifications" checked>
+                        <label class="form-check-label" for="notifications"></label>
+                    </div>
+                </div>
+
+                <div class="preference-item">
+                    <div class="preference-info">
+                        <span class="material-symbols-outlined">help_outline</span>
+                        <div class="content">
+                            <h4>Help & Support</h4>
+                            <p>Get help or contact our support team</p>
+                        </div>
+                    </div>
+                    <a href="#" class="btn btn-outline-primary btn-sm">Contact</a>
+                </div>
+            </section>
+
+            <!-- Account & Security Section -->
+            <section class="settings-section mb-4">
+                <h2>Account & Security</h2>
+                <div class="security-item">
+                    <div class="security-info">
+                        <span class="material-symbols-outlined">lock</span>
+                        <div class="content">
+                            <h4>Change Password</h4>
+                            <p>Last changed 3 months ago</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm">
+                        <span class="material-symbols-outlined align-middle" style="font-size: 1rem;">edit</span>
+                        Change
+                    </button>
+                </div>
+
+                <div class="security-item">
+                    <div class="security-info">
+                        <span class="material-symbols-outlined">security</span>
+                        <div class="content">
+                            <h4>Two-Factor Authentication</h4>
+                            <p>Add an extra layer of security to your account</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm">
+                        <span class="material-symbols-outlined align-middle" style="font-size: 1rem;">enhanced_encryption</span>
+                        Enable 2FA
+                    </button>
+                </div>
+            </section>
+
+            <!-- Danger Zone -->
+            <section class="settings-section danger-zone">
+                <h2>Danger Zone</h2>
+                <p class="text-muted mb-4">These actions are irreversible. Please proceed with caution.</p>
+                <div class="danger-actions">
+                    <button class="btn btn-outline-danger" id="signOutBtn">
+                        <span class="material-symbols-outlined align-middle me-1">logout</span> Sign Out
+                    </button>
+                    <button class="btn btn-danger" id="deleteAccountBtn">
+                        <span class="material-symbols-outlined align-middle me-1">delete_forever</span> Delete Account
+                    </button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Delete Account Confirmation Modal -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title text-danger">
+                        <span class="material-symbols-outlined align-middle me-2">warning</span>
+                        Delete Account
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p class="mb-4">Are you sure you want to delete your account? This action <strong>cannot be undone</strong>. All your data will be permanently removed, including:</p>
+                    <ul class="mb-4">
+                        <li>Your profile information</li>
+                        <li>Study progress and statistics</li>
+                        <li>Created flashcards and notes</li>
+                        <li>Community posts and interactions</li>
+                    </ul>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="confirmDelete">
+                        <label class="form-check-label" for="confirmDelete">
+                            I understand that this action is irreversible and I want to proceed with deleting my account.
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                        <span class="material-symbols-outlined align-middle me-1">delete_forever</span>
+                        Delete My Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script>
+        // Delete Account Confirmation based on checkbox
+        document.getElementById('confirmDelete').addEventListener('change', function() {
+            document.getElementById('confirmDeleteBtn').disabled = !this.checked;
+        });
+
+        // Show delete confirmation modal
+        document.getElementById('deleteAccountBtn').addEventListener('click', function() {
+            const modal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
+            modal.show();
+        });
+
+        // Handle account deletion
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            // Add your account deletion logic here
+            const toastHTML = `
+                <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header bg-danger text-white">
+                            <strong class="me-auto">Account Deleted</strong>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            Your account has been successfully deleted. We're sorry to see you go!
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Show success message
+            document.body.insertAdjacentHTML('beforeend', toastHTML);
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteAccountModal'));
+            modal.hide();
+            
+            // Redirect after a delay
+            setTimeout(() => {
+                window.location.href = '../home/index.html';
+            }, 3000);
+        });
+
+        // Handle sign out
+        document.getElementById('signOutBtn').addEventListener('click', function() {
+            // Add your sign out logic here
+            alert('Signing out...');
+        });
+    </script>
+    </div>
+  </div>
+</body>
+</html>

@@ -8,8 +8,8 @@
     <title>Bookme - Profile & Settings</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link rel="stylesheet" href="../css/theme.css" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="../static/styles-theme.css" />
+    <link rel="stylesheet" href="../static/styles-profile-settings.css" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
@@ -30,19 +30,31 @@
             <h1 class="h5 mb-0 ms-2">Bookme</h1>
           </div>
           <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
-            <a class="btn btn-sm btn-light rounded-pill" href="../home/index.html">Home</a>
-            <a class="btn btn-sm btn-light rounded-pill" href="../study/index.html">Study</a>
-            <a class="btn btn-sm btn-light rounded-pill" href="../community/feed.html">Community</a>
-            <a class="btn btn-sm btn-primary rounded-pill text-white" href="../challenges/index.html">Challenge</a>
+            <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('home.index') }}">Home</a>
+            <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
+            <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('feed.index') }}">Community</a>
+            <a class="btn btn-sm btn-primary rounded-pill text-white" href="{{ url_for('challenges.index') }}">Challenge</a>
           </nav>
-          <div class="d-none d-md-flex align-items-center header-actions">
-            <a href="#" class="btn btn-link text-muted p-0" aria-label="Notifications" title="Notifications">
-              <span class="material-symbols-outlined">notifications</span>
-            </a>
-            <a href="#" class="btn btn-link text-primary p-0 ms-3" aria-label="Profile" title="Profile" aria-current="page">
-              <span class="material-symbols-outlined fs-3">account_circle</span>
-            </a>
-          </div>
+                    <div class="d-none d-md-flex align-items-center header-actions">
+                        <a href="#" class="btn btn-link text-muted p-0" aria-label="Notifications" title="Notifications">
+                            <span class="material-symbols-outlined">notifications</span>
+                        </a>
+                        <div class="dropdown ms-3">
+                            <a class="btn btn-link text-primary p-0 dropdown-toggle" href="{{ url_for('profile.index') }}" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile" title="Profile">
+                                <span class="material-symbols-outlined fs-3">account_circle</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                <li><h6 class="dropdown-header">Account</h6></li>
+                                <li><a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
+                                        <button type="submit" class="dropdown-item">Log out</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
         </div>
       </header>
     <div class="settings-container py-4">
@@ -55,8 +67,8 @@
                     <span class="status-indicator online"></span>
                 </div>
                 <div class="profile-details">
-                    <h3>Sarah Doe <span class="username">@sarahdoe</span></h3>
-                    <span class="email">Sarah.doe@example.com</span>
+                    <h3>{{profileData.name}} <span class="username">@{{profileData.username}}</span></h3>
+                    <span class="email">{{profileData.email}}</span>
                     <button class="btn btn-outline-primary btn-sm mt-2">
                         <span class="material-symbols-outlined align-middle me-1" style="font-size: 1rem;">edit</span>
                         Edit Profile
@@ -221,7 +233,7 @@
             
             // Redirect after a delay
             setTimeout(() => {
-                window.location.href = '../home/index.html';
+                window.location.href = "{{ url_for('home.index') }}";
             }, 3000);
         });
 

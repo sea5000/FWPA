@@ -39,19 +39,31 @@
                     <h1 class="h5 mb-0 ms-2">Bookme</h1>
                 </div>
                 <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
-                    <a class="btn btn-sm btn-light rounded-pill" href="../dashboard/">Home</a>
-                    <a class="btn btn-sm btn-primary rounded-pill text-white" href="../study/">Study</a>
-                    <a class="btn btn-sm btn-light rounded-pill" href="../community/">Community</a>
-                    <a class="btn btn-sm btn-light rounded-pill" href="../challenges/">Challenge</a>
+                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('dashboard.index') }}">Home</a>
+                    <a class="btn btn-sm btn-primary rounded-pill text-white" href="{{ url_for('study.index') }}">Study</a>
+                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('community.index') }}">Community</a>
+                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('challenges.index') }}">Challenge</a>
                 </nav>
-                <div class="d-none d-md-flex align-items-center header-actions">
-                    <button type="button" class="btn btn-link text-muted p-0" aria-label="Notifications" title="Notifications">
-                        <span class="material-symbols-outlined">notifications</span>
-                    </button>
-                    <a href="../profile&settings/index.html" class="btn btn-link text-muted p-0" aria-label="Profile" title="Profile">
-                        <span class="material-symbols-outlined fs-3">account_circle</span>
-                    </a>
-            </div>
+                                <div class="d-none d-md-flex align-items-center header-actions">
+                                        <button type="button" class="btn btn-link text-muted p-0" aria-label="Notifications" title="Notifications">
+                                                <span class="material-symbols-outlined">notifications</span>
+                                        </button>
+                                        <div class="dropdown">
+                                            <a class="btn btn-link text-muted p-0 dropdown-toggle" href="{{ url_for('profile.index') }}" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile" title="Profile">
+                                                <span class="material-symbols-outlined fs-3">account_circle</span>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                                <li><h6 class="dropdown-header">Account</h6></li>
+                                                <li><a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
+                                                        <button type="submit" class="dropdown-item">Log out</button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                        </div>
         </header>
         <main class="flex-grow-1">
             <div class="bg-light rounded-3 py-5">
@@ -72,7 +84,7 @@
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">Flashcards</h5>
                                 <p class="card-text text-muted">Review key concepts with interactive flashcards.</p><a
-                                    class="btn btn-primary mt-auto" href="../flashcards/">Start Studying <span
+                                    class="btn btn-primary mt-auto" href="{{ url_for('flashcards.index') }}">Start Studying <span
                                         class="material-symbols-outlined ms-2">arrow_forward</span></a>
                             </div>
                         </div>
@@ -98,7 +110,7 @@
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">Progress</h5>
                                 <p class="card-text text-muted">Monitor your learning journey and achievements.</p><a
-                                    class="btn btn-outline-primary mt-auto" href="../progress/">View Progress <span
+                                    class="btn btn-outline-primary mt-auto" href="{{ url_for('progress.index') }}">View Progress <span
                                         class="material-symbols-outlined ms-2">trending_up</span></a>
                             </div>
                         </div>
@@ -108,15 +120,15 @@
         </main>
         <footer class="d-md-none fixed-bottom bg-white border-top">
             <nav class="nav justify-content-around py-2">
-                <a class="nav-link d-flex flex-column align-items-center text-muted" href="../home/"><span
+                <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('home.index') }}"><span
                         class="material-symbols-outlined fs-4">home</span> <small class="d-block">Home</small></a> <a
-                    class="nav-link d-flex flex-column align-items-center text-muted" href="../study/"><span
+                    class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('study.index') }}"><span
                         class="material-symbols-outlined fs-4">school</span> <small class="d-block">Study</small></a> <a
                     class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="../community/"><span class="material-symbols-outlined fs-4">groups</span> <small
+                    href="{{ url_for('community.index') }}"><span class="material-symbols-outlined fs-4">groups</span> <small
                         class="d-block">Community</small></a> <a
                     class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="../challenges/"><span class="material-symbols-outlined fs-4">emoji_events</span>
+                    href="{{ url_for('challenges.index') }}"><span class="material-symbols-outlined fs-4">emoji_events</span>
                     <small class="d-block">Challenge</small></a>
             </nav>
         </footer>

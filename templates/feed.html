@@ -107,18 +107,30 @@
                     <h1 class="h5 mb-0 ms-2">Bookme</h1>
                 </div>
                 <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
-                    <a class="btn btn-sm btn-light rounded-pill" href="../dashboard/index.html">Home</a>
-                    <a class="btn btn-sm btn-light rounded-pill" href="../study/index.html">Study</a>
-                    <a class="btn btn-sm btn-primary rounded-pill text-white" href="../community/index.html">Community</a>
-                    <a class="btn btn-sm btn-light rounded-pill" href="../challenges/index.html">Challenge</a>
+                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('dashboard.index') }}">Home</a>
+                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
+                    <a class="btn btn-sm btn-primary rounded-pill text-white" href="{{ url_for('community.index') }}">Community</a>
+                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('challenges.index') }}">Challenge</a>
                 </nav>
                 <div class="d-none d-md-flex align-items-center header-actions">
                     <button type="button" class="btn btn-link text-muted p-0" aria-label="Notifications" title="Notifications">
                         <span class="material-symbols-outlined">notifications</span>
                     </button>
-                    <button type="button" class="btn btn-link text-muted p-0" aria-label="Profile" title="Profile">
+                    <div class="dropdown">
+                      <a class="btn btn-link text-muted p-0 dropdown-toggle" href="{{ url_for('profile.index') }}" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile" title="Profile">
                         <span class="material-symbols-outlined fs-3">account_circle</span>
-                    </button>
+                      </a>
+                      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                        <li><h6 class="dropdown-header">Account</h6></li>
+                        <li><a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                          <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
+                            <button type="submit" class="dropdown-item">Log out</button>
+                          </form>
+                        </li>
+                      </ul>
+                    </div>
                 </div>
             </div>
         </header>
@@ -131,97 +143,103 @@
         <ul class="nav nav-tabs mb-4" role="tablist">
                     <li class="nav-item" role="presentation"><a class="nav-link" href="index.html" id="notes-tab" aria-controls="notes"
                       aria-selected="false">Notes</a></button></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="friends.html" id="friends-tab" aria-controls="friends" 
-                      aria-selected="false">Friends</a></button></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" href="friends.html" id="friends-tab"
+                            aria-controls="friends" aria-selected="false">Friends</a></button></li>
                     <li class="nav-item" role="presentation"><a class="nav-link" href="feed.html" id="feed-tab" aria-controls="feed" 
                       aria-selected="false">Feed</a></button></li>
                 </ul>
-<body class="p-4">
 
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="fw-bold">Your Friends</h2>
-      <button class="btn btn-outline-primary" onclick="addFriend()">+ Add Friend</button>
+
+<!-- Feed Section -->
+  <main class="container my-5">
+    <h2 class="fw-bold display-6 mb-4">Feed</h2>
+
+    <!-- Post Input -->
+    <div class="card p-4 mb-5">
+      <div class="d-flex align-items-center mb-3">
+        <img src="https://i.pravatar.cc/60?img=8" class="rounded-circle me-3" width="50" height="50" alt="user">
+        <input type="text" class="form-control rounded-pill" placeholder="Share a note, thought, or photo...">
+      </div>
+      <div class="d-flex justify-content-between">
+        <button class="btn btn-light btn-sm">📸 Add Photo</button>
+        <button class="btn btn-primary btn-sm">Post</button>
+      </div>
     </div>
 
-    <div id="friends-list" class="row gy-3">
-      <!-- Friend cards appear here -->
-    </div>
-  </div>
-
-  <script>
-    // Sample data (in a real app, this comes from a database)
-    let friends = JSON.parse(localStorage.getItem('friendsData')) || [
-      { id: 1, name: "Alex Carter", studyTime: 120, flashScore: 85, streak: 3, following: false, img: "https://randomuser.me/api/portraits/men/32.jpg" },
-      { id: 2, name: "Sarah Johnson", studyTime: 200, flashScore: 90, streak: 7, following: true, img: "https://randomuser.me/api/portraits/women/44.jpg" },
-      { id: 3, name: "Mark Lee", studyTime: 75, flashScore: 70, streak: 2, following: false, img: "https://randomuser.me/api/portraits/men/56.jpg" }
-    ];
-
-    function renderFriends() {
-      const list = document.getElementById('friends-list');
-      list.innerHTML = '';
-
-      friends.forEach(friend => {
-        const col = document.createElement('div');
-        col.className = 'col-md-6';
-
-        col.innerHTML = `
-          <div class="friend-card p-3 d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
-              <img src="${friend.img}" class="profile-img me-3" alt="${friend.name}">
-              <div>
-                <h5 class="mb-1">${friend.name}</h5>
-                <div class="stats">
-                  <small>Study: ${friend.studyTime} min • Flashcards: ${friend.flashScore}% • Streak: ${friend.streak} 🔥</small>
-                </div>
-              </div>
-            </div>
-            <button class="btn ${friend.following ? 'btn-secondary' : 'btn-primary'} btn-sm" onclick="toggleFollow(${friend.id})">
-              ${friend.following ? 'Following' : 'Follow'}
-            </button>
+    <!-- Post 1 -->
+    <div class="card p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3 post-header">
+        <div class="d-flex align-items-center gap-3">
+          <img src="https://i.pravatar.cc/60?img=5" alt="profile">
+          <div>
+            <h6 class="mb-0 fw-bold">Alice Chen</h6>
+            <small class="text-muted">2 hours ago</small>
           </div>
-        `;
-        list.appendChild(col);
-      });
-    }
+        </div>
+        <div>
+          <button class="btn btn-outline-primary btn-sm me-2">Follow</button>
+          <button class="btn btn-outline-secondary btn-sm">View Profile</button>
+        </div>
+      </div>
+      <p>Studying machine learning today! Here’s a visual summary of the gradient descent process 🧠📉</p>
+      <img src="https://www.kdnuggets.com/wp-content/uploads/gradient-descent.jpg" class="img-fluid rounded mb-3" alt="post content">
+      <div class="d-flex justify-content-between text-muted post-actions">
+        <button>👍 Like</button>
+        <button>💬 Comment</button>
+        <button>↗️ Share</button>
+      </div>
+    </div>
 
-    function toggleFollow(id) {
-      const friend = friends.find(f => f.id === id);
-      if (friend) {
-        friend.following = !friend.following;
-        saveData();
-        renderFriends();
-      }
-    }
+    <!-- Post 2 -->
+    <div class="card p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3 post-header">
+        <div class="d-flex align-items-center gap-3">
+          <img src="https://i.pravatar.cc/60?img=12" alt="profile">
+          <div>
+            <h6 class="mb-0 fw-bold">James Miller</h6>
+            <small class="text-muted">5 hours ago</small>
+          </div>
+        </div>
+        <div>
+          <button class="btn btn-outline-primary btn-sm me-2">Add Friend</button>
+          <button class="btn btn-outline-secondary btn-sm">View Profile</button>
+        </div>
+      </div>
+      <p>Here’s my summary of the <b>Photosynthesis process</b> 🌿 — feel free to save and use it for your notes!</p>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Photosynthesis_en.svg" class="img-fluid rounded mb-3" alt="notes">
+      <div class="d-flex justify-content-between text-muted post-actions">
+        <button>👍 Like</button>
+        <button>💬 Comment</button>
+        <button>↗️ Share</button>
+      </div>
+    </div>
 
-    function addFriend() {
-      const name = prompt("Enter your friend's name:");
-      if (name) {
-        const newFriend = {
-          id: Date.now(),
-          name,
-          studyTime: Math.floor(Math.random() * 200),
-          flashScore: Math.floor(Math.random() * 100),
-          streak: Math.floor(Math.random() * 10),
-          following: false,
-          img: `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random()*80)}.jpg`
-        };
-        friends.push(newFriend);
-        saveData();
-        renderFriends();
-      }
-    }
+    <!-- Post 3 -->
+    <div class="card p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3 post-header">
+        <div class="d-flex align-items-center gap-3">
+          <img src="https://i.pravatar.cc/60?img=16" alt="profile">
+          <div>
+            <h6 class="mb-0 fw-bold">Sophia Nguyen</h6>
+            <small class="text-muted">Yesterday</small>
+          </div>
+        </div>
+        <div>
+          <button class="btn btn-outline-primary btn-sm me-2">Follow</button>
+          <button class="btn btn-outline-secondary btn-sm">View Profile</button>
+        </div>
+      </div>
+      <p>Had a group study session today on Calculus — amazing collaboration and focus! Here are my notes 🧮</p>
+      <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80" class="img-fluid rounded mb-3" alt="study photo">
+      <div class="d-flex justify-content-between text-muted post-actions">
+        <button>👍 Like</button>
+        <button>💬 Comment</button>
+        <button>↗️ Share</button>
+      </div>
+    </div>
 
-    function saveData() {
-      localStorage.setItem('friendsData', JSON.stringify(friends));
-    }
-
-    // Initial render
-    renderFriends();
-  </script>
-</body>
-</main>
-<!-- Footer -->
+  </main>
+  <!-- Footer -->
   <footer class="d-md-none py-3">
     <div class="container d-flex justify-content-around text-center">
       <a href="#" class="text-decoration-none text-muted"><small>Study</small></a>

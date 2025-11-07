@@ -27,18 +27,30 @@
                     <h1 class="h5 mb-0 ms-2">Bookme</h1>
                 </div>
                 <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
-                    <a class="btn btn-sm btn-light rounded-pill" href="../dashboard/index.html">Home</a>
-                    <a class="btn btn-sm btn-light rounded-pill" href="../study/index.html">Study</a>
-                    <a class="btn btn-sm btn-primary rounded-pill text-white" href="../community/index.html">Community</a>
-                    <a class="btn btn-sm btn-light rounded-pill" href="../challenges/index.html">Challenge</a>
+                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('dashboard.index') }}">Home</a>
+                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
+                    <a class="btn btn-sm btn-primary rounded-pill text-white" href="{{ url_for('community.index') }}">Community</a>
+                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('challenges.index') }}">Challenge</a>
                 </nav>
                 <div class="d-none d-md-flex align-items-center header-actions">
                     <button type="button" class="btn btn-link text-muted p-0" aria-label="Notifications" title="Notifications">
                         <span class="material-symbols-outlined">notifications</span>
                     </button>
-                    <a href="../profile&settings/index.html" class="btn btn-link text-muted p-0" aria-label="Profile" title="Profile">
+                    <div class="dropdown">
+                      <a class="btn btn-link text-muted p-0 dropdown-toggle" href="{{ url_for('profile.index') }}" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile" title="Profile">
                         <span class="material-symbols-outlined fs-3">account_circle</span>
-                    </a>
+                      </a>
+                      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                        <li><h6 class="dropdown-header">Account</h6></li>
+                        <li><a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                          <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
+                            <button type="submit" class="dropdown-item">Log out</button>
+                          </form>
+                        </li>
+                      </ul>
+                    </div>
                 </div>
             </div>
         </header>
@@ -175,15 +187,15 @@
         </main>
         <footer class="d-md-none fixed-bottom bg-white border-top">
             <nav class="nav justify-content-around py-2">
-                <a class="nav-link d-flex flex-column align-items-center text-muted" href="../home/index.html"><span
+                <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('home.index') }}"><span
                         class="material-symbols-outlined fs-4">home</span> <small class="d-block">Home</small></a> <a
-                    class="nav-link d-flex flex-column align-items-center text-muted" href="../study/index.html"><span
+                    class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('study.index') }}"><span
                         class="material-symbols-outlined fs-4">school</span> <small class="d-block">Study</small></a> <a
                     class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="../community/index.html"><span class="material-symbols-outlined fs-4">groups</span> <small
+                    href="{{ url_for('community.index') }}"><span class="material-symbols-outlined fs-4">groups</span> <small
                         class="d-block">Community</small></a> <a
                     class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="../challenges/index.html"><span class="material-symbols-outlined fs-4">emoji_events</span>
+                    href="{{ url_for('challenges.index') }}"><span class="material-symbols-outlined fs-4">emoji_events</span>
                     <small class="d-block">Challenge</small></a>
             </nav>
         </footer>

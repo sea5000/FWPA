@@ -1,2 +1,6 @@
 legacy_copy/
-scripts/validate_html.py
+.venv
+*/__pycache__
+__pycache__
+.env
+*.bak

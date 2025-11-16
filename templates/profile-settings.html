@@ -57,7 +57,10 @@
                     </div>
         </div>
       </header>
-    <div class="settings-container py-4">
+    <div class="settings-container py-4 position-relative">
+        <!-- Save changes button (hidden until changes are made) -->
+        <button id="saveChangesBtn" class="btn btn-primary position-absolute d-none" style="top:0.75rem; right:0.75rem; z-index:5;">Save changes</button>
+    
         <!-- Profile Section -->
         <section class="settings-section mb-4">
             <h2>Profile Information</h2>
@@ -69,10 +72,19 @@
                 <div class="profile-details">
                     <h3>{{profileData.name}} <span class="username">@{{profileData.username}}</span></h3>
                     <span class="email">{{profileData.email}}</span>
-                    <button class="btn btn-outline-primary btn-sm mt-2">
+                    <button id="editProfileBtn" class="btn btn-outline-primary btn-sm mt-2">
                         <span class="material-symbols-outlined align-middle me-1" style="font-size: 1rem;">edit</span>
                         Edit Profile
                     </button>
+
+                    <!-- Profile edit controls (hidden until edit is enabled) -->
+                    <div id="profileEditControls" class="mt-3 d-none">
+                        <input id="profileFileInput" type="file" accept="image/png, image/jpeg, image/jpg" class="d-none">
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button id="uploadProfilePicBtn" type="button" class="btn btn-outline-secondary btn-sm">Upload Profile picture</button>
+                            <button id="removeProfilePicBtn" type="button" class="btn btn-outline-danger btn-sm">Remove profile picture</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -239,6 +251,75 @@
             // Add your sign out logic here
             alert('Signing out...');
         });
+    </script>
+    <script>
+        // Profile picture edit behavior
+        (function(){
+            const editBtn = document.getElementById('editProfileBtn');
+            const controls = document.getElementById('profileEditControls');
+            const uploadBtn = document.getElementById('uploadProfilePicBtn');
+            const removeBtn = document.getElementById('removeProfilePicBtn');
+            const fileInput = document.getElementById('profileFileInput');
+            const saveBtn = document.getElementById('saveChangesBtn');
+            const profileImg = document.querySelector('.profile-picture');
+            if(!editBtn || !controls || !uploadBtn || !removeBtn || !fileInput || !saveBtn || !profileImg) return;
+
+            let originalSrc = profileImg.src;
+            let hasChanges = false;
+
+            function markChanged(){
+                hasChanges = true;
+                saveBtn.classList.remove('d-none');
+            }
+
+            // Toggle edit controls visibility
+            editBtn.addEventListener('click', function(){
+                controls.classList.toggle('d-none');
+            });
+
+            // Upload flow
+            uploadBtn.addEventListener('click', function(){
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function(e){
+                const f = e.target.files && e.target.files[0];
+                if(!f) return;
+                if(!/^image\/(png|jpe?g)$/.test(f.type)){
+                    alert('Please select a JPG or PNG image.');
+                    fileInput.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(ev){
+                    profileImg.src = ev.target.result;
+                    markChanged();
+                };
+                reader.readAsDataURL(f);
+            });
+
+            // Remove profile picture
+            removeBtn.addEventListener('click', function(){
+                // Reset to a default avatar placeholder
+                profileImg.src = 'https://ui-avatars.com/api/?name={{ profileData.name | urlencode }}&background=0D6EFD&color=fff&size=200';
+                // Clear file input so subsequent uploads work cleanly
+                fileInput.value = '';
+                markChanged();
+            });
+
+            // Save changes button behavior (client-side only)
+            saveBtn.addEventListener('click', function(){
+                // For now we only simulate save: hide button and clear changed state
+                saveBtn.classList.add('d-none');
+                hasChanges = false;
+                originalSrc = profileImg.src;
+                // Optionally show a small toast feedback
+                const toast = document.createElement('div');
+                toast.innerHTML = `<div class="position-fixed bottom-0 end-0 p-3" style="z-index:11"><div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"><div class="toast-header"><strong class="me-auto">Saved</strong><button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button></div><div class="toast-body">Profile changes saved.</div></div></div>`;
+                document.body.appendChild(toast);
+                setTimeout(()=>{ try{ document.body.removeChild(toast); }catch(e){} }, 2500);
+            });
+        })();
     </script>
     </div>
   </div>

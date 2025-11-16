@@ -28,11 +28,6 @@ def community_page():
     notes = list(db.notes.find({}, {'_id': 0}))
     return render_template('community.html', notes=notes)
 
-@community_bp.route('/api/notes', methods=['POST'])
-def upload_note():
-    data = request.get_json()
-    db.notes.insert_one(data)
-    return jsonify({'message': 'Note uploaded successfully'}), 201
 
 @community_bp.route('/api/notes/<title>', methods=['GET'])
 def view_note(title):                                               #Returns full content of that note
@@ -64,3 +59,4 @@ def upload_note():                 #Uploads a new note to the community
     data['views'] = 0
     db.notes.insert_one(data)
     return jsonify({'message': 'Note uploaded successfully'}), 201
+

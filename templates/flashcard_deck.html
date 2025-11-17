@@ -72,19 +72,23 @@
         <div class="row">
           <div class="col">
             <!-- col-12 col-lg-8 -->
-            <h2 class="h2 fw-bold">Flashcard Decks</h2>
-            <t class="text-muted mt-1">Browse, create, and explore your flashcard decks.</t>
+            <h2 class="h2 fw-bold">{{deck.name}}</h2>
+            <t class="text-muted mt-1">{{deck.summary}}</t>
           </div>
           <div class="col text-center align-content-center">
             <div class="d-flex justify-content-center justify-content-md-end gap-2">
-              <a href="#" class="btn btn-primary btn-sm rounded-pill d-inline-flex align-items-center gap-2">
-                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">add_box</span>
-                <span class="fw-semibold">New Deck</span>
+              <a href="{{ url_for('flashcards.index', deck_id = deck_id) }}" class="btn btn-outline-warning btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">Arrow_back</span>
+                <span class="fw-semibold">Back to Decks</span>
               </a>
-              <a href="{{ url_for('progress.index') }}"
-                class="btn btn-info btn-sm rounded-pill d-inline-flex align-items-center gap-2">
-                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">elevation</span>
-                <span>Progress</span>
+              <a href="{{ url_for('flashcards.edit', deck_id = deck_id) }}" class="btn btn-success btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">edit</span>
+                <span class="fw-semibold">Edit</span>
+              </a>
+              <a href=""
+                class="btn btn-outline-danger btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">delete</span>
+                <span>Delete</span>
               </a>
             </div>
           </div>
@@ -95,21 +99,36 @@
               <hr class="">
               <!-- Header row for list/table labels (visible on medium+ screens) -->
               <div class="row fw-bold border-bottom py-2 d-none d-md-flex text-center">
-                <div class="col">Deck Name</div>
-                <div class="col">Cards</div>
-                <div class="col">Actions</div>
+                <div class="col">Card</div>
+                <div class="col">Front</div>
+                <div class="col">Back</div>
               </div>
               <div class="list-group list-group-flush">
-                {% for deck in decks%}
+                {% for cardn in deck.cards%}
+                {%if deck.cards[cardn].lenFront() >20%}
+                  {%set f = deck.cards[cardn].front[0:20] + '...'%}
+                {%endif%}
+                {%if deck.cards[cardn].lenBack() >20%}
+                  {%set b = deck.cards[cardn].back[0:20] + '...'%}
+                {%endif%}
                 <div class="list-group-item py-3">
-                  <div class="row align-items-center text-center">
+                  <div class="row align-items-center text-center" href="#">
                     <div class="col">
-                      <a class="text-primary d-inline-block" href="{{ url_for('flashcards.deck',deck_id = deck.id) }}">{{deck.name}}</a>
+                      {{cardn}}
                     </div>
-                    <div class="col-2">{{deck.len}}</div>
                     <div class="col">
-                      <a href="{{ url_for('flashcards.stats',deck_id = deck.id) }}" class="btn btn-sm btn-primary text-white me-2">Stats</a>
-                      <a href="{{ url_for('flashcards.edit',deck_id = deck.id) }}" class="btn btn-sm btn-secondary text-white">Edit</a>
+                      {%if f%}
+                      {{f}}
+                      {%else%}
+                      {{deck.cards[cardn].front}}
+                      {%endif%}
+                    </div>
+                    <div class="col">
+                      {%if b%}
+                      {{b}}
+                      {%else%}
+                      {{deck.cards[cardn].back}}
+                      {%endif%}
                     </div>
                   </div>
                 </div>
@@ -127,9 +146,9 @@
                   </div>
                 </div>
               </div> -->
+              </div>
             </div>
           </div>
-        </div>
     </main>
     <footer class="d-md-none fixed-bottom bg-white border-top">
       <nav class="nav justify-content-around py-2">

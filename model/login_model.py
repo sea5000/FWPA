@@ -9,7 +9,7 @@ USERS = [{
         'password': 'admin123',
         'name': 'Admin',
         'email': 'admin@example.com',
-        'studyData': {'streak': 50000, 'lastLogin': '2024-06-01', 'decks': [1,2] }
+        'studyData': {'streak': 50000, 'lastLogin': '2024-06-01', 'decks': ["1","2"] }
     },
     {
         'id': 2,
@@ -17,7 +17,7 @@ USERS = [{
         'password': 'student123',
         'name': 'Student',
         'email': 'student@example.com',
-        'studyData': {'streak': 2, 'lastLogin': '2024-06-01', 'decks': [2] }
+        'studyData': {'streak': 2, 'lastLogin': '2024-06-01', 'decks': ["2"] }
     },
     {
         'id': 3,
@@ -25,7 +25,7 @@ USERS = [{
         'password': 'teacher123',
         'name': 'Teacher',
         'email': 'teacher@example.com',
-        'studyData': {'streak': 400, 'lastLogin': '2024-06-01', 'decks': [1] }
+        'studyData': {'streak': 400, 'lastLogin': '2024-06-01', 'decks': ["1"] }
     }
 ]
 

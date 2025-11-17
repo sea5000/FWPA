@@ -27,7 +27,7 @@
             <div class="me-2" style="width:40px;height:40px;color:var(--bs-primary);">
               <span class="material-symbols-outlined fs-3 text-primary">book</span>
             </div>
-            <h1 class="h5 mb-0 ms-2">Bookme</h1>
+            <h1 class="h5 mb-0 ms-2"><a href="{{ url_for('dashboard.index') }}" class="text-decoration-none text-reset">BookMe</a></h1>
           </div>
           <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
             <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('home.index') }}">Home</a>
@@ -57,22 +57,34 @@
                     </div>
         </div>
       </header>
-    <div class="settings-container py-4">
+    <div class="settings-container py-4 position-relative">
+        <!-- Save changes button (hidden until changes are made) -->
+        <button id="saveChangesBtn" class="btn btn-primary position-absolute d-none" style="top:0.75rem; right:0.75rem; z-index:5;">Save changes</button>
+    
         <!-- Profile Section -->
         <section class="settings-section mb-4">
             <h2>Profile Information</h2>
             <div class="profile-info">
                 <div class="profile-picture-container">
-                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=0D6EFD&color=fff&size=200" alt="Profile Picture" class="profile-picture">
+                    <img src="{% if profileData.profile_pic %}{{ profileData.profile_pic }}{% else %}https://ui-avatars.com/api/?name={{ profileData.name|urlencode }}&background=0D6EFD&color=fff&size=200{% endif %}" alt="Profile Picture" class="profile-picture">
                     <span class="status-indicator online"></span>
                 </div>
                 <div class="profile-details">
                     <h3>{{profileData.name}} <span class="username">@{{profileData.username}}</span></h3>
                     <span class="email">{{profileData.email}}</span>
-                    <button class="btn btn-outline-primary btn-sm mt-2">
+                    <button id="editProfileBtn" class="btn btn-outline-primary btn-sm mt-2">
                         <span class="material-symbols-outlined align-middle me-1" style="font-size: 1rem;">edit</span>
                         Edit Profile
                     </button>
+
+                    <!-- Profile edit controls (hidden until edit is enabled) -->
+                    <div id="profileEditControls" class="mt-3 d-none">
+                        <input id="profileFileInput" type="file" accept="image/png, image/jpeg, image/jpg" class="d-none">
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button id="uploadProfilePicBtn" type="button" class="btn btn-outline-secondary btn-sm">Upload Profile picture</button>
+                            <button id="removeProfilePicBtn" type="button" class="btn btn-outline-danger btn-sm">Remove profile picture</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -143,9 +155,6 @@
                 <h2>Danger Zone</h2>
                 <p class="text-muted mb-4">These actions are irreversible. Please proceed with caution.</p>
                 <div class="danger-actions">
-                    <button class="btn btn-outline-danger" id="signOutBtn">
-                        <span class="material-symbols-outlined align-middle me-1">logout</span> Sign Out
-                    </button>
                     <button class="btn btn-danger" id="deleteAccountBtn">
                         <span class="material-symbols-outlined align-middle me-1">delete_forever</span> Delete Account
                     </button>
@@ -242,6 +251,111 @@
             // Add your sign out logic here
             alert('Signing out...');
         });
+    </script>
+    <script>
+        // Profile picture edit behavior
+        (function(){
+            const editBtn = document.getElementById('editProfileBtn');
+            const controls = document.getElementById('profileEditControls');
+            const uploadBtn = document.getElementById('uploadProfilePicBtn');
+            const removeBtn = document.getElementById('removeProfilePicBtn');
+            const fileInput = document.getElementById('profileFileInput');
+            const saveBtn = document.getElementById('saveChangesBtn');
+            const profileImg = document.querySelector('.profile-picture');
+            if(!editBtn || !controls || !uploadBtn || !removeBtn || !fileInput || !saveBtn || !profileImg) return;
+
+            let originalSrc = profileImg.src;
+            let hasChanges = false;
+            let wasRemoved = false;
+
+            function markChanged(){
+                hasChanges = true;
+                saveBtn.classList.remove('d-none');
+            }
+
+            // Toggle edit controls visibility
+            editBtn.addEventListener('click', function(){
+                controls.classList.toggle('d-none');
+            });
+
+            // Upload flow
+            uploadBtn.addEventListener('click', function(){
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function(e){
+                const f = e.target.files && e.target.files[0];
+                if(!f) return;
+                if(!/^image\/(png|jpe?g)$/.test(f.type)){
+                    alert('Please select a JPG or PNG image.');
+                    fileInput.value = '';
+                    return;
+                }
+                wasRemoved = false;
+                const reader = new FileReader();
+                reader.onload = function(ev){
+                    profileImg.src = ev.target.result;
+                    markChanged();
+                };
+                reader.readAsDataURL(f);
+            });
+
+            // Remove profile picture
+            removeBtn.addEventListener('click', function(){
+                // Reset to a default avatar placeholder
+                profileImg.src = 'https://ui-avatars.com/api/?name={{ profileData.name | urlencode }}&background=0D6EFD&color=fff&size=200';
+                // Clear file input so subsequent uploads work cleanly
+                fileInput.value = '';
+                wasRemoved = true;
+                markChanged();
+            });
+
+            // Save changes button behavior (sends to server)
+            saveBtn.addEventListener('click', async function(){
+                saveBtn.disabled = true;
+                const form = new FormData();
+                const f = fileInput.files && fileInput.files[0];
+                if(wasRemoved && !f){
+                    form.append('remove','1');
+                } else if(f){
+                    form.append('avatar', f);
+                } else {
+                    // nothing to save
+                    saveBtn.classList.add('d-none');
+                    saveBtn.disabled = false;
+                    return;
+                }
+
+                try{
+                    const resp = await fetch("{{ url_for('profile.upload_avatar') }}", {
+                        method: 'POST',
+                        body: form,
+                        credentials: 'same-origin'
+                    });
+                    const data = await resp.json();
+                    if(resp.ok && data.success){
+                        if(data.profile_pic){
+                            profileImg.src = data.profile_pic;
+                        }
+                        saveBtn.classList.add('d-none');
+                        wasRemoved = false;
+                        fileInput.value = '';
+                        // toast
+                        const toast = document.createElement('div');
+                        toast.innerHTML = `<div class="position-fixed bottom-0 end-0 p-3" style="z-index:11"><div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"><div class="toast-header"><strong class="me-auto">Saved</strong><button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button></div><div class="toast-body">Profile changes saved.</div></div></div>`;
+                        document.body.appendChild(toast);
+                        setTimeout(()=>{ try{ document.body.removeChild(toast); }catch(e){} }, 2500);
+                    } else {
+                        alert(data.error || 'Upload failed');
+                    }
+                } catch(err){
+                    console.error(err);
+                    alert('Upload failed');
+                } finally{
+                    saveBtn.disabled = false;
+                }
+            });
+        })();
     </script>
     </div>
   </div>

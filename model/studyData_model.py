@@ -3,6 +3,7 @@ from datetime import datetime
 from pymongo import MongoClient
 import os
 from typing import Optional, Dict
+from datetime import datetime as dt
 
 # MongoDB setup (configurable via MONGO_URI env)
 MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017')
@@ -10,14 +11,20 @@ _client = MongoClient(MONGO_URI)
 _db = _client.get_database('mydatabase')
 _users_col = _db.get_collection('users')
 _decks_col = _db.get_collection('decks')
+# ensure a unique index on username where possible (best-effort)
+try:
+    _users_col.create_index('username', unique=True)
+except Exception:
+    # don't fail import if index creation is not allowed / DB not available
+    pass
 """
 Login model with hardcoded user data for teaching purposes.
 No database connection required.
 """
-client = MongoClient("mongodb://localhost:27017")
+# client = MongoClient("mongodb://localhost:27017")
 
-db = client["mydatabase"]
-cards = db["cards"]
+# db = client["mydatabase"]
+# cards = db["cards"]
 
 def _make_card_dict(cid, front, back, tags=None, correct_count=0, incorrect_count=0, last_reviewed=None, ease=2.5, interval=0, repetitions=0):
     """Create a plain dict representing a card (no classes)."""
@@ -146,7 +153,7 @@ def get_deck(deck_id):
     """
     # Alias to get_deck_by_id which already handles DECKS list
     return get_deck_by_id(deck_id)
-
+ 
 
 def update_card(deck_id, card_id, front, back):
     """Update an existing card's front/back in the in-memory deck.

@@ -9,12 +9,56 @@ document is missing, behavior falls back to the (possibly-empty) in-memory
 from pymongo import MongoClient
 from typing import Optional, Dict, List
 import os
+from datetime import datetime as dt
 
 # connect lazily/configurable via env var
 MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017')
 _client = MongoClient(MONGO_URI)
 _db = _client.get_database('mydatabase')
 _users_col = _db.get_collection('users')
+
+# ensure a unique index on username where possible (best-effort)
+try:
+    _users_col.create_index('username', unique=True)
+except Exception:
+    pass
+
+
+def create_user(username: str, email: str, password: str, name: str) -> bool:
+    """Create a new user in the users collection.
+
+    Returns True on success, False on failure (duplicate username, DB error, or invalid input).
+    Note: password is stored as provided (no hashing yet).
+    """
+    if not username:
+        return False
+
+    try:
+        existing = _users_col.find_one({'username': username})
+    except Exception as e:
+        print(f"create_user (login_model): error checking existing user: {e}")
+        return False
+
+    if existing:
+        return False
+
+    try:
+        nid = str(_users_col.estimated_document_count() + 1)
+        user_doc = {
+            'id': nid,
+            'username': username,
+            'password': password,
+            'name': name,
+            'email': email,
+            # store ISO string for timestamps to avoid datetime/tz handling issues
+            'studyData': {'streak': 0, 'lastLogin': dt.utcnow().isoformat(), 'decks': []}
+        }
+        res = _users_col.insert_one(user_doc)
+        print(f"create_user (login_model): inserted user with id {nid}")
+        return bool(getattr(res, 'inserted_id', None))
+    except Exception as e:
+        print(f"create_user (login_model): error inserting user: {e}")
+        return False
 
 
 def _doc_to_user(doc: Dict) -> Dict:

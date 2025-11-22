@@ -59,6 +59,8 @@ USERS = [{
 
 # Insert a document
 #users.insert_one({"name": "Alice", "age": 30})
+users.delete_many({})
+cards.delete_many({})
 users.insert_many(USERS)
 cards.insert_many(DecksJson)
 print("Database and collections created, sample data inserted.")

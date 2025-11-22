@@ -1,86 +1,88 @@
 """
-Login model with hardcoded user data for teaching purposes.
-No database connection required.
+Login model backed by MongoDB (with a small in-memory fallback).
+
+Functions here will attempt to read from the `users` collection in the
+`mydatabase` MongoDB instance on localhost. If the DB call fails or the
+document is missing, behavior falls back to the (possibly-empty) in-memory
+`USERS` if present.
 """
-# Hardcoded users list
-USERS = [{
-        'id': 1,
-        'username': 'admin',
-        'password': 'admin123',
-        'name': 'Admin',
-        'email': 'admin@example.com',
-        'studyData': {'streak': 50000, 'lastLogin': '2024-06-01', 'decks': ["1","2"] }
-    },
-    {
-        'id': 2,
-        'username': 'student',
-        'password': 'student123',
-        'name': 'Student',
-        'email': 'student@example.com',
-        'studyData': {'streak': 2, 'lastLogin': '2024-06-01', 'decks': ["2"] }
-    },
-    {
-        'id': 3,
-        'username': 'teacher',
-        'password': 'teacher123',
-        'name': 'Teacher',
-        'email': 'teacher@example.com',
-        'studyData': {'streak': 400, 'lastLogin': '2024-06-01', 'decks': ["1"] }
+from pymongo import MongoClient
+from typing import Optional, Dict, List
+import os
+
+# connect lazily/configurable via env var
+MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017')
+_client = MongoClient(MONGO_URI)
+_db = _client.get_database('mydatabase')
+_users_col = _db.get_collection('users')
+
+
+def _doc_to_user(doc: Dict) -> Dict:
+    if not doc:
+        return None
+    # normalize document to expected user dict shape
+    return {
+        'id': doc.get('id') or str(doc.get('_id')),
+        'username': doc.get('username'),
+        'email': doc.get('email'),
+        # include password only for internal checks; callers should trim it
+        'password': doc.get('password')
     }
-]
 
 
-def get_user_by_username(username):
-    """
-    Retrieve a user by username from the hardcoded list.
-    
-    Args:
-        username (str): The username to search for
-        
-    Returns:
-        dict: User dictionary if found, None otherwise
-    """
-    for user in USERS:
-        if user['username'] == username:
-            return user
+def get_user_by_username(username: str) -> Optional[Dict]:
+    """Return a user document by username, or None if not found."""
+    if not username:
+        return None
+    doc = _users_col.find_one({'username': username})
+    if doc:
+        return _doc_to_user(doc)
+
+    # fallback: if an in-memory USERS exists, try it
+    try:
+        from .login_model import USERS as _USERS  # type: ignore
+        for u in _USERS:
+            if u.get('username') == username:
+                return {
+                    'id': u.get('id'),
+                    'username': u.get('username'),
+                    'email': u.get('email'),
+                    'password': u.get('password')
+                }
+    except Exception:
+        pass
+
     return None
 
 
-def verify_user(username, password):
-    """
-    Verify if the username and password match a user in the list.
-    
-    Args:
-        username (str): The username to verify
-        password (str): The password to verify
-        
-    Returns:
-        dict: User dictionary if credentials are correct, None otherwise
+def verify_user(username: str, password: str) -> Optional[Dict]:
+    """Verify credentials against the users collection.
+
+    Returns a small user dict (no password) on success, or None.
     """
     user = get_user_by_username(username)
-    if user and user['password'] == password:
-        # Return user without password for security
-        return {
-            'id': user['id'],
-            'username': user['username'],
-            'email': user['email']
-        }
+    if user and user.get('password') == password:
+        return {'id': user['id'], 'username': user['username'], 'email': user.get('email')}
     return None
 
 
-def get_all_users():
+def get_all_users() -> List[Dict]:
+    """Return a list of users (including password field) for admin/debug uses.
+
+    Note: callers should avoid exposing passwords in production.
     """
-    Get all users (without passwords) from the hardcoded list.
-    
-    Returns:
-        list: List of user dictionaries without passwords
-    """
-    return [
-        {
-            'id': user['id'],
-            'username': user['username'],
-            'email': user['email'],
-            'password': user['password']
-        }
-        for user in USERS
-    ]
+    docs = list(_users_col.find({}, {'_id': 0}))
+    out = []
+    for d in docs:
+        out.append(_doc_to_user(d))
+
+    # fallback to in-memory list if DB empty
+    if not out:
+        try:
+            from .login_model import USERS as _USERS  # type: ignore
+            for u in _USERS:
+                out.append({'id': u.get('id'), 'username': u.get('username'), 'email': u.get('email'), 'password': u.get('password')})
+        except Exception:
+            pass
+
+    return out

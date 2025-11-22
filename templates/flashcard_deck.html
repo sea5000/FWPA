@@ -104,32 +104,23 @@
                 <div class="col">Back</div>
               </div>
               <div class="list-group list-group-flush">
-                {% for cardn in deck.cards%}
-                {%if deck.cards[cardn].lenFront() >20%}
-                  {%set f = deck.cards[cardn].front[0:20] + '...'%}
-                {%endif%}
-                {%if deck.cards[cardn].lenBack() >20%}
-                  {%set b = deck.cards[cardn].back[0:20] + '...'%}
-                {%endif%}
+                {% for cardn in deck.cards %}
+                {% set card = deck.cards[cardn] %}
+                {% if card.front is defined and card.front|length > 20 %}
+                  {% set f = card.front[0:20] ~ '...' %}
+                {% else %}
+                  {% set f = None %}
+                {% endif %}
+                {% if card.back is defined and card.back|length > 20 %}
+                  {% set b = card.back[0:20] ~ '...' %}
+                {% else %}
+                  {% set b = None %}
+                {% endif %}
                 <div class="list-group-item py-3">
-                  <div class="row align-items-center text-center" href="#">
-                    <div class="col">
-                      {{cardn}}
-                    </div>
-                    <div class="col">
-                      {%if f%}
-                      {{f}}
-                      {%else%}
-                      {{deck.cards[cardn].front}}
-                      {%endif%}
-                    </div>
-                    <div class="col">
-                      {%if b%}
-                      {{b}}
-                      {%else%}
-                      {{deck.cards[cardn].back}}
-                      {%endif%}
-                    </div>
+                  <div class="row align-items-center text-center">
+                    <div class="col">{{ cardn }}</div>
+                    <div class="col">{{ f or card.front }}</div>
+                    <div class="col">{{ b or card.back }}</div>
                   </div>
                 </div>
                 {% endfor %}

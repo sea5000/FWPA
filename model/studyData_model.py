@@ -1,188 +1,61 @@
-from .login_model import USERS, get_user_by_username
+from .login_model import get_user_by_username
 from datetime import datetime
+from pymongo import MongoClient
+import os
+from typing import Optional, Dict
+
+# MongoDB setup (configurable via MONGO_URI env)
+MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017')
+_client = MongoClient(MONGO_URI)
+_db = _client.get_database('mydatabase')
+_users_col = _db.get_collection('users')
+_decks_col = _db.get_collection('decks')
 """
 Login model with hardcoded user data for teaching purposes.
 No database connection required.
 """
-DecksJson = {
-    "1": {
-        'id': "1",
-        'name': 'Spanish Basics',
-        'summary': 'Spanish flashcard deck.',
-        'len': '150',
-        'cards': {
-            1: ('Hola', 'Hello'),
-            2: ('Adiós', 'Goodbye'),
-            3: ('Gracias', 'Thank you'),
-        },
-    },
-    "2": {
-        'id': "2",
-        'name': 'French Basics',
-        'summary': 'French flashcard deck.',
-        'len': '200',
-        'cards': {
-            1: ('Bonjour', 'Hello'),
-            2: ('Au revoir', 'Goodbye'),
-            3: ('Merci', 'Thank you'),
-        },
-    },
-}
+client = MongoClient("mongodb://localhost:27017")
 
-class Card():
-    """
-    Representation of a single flashcard in a deck.
-    Designed to interoperate with the DECKS data structure where cards are stored
-    as {index: (front, back)} tuples.
+db = client["mydatabase"]
+cards = db["cards"]
 
-    Attributes:
-        id (int): Numeric index of the card within a deck.
-        front (str): Text on the front of the card (question/term).
-        back (str): Text on the back of the card (answer/definition).
-        tags (list): Optional list of tags/categories for the card.
-        correct_count (int): Times answered correctly.
-        incorrect_count (int): Times answered incorrectly.
-        last_reviewed (datetime|None): Last review timestamp.
-        ease (float): Ease factor used by a simple spaced-repetition algorithm.
-        interval (int): Current interval in days until next review.
-        repetitions (int): Consecutive correct repetitions.
-    """
-    def __init__(self, id:int, front:str, back:str, tags=None,
-                 correct_count:int=0, incorrect_count:int=0,
-                 last_reviewed:datetime=None, ease:float=2.5,
-                 interval:int=0, repetitions:int=0):
-        self.id = int(id)
-        self.front = front
-        self.back = back
-        self.tags = list(tags) if tags else []
-        self.correct_count = int(correct_count)
-        self.incorrect_count = int(incorrect_count)
-        self.last_reviewed = last_reviewed
-        self.ease = float(ease)
-        self.interval = int(interval)
-        self.repetitions = int(repetitions)
+def _make_card_dict(cid, front, back, tags=None, correct_count=0, incorrect_count=0, last_reviewed=None, ease=2.5, interval=0, repetitions=0):
+    """Create a plain dict representing a card (no classes)."""
+    return {
+        'id': str(cid),
+        'front': front,
+        'back': back,
+        'tags': list(tags) if tags else [],
+        'correct_count': int(correct_count),
+        'incorrect_count': int(incorrect_count),
+        'last_reviewed': last_reviewed.isoformat() if last_reviewed else None,
+        'ease': float(ease),
+        'interval': int(interval),
+        'repetitions': int(repetitions),
+    }
 
-    @classmethod
-    def from_tuple(cls, id, tpl):
-        """
-        Create a Cards instance from a tuple like (front, back),
-        which matches the DECKS card storage format.
-        """
-        front, back = tpl
-        return cls(id=id, front=front, back=back)
 
-    def to_tuple(self):
-        """Return (front, back) tuple compatible with DECKS storage."""
-        return (self.front, self.back)
-
-    def __getitem__(self, index):
-        """Allow tuple-like access: card[0] -> front, card[1] -> back.
-
-        This keeps Jinja templates that index into card tuples working when
-        cards are Card instances.
-        """
-        if index == 0:
-            return self.front
-        if index == 1:
-            return self.back
-        raise IndexError('Card index out of range')
-
-    def to_dict(self):
-        """Serialize card to a plain dict for JSON/storage."""
-        return {
-            "id": self.id,
-            "front": self.front,
-            "back": self.back,
-            "tags": self.tags,
-            "correct_count": self.correct_count,
-            "incorrect_count": self.incorrect_count,
-            "last_reviewed": self.last_reviewed.isoformat() if self.last_reviewed else None,
-            "ease": self.ease,
-            "interval": self.interval,
-            "repetitions": self.repetitions,
-        }
-    def lenBack(self):
-        """Return Length of the back card"""
-        return len(self.back)
-    def lenFront(self):
-        """Return Length of the back card"""
-        return len(self.back)
-
-    def review(self, correct:bool, reviewed_at:datetime=None):
-        """
-        Update review stats using a simple SM-2-like heuristic.
-        correct: whether the user answered correctly.
-        """
-        now = reviewed_at or datetime.utcnow()
-        self.last_reviewed = now
-
-        if correct:
-            self.correct_count += 1
-            self.repetitions += 1
-            # adjust ease slightly upward on success
-            self.ease = max(1.3, self.ease + 0.1)
-            if self.repetitions == 1:
-                self.interval = 1
-            elif self.repetitions == 2:
-                self.interval = 6
-            else:
-                # multiply previous interval by ease and round
-                self.interval = max(1, int(round(self.interval * self.ease)))
-        else:
-            self.incorrect_count += 1
-            self.repetitions = 0
-            # penalize ease on failure
-            self.ease = max(1.3, self.ease - 0.2)
-            self.interval = 1
-
-        return {
-            "id": self.id,
-            "next_interval_days": self.interval,
-            "ease": self.ease,
-            "repetitions": self.repetitions,
-            "last_reviewed": self.last_reviewed,
-        }
-
-class Deck():
-    def __init__(self, id:str, name:str, summary:str, length:str, cards):
-        self.id = id
-        self.name = name
-        self.summary = summary
-        # keep both attribute names for compatibility with existing templates
-        # which reference `deck.len` and the newer code using `deck.length`.
-        self.length = length
-        self.len = length
-        self.cards = cards
-
-    def to_dict(self):
-        """Return a plain-dict representation of the deck (cards as tuples).
-
-        Useful for templates or APIs expecting simple serializable structures.
-        """
-        return {
-            'id': self.id,
-            'name': self.name,
-            'summary': self.summary,
-            'len': self.len,
-            'cards': {cid: card.to_tuple() for cid, card in self.cards.items()}
-        }
+def _make_deck_dict(did, name, summary, cards_map):
+    """Create a plain dict representing a deck; cards_map values should be card dicts."""
+    return {
+        'id': str(did),
+        'name': name,
+        'summary': summary,
+        'len': str(len(cards_map)),
+        'cards': cards_map,
+    }
 
 def DeckImportJSON(json):
     decks = []
     for deck_id, deck_data in json.items():
         cardsFromJson = {}
-        for card_id, card_tuple in deck_data['cards'].items():  
-            cardsFromJson[card_id] = Card.from_tuple(card_id, card_tuple)
-        deck = Deck(
-            id=deck_data['id'],
-            name=deck_data['name'],
-            summary=deck_data['summary'],
-            length=deck_data['len'],
-            cards=cardsFromJson
-        )
+        for card_id, card_tuple in deck_data['cards'].items():
+            front, back = card_tuple
+            cardsFromJson[card_id] = _make_card_dict(card_id, front, back)
+        deck = _make_deck_dict(deck_data['id'], deck_data['name'], deck_data.get('summary',''), cardsFromJson)
         decks.append(deck)
     return decks
-DECKS = DeckImportJSON(DecksJson)
+DECKS = DeckImportJSON({})
 
 
 def get_deck_by_id(deck_id):
@@ -191,15 +64,32 @@ def get_deck_by_id(deck_id):
     
     Args:
         deck_id (int): The ID of the deck to retrieve"""
-    # DECKS is a list of Deck instances. Match by id (string or int accepted).
+    # Try to read from MongoDB first
     if deck_id is None:
         return None
+
+    # normalize id to string for storage keys
+    sid = str(deck_id)
+    doc = _decks_col.find_one({'id': sid})
+    if doc:
+        # convert doc -> deck dict
+        cards = {}
+        for cid, cdoc in (doc.get('cards') or {}).items():
+            try:
+                last = cdoc.get('last_reviewed')
+                last_dt = datetime.fromisoformat(last) if last else None
+            except Exception:
+                last_dt = None
+            cards[int(cid) if str(cid).isdigit() else cid] = _make_card_dict(cid, cdoc.get('front'), cdoc.get('back'), tags=cdoc.get('tags', []), correct_count=cdoc.get('correct_count', 0), incorrect_count=cdoc.get('incorrect_count', 0), last_reviewed=last_dt, ease=cdoc.get('ease',2.5), interval=cdoc.get('interval',0), repetitions=cdoc.get('repetitions',0))
+        deck = _make_deck_dict(doc.get('id'), doc.get('name'), doc.get('summary',''), cards)
+        return deck
+
+    # fallback to in-memory DECKS list
     for deck in DECKS:
         try:
-            if str(deck.id) == str(deck_id):
+            if str(deck.id) == sid:
                 return deck
         except AttributeError:
-            # in case an unexpected structure is present, skip
             continue
     return None
 
@@ -209,6 +99,14 @@ def get_user_study_data(username):
     
     Args:
         username (str): The username of the user"""
+    # prefer DB-backed users
+    if not username:
+        return None
+    doc = _users_col.find_one({'username': username})
+    if doc and 'studyData' in doc:
+        return doc.get('studyData')
+
+    # fallback to in-memory user
     user = get_user_by_username(username)
     if user and 'studyData' in user:
         return user['studyData']
@@ -224,16 +122,15 @@ def get_user_decks(username):
     Returns:
         list: List of deck dictionaries associated with the user
     """
-    user = get_user_by_username(username)
-    if not user or 'studyData' not in user:
+    study = get_user_study_data(username)
+    if not study:
         return []
 
-    deck_ids = user['studyData'].get('decks', [])
+    deck_ids = study.get('decks', [])
     decks = []
     for deck_id in deck_ids:
         deck = get_deck_by_id(deck_id)
         if deck:
-            # return the Deck instance directly; callers can access deck.cards
             decks.append(deck)
     return decks
 
@@ -265,6 +162,23 @@ def update_card(deck_id, card_id, front, back):
     except Exception:
         key = card_id
 
+    # try to persist to MongoDB if deck exists there
+    sid = str(deck_id)
+    doc = _decks_col.find_one({'id': sid})
+    if doc:
+        # update card subdocument
+        card_key = str(card_id)
+        update_doc = {
+            f'cards.{card_key}.front': front,
+            f'cards.{card_key}.back': back,
+        }
+        _decks_col.update_one({'id': sid}, {'$set': update_doc})
+        # also update in-memory Deck instance
+        if key in deck.cards:
+            deck.cards[key].front = front
+            deck.cards[key].back = back
+        return True
+
     if key in deck.cards:
         card = deck.cards[key]
         card.front = front
@@ -272,13 +186,29 @@ def update_card(deck_id, card_id, front, back):
         return True
 
     # if card not present, create it
-    try:
-        new_card = Card.from_tuple(key, (front, back))
-    except Exception:
-        new_card = Card(id=key, front=front, back=back)
+    # create a card dict
+    new_card = _make_card_dict(key, front, back)
     deck.cards[key] = new_card
     deck.len = str(len(deck.cards))
     deck.length = deck.len
+
+    # persist to DB if deck document exists
+    sid = str(deck_id)
+    doc = _decks_col.find_one({'id': sid})
+    if doc:
+        # prepare card doc
+        cdoc = {
+            'front': new_card.front,
+            'back': new_card.back,
+            'tags': new_card.tags,
+            'correct_count': new_card.correct_count,
+            'incorrect_count': new_card.incorrect_count,
+            'last_reviewed': new_card.last_reviewed.isoformat() if new_card.last_reviewed else None,
+            'ease': new_card.ease,
+            'interval': new_card.interval,
+            'repetitions': new_card.repetitions,
+        }
+        _decks_col.update_one({'id': sid}, {'$set': {f'cards.{str(key)}': cdoc, 'len': str(len(deck.cards))}})
     return True
 
 
@@ -306,10 +236,28 @@ def add_card(deck_id, front, back):
         # fallback to length+1 as string
         next_id = str(len(keys) + 1)
 
-    new_card = Card(id=next_id, front=front, back=back)
+    new_card = _make_card_dict(next_id, front, back)
     deck.cards[next_id] = new_card
     deck.len = str(len(deck.cards))
     deck.length = deck.len
+
+    # persist to DB if deck document exists
+    sid = str(deck_id)
+    doc = _decks_col.find_one({'id': sid})
+    if doc:
+        cdoc = {
+            'front': new_card.front,
+            'back': new_card.back,
+            'tags': new_card.tags,
+            'correct_count': new_card.correct_count,
+            'incorrect_count': new_card.incorrect_count,
+            'last_reviewed': new_card.last_reviewed.isoformat() if new_card.last_reviewed else None,
+            'ease': new_card.ease,
+            'interval': new_card.interval,
+            'repetitions': new_card.repetitions,
+        }
+        _decks_col.update_one({'id': sid}, {'$set': {f'cards.{str(next_id)}': cdoc, 'len': str(len(deck.cards))}})
+
     return new_card
 
 
@@ -331,6 +279,13 @@ def delete_card(deck_id, card_id):
         # update length fields
         deck.len = str(len(deck.cards))
         deck.length = deck.len
+
+        # persist deletion to DB if present
+        sid = str(deck_id)
+        doc = _decks_col.find_one({'id': sid})
+        if doc:
+            _decks_col.update_one({'id': sid}, {'$unset': {f'cards.{str(key)}': 1}, '$set': {'len': str(len(deck.cards))}})
+
         return True
 
     return False

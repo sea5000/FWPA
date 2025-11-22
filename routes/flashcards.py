@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, g, request, abort, redirect, url_f
 from utils.auth import get_current_user_from_token
 from model.login_model import get_all_users
 from model.studyData_model import get_user_decks, get_user_study_data, get_deck, update_card, add_card, delete_card
+from flask import jsonify
 
 
 flashcards_bp = Blueprint('flashcards', __name__)
@@ -61,4 +62,48 @@ def flashcards_edit(deck_id):
 
     # TODO: implement POST handling to update/add/delete cards
     return render_template('flashcard_edit.html', username=g.current_user, users=get_all_users(), deck=deck_obj, deck_id=deck_id)
+
+@flashcards_bp.route('/<deck_id>/study', endpoint='study')
+def flashcards_study(deck_id):
+    #deck_id = request.args.get('deck_id')
+    print(deck_id)
+    if not deck_id:
+        abort(400)
+    return render_template('flashcard_study.html', username=g.current_user, users=get_all_users(), deck=get_deck(deck_id), deck_id=deck_id)
+
+@flashcards_bp.route('/study/review', methods=['POST'])
+def flashcards_review():
+    """Accept review results and call Card.review on the server-side card instance.
+
+    Expects JSON or form data with: deck_id, card_id, correct (true/false or 1/0).
+    Returns JSON with the updated card review info.
+    """
+    data = request.get_json(silent=True) or request.form
+    deck_id = data.get('deck_id')
+    card_id = data.get('card_id')
+    correct = data.get('correct')
+    if deck_id is None or card_id is None or correct is None:
+        return jsonify({'ok': False, 'error': 'missing parameters'}), 400
+
+    # normalize correct
+    if isinstance(correct, str):
+        correct_val = correct.lower() in ('1', 'true', 'yes', 'on')
+    else:
+        correct_val = bool(correct)
+
+    deck = get_deck(deck_id)
+    if not deck:
+        return jsonify({'ok': False, 'error': 'deck not found'}), 404
+
+    try:
+        key = int(card_id)
+    except Exception:
+        key = card_id
+
+    if key not in deck.cards:
+        return jsonify({'ok': False, 'error': 'card not found'}), 404
+
+    card = deck.cards[key]
+    result = card.review(correct_val)
+    return jsonify({'ok': True, 'result': result})
  

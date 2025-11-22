@@ -65,12 +65,22 @@ def _doc_to_user(doc: Dict) -> Dict:
     if not doc:
         return None
     # normalize document to expected user dict shape
+    # provide safe defaults so templates don't break when DB was reinitialized
+    username = doc.get('username')
+    name = doc.get('name') or username
+    email = doc.get('email')
+    profile_pic = doc.get('profile_pic') if doc.get('profile_pic') else None
+    studyData = doc.get('studyData') or {'streak': 0, 'lastLogin': None, 'decks': []}
+
     return {
         'id': doc.get('id') or str(doc.get('_id')),
-        'username': doc.get('username'),
-        'email': doc.get('email'),
+        'username': username,
+        'name': name,
+        'email': email,
+        'profile_pic': profile_pic,
         # include password only for internal checks; callers should trim it
-        'password': doc.get('password')
+        'password': doc.get('password'),
+        'studyData': studyData,
     }
 
 
@@ -130,3 +140,14 @@ def get_all_users() -> List[Dict]:
             pass
 
     return out
+
+def delete_user_by_username(username: str) -> bool:
+    """Delete a user by username. Returns True if a user was deleted, False otherwise."""
+    if not username:
+        return False
+    try:
+        res = _users_col.delete_one({'username': username})
+        return res.deleted_count > 0
+    except Exception as e:
+        print(f"delete_user_by_username (login_model): error deleting user: {e}")
+        return False

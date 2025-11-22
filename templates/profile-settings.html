@@ -216,35 +216,98 @@
             modal.show();
         });
 
-        // Handle account deletion
-        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-            // Add your account deletion logic here
-            const toastHTML = `
-                <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-                    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                        <div class="toast-header bg-danger text-white">
-                            <strong class="me-auto">Account Deleted</strong>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-                        </div>
-                        <div class="toast-body">
-                            Your account has been successfully deleted. We're sorry to see you go!
-                        </div>
-                    </div>
-                </div>
-            `;
+        // Handle account deletion (posts to delete_user endpoint)
+        (function(){
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            const confirmCheckbox = document.getElementById('confirmDelete');
+            if(!confirmBtn) return;
+
+            confirmBtn.addEventListener('click', async function(e){
+                // Prevent any other click handlers (old handler later in file)
+                e.stopImmediatePropagation();
+
+                if(!confirmCheckbox || !confirmCheckbox.checked){
+                    return;
+                }
+
+                confirmBtn.disabled = true;
+                const originalHTML = confirmBtn.innerHTML;
+                confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Deleting...';
+
+                try{
+                    const resp = await fetch("{{ url_for('auth.delete_account', username = username) }}", {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    let data = {};
+                    try{ data = await resp.json(); }catch(err){}
+
+                    if(resp.ok && (data.success || data.deleted || resp.status === 200)){
+                        const toastHTML = `
+                            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                                    <div class="toast-header bg-danger text-white">
+                                        <strong class="me-auto">Account Deleted</strong>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                                    </div>
+                                    <div class="toast-body">
+                                        Your account has been deleted. Redirecting...
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.body.insertAdjacentHTML('beforeend', toastHTML);
+
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('deleteAccountModal'));
+                        if(modal) modal.hide();
+
+                        setTimeout(() => {
+                            window.location.href = "{{ url_for('home.index') }}";
+                        }, 2000);
+                    } else {
+                        alert(data.error || 'Failed to delete account.');
+                    }
+                } catch(err){
+                    console.error(err);
+                    alert('Failed to delete account.');
+                } finally {
+                    confirmBtn.disabled = false;
+                    confirmBtn.innerHTML = originalHTML;
+                }
+            });
+        })();
+        // document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        //     // Add your account deletion logic here
+        //     const toastHTML = `
+        //         <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        //             <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+        //                 <div class="toast-header bg-danger text-white">
+        //                     <strong class="me-auto">Account Deleted</strong>
+        //                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        //                 </div>
+        //                 <div class="toast-body">
+        //                     Your account has been successfully deleted. We're sorry to see you go!
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     `;
             
-            // Show success message
-            document.body.insertAdjacentHTML('beforeend', toastHTML);
+        //     // Show success message
+        //     document.body.insertAdjacentHTML('beforeend', toastHTML);
             
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteAccountModal'));
-            modal.hide();
+        //     // Close modal
+        //     const modal = bootstrap.Modal.getInstance(document.getElementById('deleteAccountModal'));
+        //     modal.hide();
             
-            // Redirect after a delay
-            setTimeout(() => {
-                window.location.href = "{{ url_for('home.index') }}";
-            }, 3000);
-        });
+        //     // Redirect after a delay
+        //     setTimeout(() => {
+        //         window.location.href = "{{ url_for('home.index') }}";
+        //     }, 3000);
+        // });
 
         // Handle sign out
         document.getElementById('signOutBtn').addEventListener('click', function() {

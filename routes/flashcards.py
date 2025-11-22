@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, g, request, abort, redirect, url_for
 from utils.auth import get_current_user_from_token
 from model.login_model import get_all_users
-from model.studyData_model import get_user_decks, get_user_study_data, get_deck, update_card, add_card, delete_card
+from model.studyData_model import get_user_decks, get_user_study_data, get_deck, update_card, add_card, delete_card, record_review, create_deck, add_deck_to_user
 from flask import jsonify
 
 
@@ -39,10 +39,11 @@ def flashcards_stats(deck_id):
     if not deck_obj:
         return render_template('404.html'), 404
 
-    # compute simple stats from Card objects
-    total_cards = len(deck_obj.cards)
-    total_correct = sum(getattr(c, 'correct_count', 0) for c in deck_obj.cards.values())
-    total_incorrect = sum(getattr(c, 'incorrect_count', 0) for c in deck_obj.cards.values())
+    # compute simple stats from card dicts
+    cards = deck_obj.get('cards', {}) if isinstance(deck_obj, dict) else getattr(deck_obj, 'cards', {})
+    total_cards = len(cards)
+    total_correct = sum(int(c.get('correct_count', 0)) for c in cards.values())
+    total_incorrect = sum(int(c.get('incorrect_count', 0)) for c in cards.values())
 
     stats = {
         'total_cards': total_cards,
@@ -59,8 +60,38 @@ def flashcards_edit(deck_id):
     deck_obj = get_deck_by_id(deck_id)
     if not deck_obj:
         return render_template('404.html'), 404
+    if request.method == 'POST':
+        form = request.form
+        # existing cards
+        existing_cards = list(deck_obj.get('cards', {}).keys()) if isinstance(deck_obj, dict) else list(getattr(deck_obj, 'cards', {}).keys())
+        for cardn in existing_cards:
+            card_key = str(cardn)
+            # deletion checkbox
+            if form.get(f'delete_{card_key}'):
+                delete_card(deck_id, card_key)
+                continue
 
-    # TODO: implement POST handling to update/add/delete cards
+            front = form.get(f'front_{card_key}')
+            back = form.get(f'back_{card_key}')
+            if front is None or back is None:
+                continue
+            # compare with current values
+            cur = deck_obj.get('cards', {}).get(cardn) if isinstance(deck_obj, dict) else getattr(deck_obj, 'cards', {}).get(cardn)
+            cur_front = cur.get('front') if isinstance(cur, dict) else getattr(cur, 'front', None)
+            cur_back = cur.get('back') if isinstance(cur, dict) else getattr(cur, 'back', None)
+            if front != cur_front or back != cur_back:
+                update_card(deck_id, card_key, front, back)
+
+        # new cards arrays
+        new_fronts = form.getlist('new_front[]')
+        new_backs = form.getlist('new_back[]')
+        for f, b in zip(new_fronts, new_backs):
+            if not f and not b:
+                continue
+            add_card(deck_id, f, b)
+
+        return redirect(url_for('flashcards.edit', deck_id=deck_id))
+
     return render_template('flashcard_edit.html', username=g.current_user, users=get_all_users(), deck=deck_obj, deck_id=deck_id)
 
 @flashcards_bp.route('/<deck_id>/study', endpoint='study')
@@ -95,15 +126,27 @@ def flashcards_review():
     if not deck:
         return jsonify({'ok': False, 'error': 'deck not found'}), 404
 
-    try:
-        key = int(card_id)
-    except Exception:
-        key = card_id
+    # find matching card key (cards keys may be int or str)
+    found_key = None
+    for k in deck.get('cards', {}).keys():
+        if str(k) == str(card_id):
+            found_key = str(k)
+            break
 
-    if key not in deck.cards:
+    if not found_key:
         return jsonify({'ok': False, 'error': 'card not found'}), 404
 
-    card = deck.cards[key]
-    result = card.review(correct_val)
-    return jsonify({'ok': True, 'result': result})
+    updated = record_review(deck_id, found_key, correct_val)
+    if not updated:
+        return jsonify({'ok': False, 'error': 'failed to record review'}), 500
+    return jsonify({'ok': True, 'result': updated})
  
+
+@flashcards_bp.route('/new_deck',endpoint='new_deck', methods=['get'])
+def flashcards_new_deck():
+    """Render the new deck creation page (form)."""
+    # create_deck(name, summary) -> create a new deck record and persist it
+    deck = create_deck("New Deck", "")
+    # attach the newly-created deck to the current user's studyData
+    add_deck_to_user(g.current_user, deck['id'])
+    return redirect(url_for('flashcards.edit', deck_id = deck['id']))

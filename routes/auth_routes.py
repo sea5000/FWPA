@@ -7,6 +7,7 @@ from jwt import JWT
 from jwt.jwk import OctetJWK
 from datetime import datetime, timedelta
 from model.login_model import verify_user
+from model.login_model import delete_user_by_username
 from utils.auth import JWT_SECRET_KEY, JWT_ALGORITHM
 from model.login_model import get_all_users
 
@@ -80,3 +81,13 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('auth.login'))
 
+@auth_bp.route('/delete_account', methods=['POST'])
+def delete_account():
+    """
+    Delete account route that removes the user account and redirects to signup.
+    """
+    username = session.pop('username', None)
+    session.pop('token', None)
+    if username:
+        delete_user_by_username(username)
+    return redirect(url_for('signup.index'))

@@ -32,7 +32,7 @@
           <div class="me-2" style="width:40px;height:40px;color:var(--bs-primary);">
             <span class="material-symbols-outlined fs-3 text-primary">book</span>
           </div>
-          <h1 class="h5 mb-0 ms-2"><a href="{{ url_for('dashboard.index') }}" class="text-decoration-none text-reset">Bookme</a></h1>
+          <h1 class="h5 mb-0 ms-2">Bookme</h1>
         </div>
         <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
           <a class="btn btn-sm btn-primary rounded-pill text-white" href="{{ url_for('dashboard.index') }}">Home</a>
@@ -72,19 +72,23 @@
         <div class="row">
           <div class="col">
             <!-- col-12 col-lg-8 -->
-            <h2 class="h2 fw-bold">Flashcard Decks</h2>
-            <t class="text-muted mt-1">Browse, create, and explore your flashcard decks.</t>
+            <h2 class="h2 fw-bold">{{deck.name}}</h2>
+            <t class="text-muted mt-1">{{deck.summary}}</t>
           </div>
           <div class="col text-center align-content-center">
             <div class="d-flex justify-content-center justify-content-md-end gap-2">
-              <a href="{{ url_for('flashcards.new_deck')}}" class="btn btn-primary btn-sm rounded-pill d-inline-flex align-items-center gap-2">
-                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">add_box</span>
-                <span class="fw-semibold">New Deck</span>
+              <a href="{{ url_for('flashcards.index', deck_id = deck_id) }}" class="btn btn-outline-warning btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">Arrow_back</span>
+                <span class="fw-semibold">Back to Decks</span>
               </a>
-              <a href="{{ url_for('progress.index') }}"
-                class="btn btn-info btn-sm rounded-pill d-inline-flex align-items-center gap-2">
-                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">elevation</span>
-                <span>Progress</span>
+              <a href="{{ url_for('flashcards.edit', deck_id = deck_id) }}" class="btn btn-success btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">edit</span>
+                <span class="fw-semibold">Edit</span>
+              </a>
+              <a href=""
+                class="btn btn-outline-danger btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">delete</span>
+                <span>Delete</span>
               </a>
             </div>
           </div>
@@ -95,25 +99,107 @@
               <hr class="">
               <!-- Header row for list/table labels (visible on medium+ screens) -->
               <div class="row fw-bold border-bottom py-2 d-none d-md-flex text-center">
-                <div class="col">Deck Name</div>
-                <div class="col">Cards</div>
-                <div class="col">Actions</div>
+                <div class="col">Card</div>
+                <div class="col">Front</div>
+                <div class="col">Back</div>
               </div>
-              <div class="list-group list-group-flush">
-                {% for deck in decks%}
-                <div class="list-group-item py-3">
-                  <div class="row align-items-center text-center">
-                    <div class="col">
-                      <a class="text-primary d-inline-block" href="{{ url_for('flashcards.study',deck_id = deck.id) }}">{{deck.name}}</a>
-                    </div>
-                    <div class="col-2">{{deck.len}}</div>
-                    <div class="col">
-                      <a href="{{ url_for('flashcards.stats',deck_id = deck.id) }}" class="btn btn-sm btn-primary text-white me-2">Stats</a>
-                      <a href="{{ url_for('flashcards.edit',deck_id = deck.id) }}" class="btn btn-sm btn-secondary text-white">Edit</a>
-                    </div>
+              <div class="card mx-auto" style="max-width:720px;">
+                <div class="card-body text-center">
+                  <div id="study-counter" class="mb-2 text-muted small">Card <span id="current-index">0</span> / <span id="total-cards">0</span></div>
+                  <h4 id="card-front" class="card-title">Front</h4>
+                  <p id="card-front-text" class="card-text fs-5"></p>
+
+                  <div id="answer-area" class="mt-4 d-none">
+                    <h6 class="text-muted">Answer</h6>
+                    <p id="card-back-text" class="fs-5"></p>
+                  </div>
+
+                  <div class="mt-4 d-flex justify-content-center gap-2">
+                    <button id="show-answer" class="btn btn-outline-primary">Show answer</button>
+                    <button id="correct-btn" class="btn btn-success d-none">Correct</button>
+                    <button id="incorrect-btn" class="btn btn-danger d-none">Incorrect</button>
                   </div>
                 </div>
-                {% endfor %}
+              </div>
+
+              <script>
+                // Build cards array from server-side deck (serialized safely)
+                const STUDY_CARDS = [
+                  {% for cid, card in deck.cards.items() %}
+                    {"id": {{ cid|tojson }}, "front": {{ card.front|tojson }}, "back": {{ card.back|tojson }}}{% if not loop.last %},{% endif %}
+                  {% endfor %}
+                ];
+
+                (function(){
+                  let idx = 0;
+                  const totalEl = document.getElementById('total-cards');
+                  const currEl = document.getElementById('current-index');
+                  const frontText = document.getElementById('card-front-text');
+                  const backText = document.getElementById('card-back-text');
+                  const answerArea = document.getElementById('answer-area');
+                  const showBtn = document.getElementById('show-answer');
+                  const correctBtn = document.getElementById('correct-btn');
+                  const incorrectBtn = document.getElementById('incorrect-btn');
+
+                  const deckId = `{{ deck_id }}`;
+                  const reviewUrl = `{{ url_for('flashcards.flashcards_review') }}`;
+
+                  function render(){
+                    if(STUDY_CARDS.length === 0){
+                      document.getElementById('card-front-text').textContent = 'No cards in this deck.';
+                      showBtn.disabled = true;
+                      return;
+                    }
+                    if(idx < 0) idx = 0;
+                    if(idx >= STUDY_CARDS.length) idx = 0; // loop
+                    const c = STUDY_CARDS[idx];
+                    totalEl.textContent = STUDY_CARDS.length;
+                    currEl.textContent = idx+1;
+                    frontText.textContent = c.front;
+                    backText.textContent = c.back;
+                    answerArea.classList.add('d-none');
+                    showBtn.classList.remove('d-none');
+                    correctBtn.classList.add('d-none');
+                    incorrectBtn.classList.add('d-none');
+                  }
+
+                  function postReview(cardId, correct){
+                    fetch(reviewUrl, {
+                      method: 'POST',
+                      headers: {'Content-Type':'application/json'},
+                      body: JSON.stringify({deck_id: deckId, card_id: cardId, correct: correct})
+                    }).then(r=>r.json()).then(data=>{
+                      // ignore returned details for now; advance to next card
+                      idx = (idx + 1) % STUDY_CARDS.length;
+                      render();
+                    }).catch(err=>{
+                      console.error('Review error', err);
+                      // still advance
+                      idx = (idx + 1) % STUDY_CARDS.length;
+                      render();
+                    });
+                  }
+
+                  showBtn.addEventListener('click', function(){
+                    answerArea.classList.remove('d-none');
+                    showBtn.classList.add('d-none');
+                    correctBtn.classList.remove('d-none');
+                    incorrectBtn.classList.remove('d-none');
+                  });
+
+                  correctBtn.addEventListener('click', function(){
+                    const c = STUDY_CARDS[idx];
+                    postReview(c.id, true);
+                  });
+                  incorrectBtn.addEventListener('click', function(){
+                    const c = STUDY_CARDS[idx];
+                    postReview(c.id, false);
+                  });
+
+                  // initial render
+                  document.addEventListener('DOMContentLoaded', render);
+                })();
+              </script>
                 <!-- <div class="list-group-item py-3">
                   <div class="row align-items-center text-center">
                     <div class="col">
@@ -127,9 +213,9 @@
                   </div>
                 </div>
               </div> -->
+              </div>
             </div>
           </div>
-        </div>
     </main>
     <footer class="d-md-none fixed-bottom bg-white border-top">
       <nav class="nav justify-content-around py-2">

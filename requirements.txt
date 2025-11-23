@@ -10,3 +10,5 @@ psycopg2-binary>=2.9.7
 pytest>=7.4.0
 jwt
 anthropic>=0.30.0
+pymongo
+datetime

@@ -27,7 +27,7 @@
     />
     <style>
       body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: "Plus Jakarta Sans", sans-serif;
       }
     </style>
   </head>
@@ -38,16 +38,43 @@
           class="container d-flex align-items-center justify-content-between py-3"
         >
           <div class="d-flex align-items-center">
-            <div class="me-2" style="width:40px;height:40px;color:var(--bs-primary);">
-              <span class="material-symbols-outlined fs-3 text-primary">book</span>
+            <div
+              class="me-2"
+              style="width: 40px; height: 40px; color: var(--bs-primary)"
+            >
+              <span class="material-symbols-outlined fs-3 text-primary"
+                >book</span
+              >
             </div>
-            <h1 class="h5 mb-0 ms-2">Bookme</h1>
+            <h1 class="h5 mb-0 ms-2">
+              <a
+                href="{{ url_for('dashboard.index') }}"
+                class="text-decoration-none text-reset"
+                >BookMe</a
+              >
+            </h1>
           </div>
           <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
-            <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('dashboard.index') }}">Home</a>
-            <a class="btn btn-sm btn-primary rounded-pill text-white" href="{{ url_for('study.index') }}">Study</a>
-            <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('community.index') }}">Community</a>
-            <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('challenges.index') }}">Challenge</a>
+            <a
+              class="btn btn-sm btn-light rounded-pill"
+              href="{{ url_for('dashboard.index') }}"
+              >Home</a
+            >
+            <a
+              class="btn btn-sm btn-primary rounded-pill text-white"
+              href="{{ url_for('study.index') }}"
+              >Study</a
+            >
+            <a
+              class="btn btn-sm btn-light rounded-pill"
+              href="{{ url_for('community.index') }}"
+              >Community</a
+            >
+            <a
+              class="btn btn-sm btn-light rounded-pill"
+              href="{{ url_for('challenges.index') }}"
+              >Challenge</a
+            >
           </nav>
           <div class="d-none d-md-flex align-items-center header-actions">
             <button
@@ -59,15 +86,36 @@
               <span class="material-symbols-outlined">notifications</span>
             </button>
             <div class="dropdown">
-              <a class="btn btn-link text-muted p-0 dropdown-toggle" href="{{ url_for('profile.index') }}" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile" title="Profile">
-                <span class="material-symbols-outlined fs-3">account_circle</span>
+              <a
+                class="btn btn-link text-muted p-0 dropdown-toggle"
+                href="{{ url_for('profile.index') }}"
+                id="profileDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                aria-label="Profile"
+                title="Profile"
+              >
+                <span class="material-symbols-outlined fs-3"
+                  >account_circle</span
+                >
               </a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="profileDropdown"
+              >
                 <li><h6 class="dropdown-header">Account</h6></li>
-                <li><a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a></li>
-                <li><hr class="dropdown-divider"></li>
                 <li>
-                  <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
+                  <a class="dropdown-item" href="{{ url_for('profile.index') }}"
+                    >Profile & Settings</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <form
+                    method="POST"
+                    action="{{ url_for('auth.logout') }}"
+                    class="m-0"
+                  >
                     <button type="submit" class="dropdown-item">Log out</button>
                   </form>
                 </li>
@@ -110,12 +158,17 @@
 
         <!-- gif section -->
         <div class="motivational-section text-center mt-4">
-          <img src="https://i.pinimg.com/originals/d5/f5/ae/d5f5ae2e743118a375986e0bb292f1a2.gif"
-               alt="Motivational celebration gif"
-               class="motivational-gif mb-3" />
+          <img
+            src="https://i.pinimg.com/originals/d5/f5/ae/d5f5ae2e743118a375986e0bb292f1a2.gif"
+            alt="Motivational celebration gif"
+            class="motivational-gif mb-3"
+          />
           <div class="motivational-message">
             <p class="h6 text-primary fw-bold mb-1">You're doing amazing!</p>
-            <p class="text-muted small">Remember why you're doing this ✩ every small step counts toward your goals. Keep up the great work! 🌟</p>
+            <p class="text-muted small">
+              Remember why you're doing this ✩ every small step counts toward
+              your goals. Keep up the great work! 🌟
+            </p>
           </div>
         </div>
       </main>
@@ -157,20 +210,17 @@
         const today = new Date();
         const daysInGrid = 371; // 53 weeks * 7 days
 
-        //generate random data
-        let studyData = JSON.parse(localStorage.getItem("studyData")) || {};
-        if (Object.keys(studyData).length === 0) {
-          for (let i = 0; i < daysInGrid; i++) {
-            const date = new Date();
-            date.setDate(today.getDate() - i);
-            if (Math.random() > 0.4) {
-              // 60% chance of having data for a day
-              studyData[date.toLocaleDateString()] = Math.floor(
-                Math.random() * 120
-              ); // 0-120 minutes
-            }
-          }
-          localStorage.setItem("studyData", JSON.stringify(studyData));
+        // Use server-provided streak data
+        const streakDays = {{ studyData.streak | default(0) }};
+        const studyData = {};
+
+        // Populate studyData: fill in consecutive days starting from today going backwards
+        // Each day gets incrementally more study time to visualize the streak
+        for (let i = 0; i < streakDays && i < daysInGrid; i++) {
+          const date = new Date();
+          date.setDate(today.getDate() - i);
+          // Assign increasing study time for streak visualization
+          studyData[date.toLocaleDateString()] = 30 + (i % 5) * 20; // 30-110 minutes per day
         }
 
         function getLevel(minutes) {

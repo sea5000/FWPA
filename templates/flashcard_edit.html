@@ -32,7 +32,7 @@
           <div class="me-2" style="width:40px;height:40px;color:var(--bs-primary);">
             <span class="material-symbols-outlined fs-3 text-primary">book</span>
           </div>
-          <h1 class="h5 mb-0 ms-2"><a href="{{ url_for('dashboard.index') }}" class="text-decoration-none text-reset">Bookme</a></h1>
+          <h1 class="h5 mb-0 ms-2">Bookme</h1>
         </div>
         <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
           <a class="btn btn-sm btn-primary rounded-pill text-white" href="{{ url_for('dashboard.index') }}">Home</a>
@@ -72,19 +72,23 @@
         <div class="row">
           <div class="col">
             <!-- col-12 col-lg-8 -->
-            <h2 class="h2 fw-bold">Flashcard Decks</h2>
-            <t class="text-muted mt-1">Browse, create, and explore your flashcard decks.</t>
+            <h2 class="h2 fw-bold">{{deck.name}}</h2>
+            <t class="text-muted mt-1">{{deck.summary}}</t>
           </div>
           <div class="col text-center align-content-center">
             <div class="d-flex justify-content-center justify-content-md-end gap-2">
-              <a href="{{ url_for('flashcards.new_deck')}}" class="btn btn-primary btn-sm rounded-pill d-inline-flex align-items-center gap-2">
-                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">add_box</span>
-                <span class="fw-semibold">New Deck</span>
+              <a href="{{ url_for('flashcards.index', deck_id = deck_id) }}" class="btn btn-outline-warning btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">Arrow_back</span>
+                <span class="fw-semibold">Back to Decks</span>
               </a>
-              <a href="{{ url_for('progress.index') }}"
-                class="btn btn-info btn-sm rounded-pill d-inline-flex align-items-center gap-2">
-                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">elevation</span>
-                <span>Progress</span>
+              <a href="{{ url_for('flashcards.deck',deck_id = deck_id) }}" class="btn btn-warning btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">arrow_back</span>
+                <span class="fw-semibold">Exit</span>
+              </a>
+              <a href=""
+                class="btn btn-outline-danger btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                <span class="material-symbols-outlined" aria-hidden="true" style="font-size:18px;">delete</span>
+                <span>Delete</span>
               </a>
             </div>
           </div>
@@ -95,25 +99,65 @@
               <hr class="">
               <!-- Header row for list/table labels (visible on medium+ screens) -->
               <div class="row fw-bold border-bottom py-2 d-none d-md-flex text-center">
-                <div class="col">Deck Name</div>
-                <div class="col">Cards</div>
-                <div class="col">Actions</div>
+                <div class="col">Card</div>
+                <div class="col">Front</div>
+                <div class="col">Back</div>
               </div>
-              <div class="list-group list-group-flush">
-                {% for deck in decks%}
-                <div class="list-group-item py-3">
-                  <div class="row align-items-center text-center">
-                    <div class="col">
-                      <a class="text-primary d-inline-block" href="{{ url_for('flashcards.study',deck_id = deck.id) }}">{{deck.name}}</a>
-                    </div>
-                    <div class="col-2">{{deck.len}}</div>
-                    <div class="col">
-                      <a href="{{ url_for('flashcards.stats',deck_id = deck.id) }}" class="btn btn-sm btn-primary text-white me-2">Stats</a>
-                      <a href="{{ url_for('flashcards.edit',deck_id = deck.id) }}" class="btn btn-sm btn-secondary text-white">Edit</a>
+              <form method="POST">
+                <input type="hidden" name="deck_id" value="{{deck.id}}" />
+                <div class="list-group list-group-flush">
+                  {% for cardn, card in deck.cards.items() %}
+                  <div class="list-group-item py-3">
+                    <div class="row g-2 align-items-center">
+                      <div class="col-1 text-center">
+                        <strong>{{cardn}}</strong>
+                        <div class="form-check mt-1">
+                          <input class="form-check-input" type="checkbox" name="delete_{{cardn}}" id="delete_{{cardn}}">
+                          <label class="form-check-label small text-danger" for="delete_{{cardn}}">Delete</label>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <input class="form-control" name="front_{{cardn}}" value="{{card.front}}" />
+                      </div>
+                      <div class="col">
+                        <input class="form-control" name="back_{{cardn}}" value="{{card.back}}" />
+                      </div>
                     </div>
                   </div>
+                  {% endfor %}
+
+                  <div class="list-group-item py-3 bg-light">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <strong>New cards</strong>
+                      <div>
+                        <button type="button" id="add-new-card" class="btn btn-sm btn-outline-primary">Add card</button>
+                      </div>
+                    </div>
+
+                    <div id="new-cards-container">
+                      <!-- new card rows will be inserted here -->
+                      <div class="new-card-row d-none" id="new-card-template">
+                        <div class="row g-2 align-items-center">
+                          <div class="col-1 text-center">
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-new-card" title="Remove">×</button>
+                          </div>
+                          <div class="col">
+                            <input class="form-control" placeholder="Front" name="new_front[]" />
+                          </div>
+                          <div class="col">
+                            <input class="form-control" placeholder="Back" name="new_back[]" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <small class="text-muted">Click "Add card" to create multiple new cards. You can remove them before saving.</small>
+                  </div>
+
+                  <div class="list-group-item py-3 text-end">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                  </div>
                 </div>
-                {% endfor %}
+              </form>
                 <!-- <div class="list-group-item py-3">
                   <div class="row align-items-center text-center">
                     <div class="col">
@@ -127,9 +171,9 @@
                   </div>
                 </div>
               </div> -->
+              </div>
             </div>
           </div>
-        </div>
     </main>
     <footer class="d-md-none fixed-bottom bg-white border-top">
       <nav class="nav justify-content-around py-2">
@@ -146,6 +190,40 @@
     </footer>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Dynamic new-card rows for flashcard edit page
+    (function(){
+      function addNewCardRow(front, back){
+        const tmpl = document.getElementById('new-card-template');
+        if(!tmpl) return;
+        const clone = tmpl.cloneNode(true);
+        clone.id = '';
+        clone.classList.remove('d-none');
+        // set values if provided
+        if(front !== undefined) clone.querySelector('input[name="new_front[]"]').value = front;
+        if(back !== undefined) clone.querySelector('input[name="new_back[]"]').value = back;
+        // wire remove button
+        const btn = clone.querySelector('.remove-new-card');
+        if(btn){
+          btn.addEventListener('click', function(){
+            clone.remove();
+          });
+        }
+        document.getElementById('new-cards-container').appendChild(clone);
+      }
+
+      document.addEventListener('DOMContentLoaded', function(){
+        const addBtn = document.getElementById('add-new-card');
+        if(addBtn){
+          addBtn.addEventListener('click', function(){
+            addNewCardRow('','');
+          });
+        }
+
+        // No prefill-handling necessary; new rows will be added by the user.
+      });
+    })();
+  </script>
   <script>
 
     // Highlight header/footer nav link using the folder slug

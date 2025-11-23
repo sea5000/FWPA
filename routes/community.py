@@ -28,6 +28,14 @@ def community_page():
     notes = list(db.notes.find({}, {'_id': 0}))
     return render_template('community.html', notes=notes)
 
+@community_bp.route('/community/friends', endpoint='friends')
+def friends():
+    return render_template('community_friends.html', username=g.current_user, users=get_all_users())
+
+@community_bp.route('/community/feed', endpoint='feed')
+def feed():
+    return render_template('community_feed.html', username=g.current_user, users=get_all_users())
+
 
 @community_bp.route('/api/notes/<title>', methods=['GET'])
 def view_note(title):                                               #Returns full content of that note

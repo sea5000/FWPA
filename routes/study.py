@@ -16,3 +16,7 @@ def require_auth():
 @study_bp.route('/', endpoint='index')
 def study_index():
     return render_template('study-dashboard.html', username=g.current_user, users=get_all_users())
+
+@study_bp.route('/study/timer', endpoint='dashboard')
+def timer():
+    return render_template('study_timer.html', username=g.current_user, users=get_all_users())

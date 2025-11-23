@@ -5,6 +5,17 @@ from datetime import datetime
 from bson import ObjectId
 from flask import request, jsonify
 from pymongo import MongoClient
+from flask import Blueprint, render_template
+from routes.community import community_bp
+#from routes.community import friends_bp
+
+friends_bp = Blueprint('friends', __name__, url_prefix='/friends')
+community_bp = Blueprint('community', __name__, url_prefix='/community')
+
+@community_bp.route('/community/notes', endpoint='community_notes')
+def community_notes():
+    ...
+
 feed_bp = Blueprint('feed', __name__)
 
 
@@ -24,6 +35,18 @@ def require_auth():
 @feed_bp.route('/', endpoint='index')
 def feed_index():
     return render_template('feed.html', username=g.current_user, users=get_all_users())
+
+
+@feed_bp.route('/community/notes', endpoint='community_notes')
+def notes():
+    return render_template('community.html', username=g.current_user, users=get_all_users()) 
+
+@feed_bp.route('/community/friends', endpoint='friends')
+def friends():
+    return render_template('community_friends.html', username=g.current_user, users=get_all_users())
+
+
+
 
 @feed_bp.route('/api/feed/posts', methods=['GET'])
 def get_posts():

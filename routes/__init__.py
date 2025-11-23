@@ -25,6 +25,7 @@ from routes.signup import signup_bp
 from routes.profile import profile_bp
 from routes.streak import streak_bp
 from routes.timer import timer_bp
+#from routes.ai import ai_bp
 
 __all__ = [
 	'auth_bp',
@@ -41,4 +42,5 @@ __all__ = [
 	'profile_bp',
 	'streak_bp',
 	'timer_bp',
+    #'ai_bp',
 ]

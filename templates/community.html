@@ -60,14 +60,15 @@
                     <h2 class="h3 mb-0">Community</h2><small class="text-muted">Connect with others</small>
                 </div>
                 <ul class="nav nav-tabs mb-4" role="tablist">
-                    <li class="nav-item" role="presentation"><button class="nav-link active" id="notes-tab"
+                    <li class="nav-item" role="presentation"><a class="nav-link active" href="{{ url_for('community.community_notes') }}" id="notes-tab"
                             data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab" aria-controls="notes"
                             aria-selected="true">Notes</button></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="friends.html" id="friends-tab"
-                            aria-controls="friends" aria-selected="false">Friends</a></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="feed.html" id="feed-tab" aria-controls="feed" 
-                      aria-selected="false">Feed</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('community.friends') }}" id="friends-tab" 
+                      data-bs-toggle="tab" data-bs-target="#friends" type="button" role="tab" aria-controls="friends" aria-selected="false">Friends</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('feed.index') }}" id="feed-tab" 
+                      data-bs-toggle="tab" data-bs-target="#feed" type="button" role="tab" aria-controls="feed" aria-selected="false">Feed</a></li> 
                 </ul>
+
         <!-- Subject Folders -->
             <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="fw-bold display-6">Study Content</h2>

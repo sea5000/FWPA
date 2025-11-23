@@ -20,6 +20,7 @@ from routes import (
     profile_bp,
     streak_bp,
     timer_bp,
+    #ai_bp,
 )
 
 app = Flask(__name__)
@@ -41,6 +42,7 @@ app.register_blueprint(signup_bp, url_prefix='/signup')
 app.register_blueprint(profile_bp, url_prefix='/profile-settings')
 app.register_blueprint(streak_bp, url_prefix='/streak')
 app.register_blueprint(timer_bp, url_prefix='/timer')
+#app.register_blueprint(ai_bp, url_prefix='/ai')
 
 
 @app.route('/')

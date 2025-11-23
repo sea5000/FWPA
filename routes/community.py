@@ -89,6 +89,8 @@ from utils.auth import get_current_user_from_token
 from model.login_model import get_all_users
 from pymongo import MongoClient
 from datetime import datetime
+from werkzeug.utils import secure_filename
+import os
 
 community_bp = Blueprint("community", __name__)
 
@@ -171,67 +173,103 @@ def upload_note():
 
     return jsonify({"message": "Note uploaded successfully"}), 201
 
-
-# READ all posts
-@community_bp.route("/api/community/posts", methods=["GET"])
-def get_posts():
-    posts = list(db.posts.find({}))
-    for p in posts:
-        p["_id"] = str(p["_id"])
-    return jsonify(posts)
-
-
-# CREATE new community post
-@community_bp.route("/api/community/posts", methods=["POST"])
-def create_post():
+# UPDATE existing note
+@community_bp.route("/api/notes/<note_id>", methods=["PUT"])
+def update_note(note_id):
     data = request.get_json()
+    update_fields = {
+        "title": data.get("title"),
+        "content": data.get("content"),
+        "timestamp": datetime.utcnow()
+    }
+    result = db.notes.update_one({"_id": ObjectId(note_id)}, {"$set": update_fields})
+    if result.matched_count == 0:
+        return jsonify({"error": "Note not found"}), 404
+    return jsonify({"message": "Note updated"}), 200
 
-    new_post = {
+# DELETE note
+@community_bp.route("/api/notes/<note_id>", methods=["DELETE"])
+def delete_note(note_id):
+    result = db.notes.delete_one({"_id": ObjectId(note_id)})
+    if result.deleted_count == 0:
+        return jsonify({"error": "Note not found"}), 404
+    return jsonify({"message": "Note deleted"}), 200
+
+# CREATE new note with file upload
+@community_bp.route("/api/notes/upload", methods=["POST"])
+def upload_note_with_file():
+    title = request.form.get("title")
+    content = request.form.get("content")
+    file = request.files.get("file")
+
+    filename = None
+    if file:
+        filename = secure_filename(file.filename)
+        file.save(os.path.join("static/uploads", filename))
+
+    new_note = {
+        "title": title,
+        "content": content,
         "author": g.current_user,
-        "text": data.get("text", ""),
-        "image": data.get("image", None),
-        "timestamp": datetime.utcnow(),
-        "likes": 0,
-        "comments": []
+        "file": filename,
+        "views": 0,
+        "timestamp": datetime.utcnow()
     }
 
-    db.posts.insert_one(new_post)
-    return jsonify({"message": "Post created"}), 201
+    db.notes.insert_one(new_note)
+    return jsonify({"message": "Note with file uploaded"}), 201
 
 
-# ADD COMMENT
-@community_bp.route("/api/community/posts/<post_id>/comments", methods=["POST"])
-def add_comment(post_id):
-    try:
-        comment_data = request.get_json()
+UPLOAD_FOLDER = "static/uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-        comment = {
-            "author": g.current_user,
-            "text": comment_data.get("text"),
-            "timestamp": datetime.utcnow()
-        }
+#
+@community_bp.route("/api/files", methods=["POST"])
+def upload_file():
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
 
-        db.posts.update_one(
-            {"_id": ObjectId(post_id)},
-            {"$push": {"comments": comment}}
-        )
-        return jsonify({"message": "Comment added"}), 200
+    file = request.files["file"]
+    if not file or file.filename == "":
+        return jsonify({"error": "No file selected for uploading"}), 400
+    filename = secure_filename(file.filename)
+    file.save(os.path.join(UPLOAD_FOLDER, filename))
 
-    except:
-        return jsonify({"error": "Invalid post id"}), 400
+    new_file = {
+        "filename": filename,
+        "author": g.current_user,
+        "timestamp": datetime.utcnow()
+    }
+
+    db.files.insert_one(new_file)
+    return jsonify({"message": "File uploaded successfully"}), 201
+
+# READ all files
+@community_bp.route("/api/files", methods=["GET"])
+def get_files():
+    files = list(db.files.find({}))
+    for f in files:
+        f["_id"] = str(f["_id"])
+    return jsonify(files)
+
+# DELETE file
+@community_bp.route("/api/files/<file_id>", methods=["DELETE"])
+def delete_file(file_id):
+    result = db.files.delete_one({"_id": ObjectId(file_id)})
+    if result.deleted_count == 0:
+        return jsonify({"error": "File not found"}), 404
+    return jsonify({"message": "File deleted"}), 200
 
 
-# LIKE POST
-@community_bp.route("/api/community/posts/<post_id>/like", methods=["POST"])
-def like_post(post_id):
-    try:
-        db.posts.update_one(
-            {"_id": ObjectId(post_id)},
-            {"$inc": {"likes": 1}}
-        )
-        return jsonify({"message": "Post liked"}), 200
+notes = [
+    {"name": "Derivatives Rules",
+     "folder": "Mathematics",
+     "owner": g.current_user },
+    {"name": "World War II Summary",
+     "folder": "History",
+    "owner": g.current_user },
+    {"name": "Cell Division Overview",
+     "folder": "Biology",
+     "owner": "Alice Chen" }
 
-    except:
-        return jsonify({"error": "Invalid post id"}), 400
-
-
+]

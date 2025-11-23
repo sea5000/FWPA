@@ -147,3 +147,28 @@ def today_study_time():
         "date": today_start.strftime("%Y-%m-%d"),
         "total_seconds": total
     })
+
+
+study_session = [
+    {
+        "user": "alice",
+        "duration": 1500,
+        "subject": "Math",
+        "mode": "Pomodoro",
+        "timestamp": datetime.utcnow() - timedelta(days=1)
+    },
+    {
+        "user": "alice",
+        "duration": 3000,
+        "subject": "Science",
+        "mode": "Deep Work",
+        "timestamp": datetime.utcnow() - timedelta(days=2)
+    },
+    {
+        "user": "bob",
+        "duration": 1200,
+        "subject": "History",
+        "mode": "Pomodoro",
+        "timestamp": datetime.utcnow() - timedelta(hours=5)
+    },
+]

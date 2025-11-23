@@ -293,3 +293,37 @@ def create_post_with_image():
     db.posts.insert_one(post)
     return jsonify({"message": "Post created"}), 201
 
+post = [
+    {"author": "Sophia Nguyen",
+        "content": "Had a group study session today on Calculus — amazing collaboration and focus! Here are my notes 🧮",
+        "image": None,
+        "timestamp": "Yesterday", #datetime.utcnow(),
+        "likes": 0,
+        "comments": []
+    },
+    {
+        "author": "Liam Smith",
+        "content": "Just finished reading 'Atomic Habits' by James Clear. Highly recommend for building better study routines! 📚",
+        "image": None,
+        "timestamp": "2 days ago", #datetime.utcnow(),
+        "likes": 0,
+        "comments": []
+    },
+    {
+        "author": "James Miller",
+        "content": "Photosynthesis process</b> 🌿 — feel free to save and use it for your notes!",
+        "image": None,
+        "timestamp": "5 hours ago", #datetime.utcnow(),
+        "likes": 0,
+        "comments": []
+    },
+    {
+        "author": "Alice Chen",
+        "content": "Studying machine learning today! Here’s a visual summary of the gradient descent process 🧠📉",
+        "image": None,
+        "timestamp": "2 hours ago", #datetime.utcnow(),
+        "likes": 0,
+        "comments": []
+    }
+
+]

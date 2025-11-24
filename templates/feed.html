@@ -1,529 +1,388 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0">
     <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect">
-    <link as="style"
-        href="https://fonts.googleapis.com/css2?display=swap&amp;family=Plus+Jakarta+Sans%3Awght%40400%3B500%3B700%3B800"
-        onload="this.rel='stylesheet'" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?display=swap&amp;family=Plus+Jakarta+Sans:wght@400;500;700;800" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/theme.css">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-    <title>Bookme Community</title>
-    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon">
+    <title>Community - Feed | BookMe</title>
+    <style>
+        .post-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .post-image {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+        .post-actions button {
+            background: none;
+            border: none;
+            color: #666;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .post-actions button:hover {
+            color: #2badee;
+        }
+    </style>
 </head>
-  <style>
-    :root {
-      --primary: #2badee;
-      --bg-light: #f6f7f8;
-      --bg-dark: #101c22;
-    }
-
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--bg-light);
-      color: #333;
-    }
-
-    body.dark-mode {
-      background-color: var(--bg-dark);
-      color: #ddd;
-    }
-
-    .navbar {
-      border-bottom: 1px solid rgba(0,0,0,0.1);
-      background-color: var(--bg-light);
-    }
-
-    .dark-mode .navbar {
-      background-color: var(--bg-dark);
-      border-color: rgba(255,255,255,0.1);
-    }
-
-    .nav-link.active {
-      color: var(--primary) !important;
-      font-weight: 700;
-    }
-
-    .card {
-      border: none;
-      border-radius: 1rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      background-color: #fff;
-    }
-
-    .dark-mode .card {
-      background-color: rgba(255,255,255,0.05);
-      border-color: rgba(255,255,255,0.15);
-    }
-
-    .post-header img {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .post-actions button {
-      background: none;
-      border: none;
-      color: #666;
-      font-weight: 500;
-    }
-
-    .post-actions button:hover {
-      color: var(--primary);
-    }
-
-    footer {
-      border-top: 1px solid rgba(0,0,0,0.1);
-      background-color: var(--bg-light);
-    }
-
-    .dark-mode footer {
-      background-color: var(--bg-dark);
-      border-color: rgba(255,255,255,0.1);
-    }
-
-    .btn-primary {
-      background-color: var(--primary);
-      border-color: var(--primary);
-    }
-    .btn-primary:hover {
-      background-color: #1b8ecb;
-    }
-  </style>
-<body class="bg-light text-dark">
+<body class="bg-light">
     <div class="d-flex flex-column min-vh-100">
-        <header class="w-100 site-header">
+        <!-- Header -->
+        <header class="w-100 bg-white border-bottom">
             <div class="container d-flex align-items-center justify-content-between py-3">
-              <div class="d-flex align-items-center">
-                <div class="me-2" style="width:40px;height:40px;color:var(--bs-primary);">
-                  <span class="material-symbols-outlined fs-3 text-primary">book</span>
+                <div class="d-flex align-items-center">
+                    <span class="material-symbols-outlined fs-3 text-primary me-2">book</span>
+                    <h1 class="h5 mb-0"><a href="{{ url_for('dashboard.index') }}" class="text-decoration-none text-reset">BookMe</a></h1>
                 </div>
-                <h1 class="h5 mb-0 ms-2"><a href="{{ url_for('dashboard.index') }}" class="text-decoration-none text-reset">BookMe</a></h1>
-              </div>
-              <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
-                <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('dashboard.index') }}">Home</a>
-                <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
-                <a class="btn btn-sm btn-primary rounded-pill text-white" href="{{ url_for('community.index') }}">Community</a>
-                <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('challenges.index') }}">Challenge</a>
-              </nav>
-              <div class="d-none d-md-flex align-items-center header-actions">
-                <button type="button" class="btn btn-link text-muted p-0" aria-label="Notifications" title="Notifications">
-                  <span class="material-symbols-outlined">notifications</span>
-                </button>
-                <div class="dropdown">
-                  <a class="btn btn-link text-muted p-0 dropdown-toggle" href="{{ url_for('profile.index') }}" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile" title="Profile">
-                    <span class="material-symbols-outlined fs-3">account_circle</span>
-                  </a>
-                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                    <li><h6 class="dropdown-header">Account</h6></li>
-                    <li><a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a></li>
-                    <li><hr class="dropdown-divider" /></li>
-                    <li>
-                      <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
-                        <button type="submit" class="dropdown-item">Log out</button>
-                      </form>
-                    </li>
-                  </ul>
+                <nav class="d-none d-md-flex align-items-center gap-2">
+                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('dashboard.index') }}">Home</a>
+                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
+                    <a class="btn btn-sm btn-primary rounded-pill text-white" href="{{ url_for('community.index') }}">Community</a>
+                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('challenges.index') }}">Challenge</a>
+                </nav>
+                <div class="d-none d-md-flex align-items-center gap-3">
+                    <button type="button" class="btn btn-link text-muted p-0">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+                    <div class="dropdown">
+                        <a class="btn btn-link text-muted p-0" href="#" id="profileDropdown" data-bs-toggle="dropdown">
+                            <span class="material-symbols-outlined fs-3">account_circle</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header">Account</h6></li>
+                            <li><a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
+                                    <button type="submit" class="dropdown-item">Log out</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-              </div>
             </div>
         </header>
+
+        <!-- Main Content -->
         <main class="flex-grow-1">
             <div class="container my-5">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h2 class="h3 mb-0">Community</h2><small class="text-muted">Connect with others</small>
+                <!-- Page Header -->
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div>
+                        <h2 class="h3 mb-0">Community</h2>
+                        <small class="text-muted">Connect and share knowledge</small>
+                    </div>
                 </div>
 
-        <ul class="nav nav-tabs mb-4" role="tablist">
-                    <!--<li class="nav-item" role="presentation"><a class="nav-link" href="index.html" id="notes-tab" aria-controls="notes"
-                      aria-selected="false">Notes</a></button></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="friends.html" id="friends-tab"
-                            aria-controls="friends" aria-selected="false">Friends</a></button></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="feed.html" id="feed-tab" aria-controls="feed" 
-                      aria-selected="false">Feed</a></button></li> -->
-                      <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('community.index') }}" id="notes-tab"
-                        data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab" aria-controls="notes"
-                            aria-selected="false">Notes</a></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('community.friends') }}" id="friends-tab" 
-                      data-bs-toggle="tab" data-bs-target="#friends" type="button" role="tab" aria-controls="friends" aria-selected="false">Friends</a></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link active" href="{{ url_for('community.feed')}}" id="feed-tab" 
-                      data-bs-toggle="tab" data-bs-target="#feed" type="button" role="tab" aria-controls="feed" aria-selected="true">Feed</button></li> 
-
-                      <!-- <li class="nav-item" role="presentation"><button class="nav-link active" id="notes-tab"
-                            data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab" aria-controls="notes"
-                            aria-selected="true">Notes</button></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('community.friends') }}" id="friends-tab" 
-                      data-bs-toggle="tab" data-bs-target="#friends" type="button" role="tab" aria-controls="friends" aria-selected="false">Friends</a></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('feed.index') }}" id="feed-tab" 
-                      data-bs-toggle="tab" data-bs-target="#feed" type="button" role="tab" aria-controls="feed" aria-selected="false">Feed</a></li>  -->
-
-
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs mb-4">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('community.index') }}">📝 Notes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('friends.index') }}">👥 Friends</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('feed.index') }}">📰 Feed</a>
+                    </li>
                 </ul>
 
+                <!-- Create Post Section -->
+                <div class="card p-4 mb-4">
+                    <div class="d-flex align-items-start gap-3 mb-3">
+                        <img src="https://i.pravatar.cc/60?u={{ username }}" class="post-avatar" alt="Your avatar">
+                        <textarea id="postText" class="form-control" rows="3" placeholder="Share your study progress, notes, or thoughts..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <input type="file" id="postImage" class="form-control" accept="image/*">
+                        <small class="text-muted">Optional: Add an image to your post</small>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-primary" onclick="createPost()">
+                            <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">send</span>
+                            Post
+                        </button>
+                    </div>
+                </div>
 
-<!-- Feed Section -->
-  <main class="container my-5">
-    <h2 class="fw-bold display-6 mb-4">Feed</h2>
+                <!-- Feed Posts -->
+                <div id="feedContainer">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
 
-    <!-- Post Input -->
-    <div class="card p-4 mb-5">
-      <div class="d-flex align-items-center mb-3">
-        <img src="https://i.pravatar.cc/60?img=8" class="rounded-circle me-3" width="50" height="50" alt="user">
-        <input id="postText" type="text" class="form-control rounded-pill" placeholder="Share a note, thought, or photo...">
-      </div>
-      <input type="text" id="postImage" placeholder = "Image URL (optional)" accept="image/*" class="form-control mb-3">
-      <div class="d-flex justify-content-between">
-        <button class="btn btn-light btn-sm">📸 Add Photo</button>  
-        <button class="btn btn-primary btn-sm" onclick="createPost()">Post</button>
-
-      </div>
+        <!-- Mobile Footer -->
+        <footer class="d-md-none fixed-bottom bg-white border-top">
+            <nav class="nav justify-content-around py-2">
+                <a class="nav-link text-muted" href="{{ url_for('dashboard.index') }}">
+                    <span class="material-symbols-outlined">home</span>
+                    <small class="d-block">Home</small>
+                </a>
+                <a class="nav-link text-muted" href="{{ url_for('study.index') }}">
+                    <span class="material-symbols-outlined">school</span>
+                    <small class="d-block">Study</small>
+                </a>
+                <a class="nav-link text-primary" href="{{ url_for('community.index') }}">
+                    <span class="material-symbols-outlined">groups</span>
+                    <small class="d-block">Community</small>
+                </a>
+                <a class="nav-link text-muted" href="{{ url_for('challenges.index') }}">
+                    <span class="material-symbols-outlined">emoji_events</span>
+                    <small class="d-block">Challenge</small>
+                </a>
+            </nav>
+        </footer>
     </div>
-
-
-    <div id="feedPosts"></div>
-
-    <h2>Share an image</h2>
-<form action="/api/community/posts/image" method="POST" enctype="multipart/form-data">
-  <input type="file" name="image" accept="image/*" required>
-  <button type="submit">Upload</button>
-</form>
-
-<h2 class="mb-4">Share a post</h2>
-<form action="/api/feed/posts/image" method="POST" enctype="multipart/form-data" class="mb-5">
-  <div class="mb-3">
-    <textarea name="content" class="form-control" rows="3" placeholder="Write something..." required></textarea>
-  </div>
-  <div class="mb-3">
-    <input type="file" name="image" accept="image/*" class="form-control">
-  </div>
-  <button type="submit" class="btn btn-primary">Post</button>
-</form>
-
-
-    {% for post in posts %}
-    <div class="card p-4 mb-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h6 class="mb-0 fw-bold">{{ post.author }}</h6>
-    </div>
-  </div>
-  <p>{{ post.content }}</p>
-
-  {% if post.image %}
-    <img src="{{ url_for('static', filename='uploads/' + post.image) }}"
-         alt="Post Image"
-         class="img-fluid rounded mb-3"
-         style="max-width: 300px; border-radius:10px;">
-  {% endif %}
-
-  <div class="d-flex justify-content-between text-muted">
-    <button>👍 Like</button>
-    <button>💬 Comment</button>
-    <button>↗️ Share</button>
-  </div>
-</div>
-
-  <div class="post">
-    <p><strong>{{ post.author }}</strong></p>
-    <p>{{ post.content }}</p>
-
-  </div>
-    {% endfor %}
-
-     <!-- Post 1 -->
-    <div class="card p-4 mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-3 post-header">
-        <div class="d-flex align-items-center gap-3">
-          <img src="https://i.pravatar.cc/60?img=5" alt="profile">
-          <div>
-            <h6 class="mb-0 fw-bold">Alice Chen</h6>
-            <small class="text-muted">2 hours ago</small>
-          </div>
-        </div>
-        <div>
-          <button class="btn btn-outline-primary btn-sm me-2">Follow</button>
-          <button class="btn btn-outline-secondary btn-sm">View Profile</button>
-        </div>
-      </div>
-      <p>Studying machine learning today! Here’s a visual summary of the gradient descent process 🧠📉</p>
-      <img src="https://www.kdnuggets.com/wp-content/uploads/gradient-descent.jpg" class="img-fluid rounded mb-3" alt="post content">
-      <div class="d-flex justify-content-between text-muted post-actions">
-        <button>👍 Like</button>
-        <button>💬 Comment</button>
-        <button>↗️ Share</button>
-      </div>
-    </div>
-
-    <!-- Post 2 -->
-    <div class="card p-4 mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-3 post-header">
-        <div class="d-flex align-items-center gap-3">
-          <img src="https://i.pravatar.cc/60?img=12" alt="profile">
-          <div>
-            <h6 class="mb-0 fw-bold">James Miller</h6>
-            <small class="text-muted">5 hours ago</small>
-          </div>
-        </div>
-        <div>
-          <button class="btn btn-outline-primary btn-sm me-2">Add Friend</button>
-          <button class="btn btn-outline-secondary btn-sm">View Profile</button>
-        </div>
-      </div>
-      <p>Here’s my summary of the <b>Photosynthesis process</b> 🌿 — feel free to save and use it for your notes!</p>
-      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Photosynthesis_en.svg" class="img-fluid rounded mb-3" alt="notes">
-      <div class="d-flex justify-content-between text-muted post-actions">
-        <button>👍 Like</button>
-        <button>💬 Comment</button>
-        <button>↗️ Share</button>
-      </div>
-    </div>
-
-    <!-- Post 3 -->
-    <div class="card p-4 mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-3 post-header">
-        <div class="d-flex align-items-center gap-3">
-          <img src="https://i.pravatar.cc/60?img=16" alt="profile">
-          <div>
-            <h6 class="mb-0 fw-bold">Sophia Nguyen</h6>
-            <small class="text-muted">Yesterday</small>
-          </div>
-        </div>
-        <div>
-          <button class="btn btn-outline-primary btn-sm me-2">Follow</button>
-          <button class="btn btn-outline-secondary btn-sm">View Profile</button>
-        </div>
-      </div>
-      <p>Had a group study session today on Calculus — amazing collaboration and focus! Here are my notes 🧮</p>
-      <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80" class="img-fluid rounded mb-3" alt="study photo">
-      <div class="d-flex justify-content-between text-muted post-actions">
-        <button>👍 Like</button>
-        <button>💬 Comment</button>
-        <button>↗️ Share</button>
-      </div>
-    </div>
-
-  </main>
 
     <!-- Comment Modal -->
-<div class="modal fade" id="commentModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-scrollable">
-    <div class="modal-content">
+    <div class="modal fade" id="commentModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Comments</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="commentList" class="mb-3"></div>
+                </div>
+                <div class="modal-footer">
+                    <input type="text" id="commentInput" class="form-control me-2" placeholder="Write a comment...">
+                    <button class="btn btn-primary" onclick="submitComment()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-      <div class="modal-header">
-        <h5 class="modal-title">Comments</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <div class="modal-body">
-        <div id="commentList"></div>
-      </div>
- 
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-// Simple nav highlight (optional)
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    const header = document.querySelector('header');
-    const links = header ? Array.from(header.querySelectorAll('a[href]')) : [];
-    const parts = location.pathname.split('/').filter(Boolean);
-    const currentSlug = parts[0] || 'home';
-    links.forEach(a => {
-      try {
-        const url = new URL(a.getAttribute('href'), location.origin);
-        const linkParts = url.pathname.split('/').filter(Boolean);
-        const linkSlug = linkParts[0] || 'home';
-        a.classList.remove('active');
-        if (linkSlug === currentSlug) a.classList.add('active');
-      } catch {}
-    });
-  } catch {}
-});
+        let activePostId = null;
 
-function formatPostTime(timestamp) {
-  if (!timestamp) return 'Just now';
-  const postDate = new Date(timestamp);
-  const now = new Date();
-  const diffMs = now - postDate;
-  const diffSec = Math.floor(diffMs / 1000);
-  const diffMin = Math.floor(diffSec / 60);
-  const diffHour = Math.floor(diffMin / 60);
-  const diffDay = Math.floor(diffHour / 24);
-  if (diffSec < 60) return 'Just now';
-  if (diffMin < 60) return `${diffMin} minute${diffMin === 1 ? '' : 's'} ago`;
-  if (diffHour < 24) return `${diffHour} hour${diffHour === 1 ? '' : 's'} ago`;
-  if (diffDay < 7) return `${diffDay} day${diffDay === 1 ? '' : 's'} ago`;
-  return postDate.toLocaleDateString();
-}
+        // Format timestamp
+        function formatPostTime(timestamp) {
+            if (!timestamp) return 'Just now';
+            const postDate = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - postDate;
+            const diffSec = Math.floor(diffMs / 1000);
+            const diffMin = Math.floor(diffSec / 60);
+            const diffHour = Math.floor(diffMin / 60);
+            const diffDay = Math.floor(diffHour / 24);
+            
+            if (diffSec < 60) return 'Just now';
+            if (diffMin < 60) return `${diffMin} minute${diffMin === 1 ? '' : 's'} ago`;
+            if (diffHour < 24) return `${diffHour} hour${diffHour === 1 ? '' : 's'} ago`;
+            if (diffDay < 7) return `${diffDay} day${diffDay === 1 ? '' : 's'} ago`;
+            return postDate.toLocaleDateString();
+        }
 
-function readFileAsDataURL(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+        // Convert file to Data URL
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
 
-async function createPost() {
-  const postInput = document.getElementById('postText');
-  const imageInput = document.getElementById('postImage');
-  const text = (postInput?.value || '').trim();
-  if (!text && !(imageInput && imageInput.files && imageInput.files.length)) return;
+        // Create Post
+        async function createPost() {
+            const textInput = document.getElementById('postText');
+            const imageInput = document.getElementById('postImage');
+            const text = (textInput?.value || '').trim();
+            
+            if (!text && !(imageInput && imageInput.files && imageInput.files.length)) {
+                alert('Please write something or add an image');
+                return;
+            }
 
-  let image = null;
-  if (imageInput && imageInput.files && imageInput.files[0]) {
-    try {
-      image = await readFileAsDataURL(imageInput.files[0]);
-    } catch (e) {
-      // ignore image read errors
-    }
-  }
+            let image = null;
+            if (imageInput && imageInput.files && imageInput.files[0]) {
+                try {
+                    image = await readFileAsDataURL(imageInput.files[0]);
+                } catch (e) {
+                    console.error('Error reading image:', e);
+                }
+            }
 
-  try {
-    const response = await fetch('/feed/api/feed/posts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, image })
-    });
-    if (response.ok) {
-      if (postInput) postInput.value = '';
-      if (imageInput) imageInput.value = '';
-      loadFeed();
-    } else {
-      alert('Failed to create post. Please try again.');
-    }
-  } catch {
-    alert('Network error. Please try again.');
-  }
-}
+            try {
+                const response = await fetch('/feed/api/feed/posts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, image })
+                });
+                
+                if (response.ok) {
+                    textInput.value = '';
+                    imageInput.value = '';
+                    loadFeed();
+                } else {
+                    alert('Failed to create post. Please try again.');
+                }
+            } catch (e) {
+                alert('Network error. Please try again.');
+            }
+        }
 
-let activePostId = null;
+        // Like Post
+        async function likePost(postId) {
+            try {
+                await fetch(`/feed/api/feed/posts/${postId}/like`, { method: 'POST' });
+                loadFeed();
+            } catch (e) {
+                console.error('Error liking post:', e);
+            }
+        }
 
-async function openComments(postId) {
-  activePostId = postId;
-  try {
-    const res = await fetch(`/feed/api/feed/posts/${postId}`);
-    if (!res.ok) throw new Error();
-    const post = await res.json();
-    const list = document.getElementById('commentList');
-    list.innerHTML = '';
-    const comments = post.comments || [];
-    if (!comments.length) {
-      list.innerHTML = '<div class="text-muted">No comments yet.</div>';
-    } else {
-      comments.forEach(c => {
-        const div = document.createElement('div');
-        div.className = 'border rounded p-2 mb-2';
-        div.innerHTML = `<strong>${c.author}:</strong><br><span>${c.text}</span><br><small class=\"text-muted\">${new Date(c.timestamp).toLocaleString()}</small>`;
-        list.appendChild(div);
-      });
-    }
-    const modalEl = document.getElementById('commentModal');
-    if (modalEl) new bootstrap.Modal(modalEl).show();
-  } catch {
-    alert('Failed to load comments.');
-  }
-}
+        // Open Comments
+        async function openComments(postId) {
+            activePostId = postId;
+            try {
+                const res = await fetch(`/feed/api/feed/posts/${postId}`);
+                if (!res.ok) throw new Error('Failed to load comments');
+                
+                const post = await res.json();
+                const list = document.getElementById('commentList');
+                list.innerHTML = '';
+                
+                const comments = post.comments || [];
+                if (!comments.length) {
+                    list.innerHTML = '<div class="text-muted text-center py-3">No comments yet. Be the first to comment!</div>';
+                } else {
+                    comments.forEach(c => {
+                        const div = document.createElement('div');
+                        div.className = 'border rounded p-3 mb-2';
+                        div.innerHTML = `
+                            <div class="d-flex align-items-start gap-2">
+                                <img src="https://i.pravatar.cc/40?u=${c.author}" class="rounded-circle" width="40" height="40" alt="${c.author}">
+                                <div class="flex-grow-1">
+                                    <strong>${c.author}</strong>
+                                    <p class="mb-1">${c.text}</p>
+                                    <small class="text-muted">${new Date(c.timestamp).toLocaleString()}</small>
+                                </div>
+                            </div>
+                        `;
+                        list.appendChild(div);
+                    });
+                }
+                
+                new bootstrap.Modal(document.getElementById('commentModal')).show();
+            } catch (e) {
+                alert('Failed to load comments.');
+            }
+        }
 
-async function submitComment() {
-  if (!activePostId) return;
-  const inputEl = document.getElementById('commentInput');
-  const text = (inputEl?.value || '').trim();
-  if (!text) return;
-  try {
-    const res = await fetch(`/feed/api/feed/posts/${activePostId}/comments`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text })
-    });
-    if (res.ok) {
-      inputEl.value = '';
-      openComments(activePostId);
-      loadFeed();
-    } else {
-      alert('Failed to submit comment. Please try again.');
-    }
-  } catch {
-    alert('Network error. Please try again.');
-  }
-}
+        // Submit Comment
+        async function submitComment() {
+            if (!activePostId) return;
+            
+            const inputEl = document.getElementById('commentInput');
+            const text = (inputEl?.value || '').trim();
+            
+            if (!text) {
+                alert('Please write a comment');
+                return;
+            }
 
-async function likePost(postId) {
-  await fetch(`/feed/api/feed/posts/${postId}/like`, { method: 'POST' });
-  loadFeed();
-}
+            try {
+                const res = await fetch(`/feed/api/feed/posts/${activePostId}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                
+                if (res.ok) {
+                    inputEl.value = '';
+                    openComments(activePostId);
+                    loadFeed();
+                } else {
+                    alert('Failed to submit comment. Please try again.');
+                }
+            } catch (e) {
+                alert('Network error. Please try again.');
+            }
+        }
 
-async function loadFeed() {
-  try {
-    const res = await fetch('/feed/api/feed/posts');
-    const posts = await res.json();
-    const container = document.getElementById('feedPosts');
-    container.innerHTML = '';
-    posts.forEach(post => {
-      const card = document.createElement('div');
-      card.className = 'card p-4 mb-4';
+        // Load Feed
+        async function loadFeed() {
+            const container = document.getElementById('feedContainer');
+            
+            try {
+                const res = await fetch('/feed/api/feed/posts');
+                const posts = await res.json();
+                
+                if (!posts || posts.length === 0) {
+                    container.innerHTML = `
+                        <div class="card p-5 text-center">
+                            <span class="material-symbols-outlined" style="font-size: 64px; color: #ccc;">feed</span>
+                            <h5 class="mt-3">No posts yet</h5>
+                            <p class="text-muted">Be the first to share something!</p>
+                        </div>
+                    `;
+                    return;
+                }
 
-      const header = document.createElement('div');
-      header.className = 'd-flex justify-content-between align-items-center mb-3 post-header';
-      const left = document.createElement('div');
-      left.className = 'd-flex align-items-center gap-3';
-      const avatar = document.createElement('img');
-      avatar.src = `https://i.pravatar.cc/60?u=${post.author}`;
-      avatar.alt = 'profile';
-      left.appendChild(avatar);
-      const info = document.createElement('div');
-      const name = document.createElement('h6');
-      name.className = 'mb-0 fw-bold';
-      name.textContent = post.author;
-      const time = document.createElement('small');
-      time.className = 'text-muted';
-      time.textContent = formatPostTime(post.timestamp);
-      info.appendChild(name);
-      info.appendChild(time);
-      left.appendChild(info);
-      header.appendChild(left);
-      card.appendChild(header);
+                container.innerHTML = '';
+                posts.forEach(post => {
+                    const card = document.createElement('div');
+                    card.className = 'card p-4 mb-4';
+                    
+                    card.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <img src="https://i.pravatar.cc/60?u=${post.author}" class="post-avatar" alt="${post.author}">
+                                <div>
+                                    <h6 class="mb-0 fw-bold">${post.author}</h6>
+                                    <small class="text-muted">${formatPostTime(post.timestamp)}</small>
+                                </div>
+                            </div>
+                        </div>
+                        ${post.text ? `<p class="mb-2">${post.text}</p>` : ''}
+                        ${post.image ? `<img src="${post.image}" class="post-image" alt="Post image">` : ''}
+                        <hr class="my-3">
+                        <div class="d-flex justify-content-between post-actions">
+                            <button onclick="likePost('${post._id}')">
+                                <span class="material-symbols-outlined" style="font-size: 20px; vertical-align: middle;">thumb_up</span>
+                                ${post.likes || 0}
+                            </button>
+                            <button onclick="openComments('${post._id}')">
+                                <span class="material-symbols-outlined" style="font-size: 20px; vertical-align: middle;">comment</span>
+                                ${(post.comments || []).length}
+                            </button>
+                            <button>
+                                <span class="material-symbols-outlined" style="font-size: 20px; vertical-align: middle;">share</span>
+                                Share
+                            </button>
+                        </div>
+                    `;
+                    
+                    container.appendChild(card);
+                });
+            } catch (e) {
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>Error loading feed</strong><br>
+                        Please refresh the page or try again later.
+                    </div>
+                `;
+            }
+        }
 
-      if (post.text) {
-        const p = document.createElement('p');
-        p.textContent = post.text;
-        card.appendChild(p);
-      }
-      if (post.image) {
-        const im = document.createElement('img');
-        im.src = post.image;
-        im.className = 'img-fluid rounded mb-3';
-        card.appendChild(im);
-      }
-
-      const actions = document.createElement('div');
-      actions.className = 'd-flex justify-content-between text-muted post-actions';
-      const likeBtn = document.createElement('button');
-      likeBtn.textContent = `👍 ${post.likes || 0}`;
-      likeBtn.onclick = () => likePost(post._id);
-      const commentBtn = document.createElement('button');
-      commentBtn.textContent = `💬 ${(post.comments || []).length}`;
-      commentBtn.onclick = () => openComments(post._id);
-      const shareBtn = document.createElement('button');
-      shareBtn.textContent = '↗️ Share';
-      actions.appendChild(likeBtn);
-      actions.appendChild(commentBtn);
-      actions.appendChild(shareBtn);
-      card.appendChild(actions);
-
-      container.appendChild(card);
-    });
-  } catch {}
-}
-
-document.addEventListener('DOMContentLoaded', loadFeed);
+        // Load feed on page load
+        document.addEventListener('DOMContentLoaded', loadFeed);
     </script>
-  </body>
-
-</html> 
+</body>
+</html>

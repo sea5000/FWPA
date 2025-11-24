@@ -1,287 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0">
     <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect">
-    <link as="style"
-        href="https://fonts.googleapis.com/css2?display=swap&amp;family=Plus+Jakarta+Sans%3Awght%40400%3B500%3B700%3B800"
-        onload="this.rel='stylesheet'" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?display=swap&amp;family=Plus+Jakarta+Sans:wght@400;500;700;800" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/theme.css">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-    <title>Bookme Community</title>
-    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon">
+    <title>Community - Notes | BookMe</title>
 </head>
-
-<body class="bg-light text-dark">
+<body class="bg-light">
     <div class="d-flex flex-column min-vh-100">
-        <header class="w-100 site-header">
+        <!-- Header -->
+        <header class="w-100 bg-white border-bottom">
             <div class="container d-flex align-items-center justify-content-between py-3">
                 <div class="d-flex align-items-center">
-                    <div class="me-2" style="width:40px;height:40px;color:var(--bs-primary);">
-                        <span class="material-symbols-outlined fs-3 text-primary">book</span>
-                    </div>
-                    <h1 class="h5 mb-0 ms-2"><a href="{{ url_for('dashboard.index') }}" class="text-decoration-none text-reset">BookMe</a></h1>
+                    <span class="material-symbols-outlined fs-3 text-primary me-2">book</span>
+                    <h1 class="h5 mb-0"><a href="{{ url_for('dashboard.index') }}" class="text-decoration-none text-reset">BookMe</a></h1>
                 </div>
-                <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
+                <nav class="d-none d-md-flex align-items-center gap-2">
                     <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('dashboard.index') }}">Home</a>
                     <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
                     <a class="btn btn-sm btn-primary rounded-pill text-white" href="{{ url_for('community.index') }}">Community</a>
                     <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('challenges.index') }}">Challenge</a>
                 </nav>
-                <div class="d-none d-md-flex align-items-center header-actions">
-                    <button type="button" class="btn btn-link text-muted p-0" aria-label="Notifications" title="Notifications">
+                <div class="d-none d-md-flex align-items-center gap-3">
+                    <button type="button" class="btn btn-link text-muted p-0">
                         <span class="material-symbols-outlined">notifications</span>
                     </button>
                     <div class="dropdown">
-                      <a class="btn btn-link text-muted p-0 dropdown-toggle" href="{{ url_for('profile.index') }}" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile" title="Profile">
-                        <span class="material-symbols-outlined fs-3">account_circle</span>
-                      </a>
-                      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                        <li><h6 class="dropdown-header">Account</h6></li>
-                        <li><a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                          <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
-                            <button type="submit" class="dropdown-item">Log out</button>
-                          </form>
-                        </li>
-                      </ul>
+                        <a class="btn btn-link text-muted p-0" href="#" id="profileDropdown" data-bs-toggle="dropdown">
+                            <span class="material-symbols-outlined fs-3">account_circle</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header">Account</h6></li>
+                            <li><a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
+                                    <button type="submit" class="dropdown-item">Log out</button>
+                                </form>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </header>
+
+        <!-- Main Content -->
         <main class="flex-grow-1">
             <div class="container my-5">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h2 class="h3 mb-0">Community</h2><small class="text-muted">Connect with others</small>
+                <!-- Page Header -->
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div>
+                        <h2 class="h3 mb-0">Community</h2>
+                        <small class="text-muted">Connect and share knowledge</small>
+                    </div>
                 </div>
-                <ul class="nav nav-tabs mb-4" role="tablist">
-                    <li class="nav-item" role="presentation"><a class="nav-link active" href="{{ url_for('community.community_notes') }}" id="notes-tab"
-                            data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab" aria-controls="notes"
-                            aria-selected="true">Notes</button></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('community.friends') }}" id="friends-tab" 
-                      data-bs-toggle="tab" data-bs-target="#friends" type="button" role="tab" aria-controls="friends" aria-selected="false">Friends</a></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('feed.index') }}" id="feed-tab" 
-                      data-bs-toggle="tab" data-bs-target="#feed" type="button" role="tab" aria-controls="feed" aria-selected="false">Feed</a></li> 
+
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs mb-4">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('community.index') }}">📝 Notes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('friends.index') }}">👥 Friends</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('feed.index') }}">📰 Feed</a>
+                    </li>
                 </ul>
 
-        <!-- Subject Folders -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="fw-bold display-6">Study Content</h2>
-      <form action="/api/notes/upload" method="POST" enctype="multipart/form-data">
-        <input type="text" name="title" required>
-        <textarea name="content" required></textarea>
-        <input type="file" name="file" accept=".pdf,.jpg,.png">
-        <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">+ Add New Note</button>
-      </form>
+                <!-- Notes Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="mb-0">Shared Notes</h4>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
+                                + Add Note
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-      <h2>Upload a file</h2>
-      <form action="/api/files" method="POST" enctype="multipart/form-data">
-        <input type="file" name="file" required>
-        <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">Upload a File</button>
-      </form>
-
-    </div>
-
-    
-    <h4 class="fw-bold mb-3">Your Folders</h4>
-    <div class="row g-4 mb-5">
-      <div class="col-6 col-md-4 col-lg-3">
-        <div class="card folder-card p-3 text-center">
-          <div class="folder-icon mb-2">📘</div>
-          <h6 class="fw-bold mb-1">Mathematics</h6>
-          <p class="text-muted small mb-0">8 notes</p>
-        </div>
-      </div>
-      <div class="col-6 col-md-4 col-lg-3">
-        <div class="card folder-card p-3 text-center">
-          <div class="folder-icon mb-2">🧬</div>
-          <h6 class="fw-bold mb-1">Biology</h6>
-          <p class="text-muted small mb-0">5 notes</p>
-        </div>
-      </div>
-      <div class="col-6 col-md-4 col-lg-3">
-        <div class="card folder-card p-3 text-center">
-          <div class="folder-icon mb-2">💻</div>
-          <h6 class="fw-bold mb-1">Programming</h6>
-          <p class="text-muted small mb-0">12 notes</p>
-        </div>
-      </div>
-      <div class="col-6 col-md-4 col-lg-3">
-        <div class="card folder-card p-3 text-center">
-          <div class="folder-icon mb-2">🧠</div>
-          <h6 class="fw-bold mb-1">Psychology</h6>
-          <p class="text-muted small mb-0">3 notes</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Recent Notes -->
-    <h4 class="fw-bold mb-3">Recent Notes</h4>
-    <div class="row g-4">
-      <div class="col-md-6 col-lg-4">
-        <div class="note-card p-3">
-          <h6 class="fw-bold">Derivatives Rules</h6>
-          <p class="text-muted small">Mathematics</p>
-          <p>Quick summary of differentiation formulas for test prep. 📖</p>
-          <div class="d-flex justify-content-between">
-            <button class="btn btn-sm btn-outline-primary">View</button>
-            <button class="btn btn-sm btn-outline-secondary">Edit</button>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4">
-        <div class="note-card p-3">
-          <h6 class="fw-bold">Cell Division Overview</h6>
-          <p class="text-muted small">Biology</p>
-          <p>Diagram and steps of mitosis and meiosis 🧬</p>
-          <div class="d-flex justify-content-between">
-            <button class="btn btn-sm btn-outline-primary">View</button>
-            <button class="btn btn-sm btn-outline-secondary">Edit</button>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4">
-        <div class="note-card p-3">
-          <h6 class="fw-bold">Python Basics</h6>
-          <p class="text-muted small">Programming</p>
-          <p>Variables, loops, and conditionals — beginner-friendly!</p>
-          <div class="d-flex justify-content-between">
-            <button class="btn btn-sm btn-outline-primary">View</button>
-            <button class="btn btn-sm btn-outline-secondary">Edit</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Add Note Modal -->
-  <div class="modal fade" id="addNoteModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form>
-          <div class="modal-header">
-            <h5 class="modal-title fw-bold">Add New Note</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label for="noteTitle" class="form-label">Title</label>
-              <input type="text" id="noteTitle" class="form-control" placeholder="Enter note title" required>
+                <!-- Notes Grid -->
+                <div class="row g-4" id="notesContainer">
+                    {% if notes %}
+                        {% for note in notes %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ note.title }}</h5>
+                                    <p class="text-muted small mb-2">
+                                        By {{ note.author }} • {{ note.views or 0 }} views
+                                    </p>
+                                    <p class="card-text">{{ note.content[:100] }}{% if note.content|length > 100 %}...{% endif %}</p>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewNote('{{ note._id }}')">View</button>
+                                        {% if note.author == username %}
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="editNote('{{ note._id }}')">Edit</button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteNote('{{ note._id }}')">Delete</button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                No notes shared yet. Be the first to share your knowledge!
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
-            <div class="mb-3">
-              <label for="noteSubject" class="form-label">Subject</label>
-              <select id="noteSubject" class="form-select" required>
-                <option selected disabled>Choose folder...</option>
-                <option>Mathematics</option>
-                <option>Biology</option>
-                <option>Programming</option>
-                <option>Psychology</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="noteContent" class="form-label">Content</label>
-              <textarea id="noteContent" class="form-control" rows="4" placeholder="Write your note here..." required></textarea>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Save Note</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-                
         </main>
+
+        <!-- Mobile Footer -->
         <footer class="d-md-none fixed-bottom bg-white border-top">
             <nav class="nav justify-content-around py-2">
-                <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('home.index') }}"><span
-                        class="material-symbols-outlined fs-4">home</span> <small class="d-block">Home</small></a> <a
-                    class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('study.index') }}"><span
-                        class="material-symbols-outlined fs-4">school</span> <small class="d-block">Study</small></a> <a
-                    class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="{{ url_for('community.index') }}"><span class="material-symbols-outlined fs-4">groups</span> <small
-                        class="d-block">Community</small></a> <a
-                    class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="{{ url_for('challenges.index') }}"><span class="material-symbols-outlined fs-4">emoji_events</span>
-                    <small class="d-block">Challenge</small></a>
+                <a class="nav-link text-muted" href="{{ url_for('dashboard.index') }}">
+                    <span class="material-symbols-outlined">home</span>
+                    <small class="d-block">Home</small>
+                </a>
+                <a class="nav-link text-muted" href="{{ url_for('study.index') }}">
+                    <span class="material-symbols-outlined">school</span>
+                    <small class="d-block">Study</small>
+                </a>
+                <a class="nav-link text-primary" href="{{ url_for('community.index') }}">
+                    <span class="material-symbols-outlined">groups</span>
+                    <small class="d-block">Community</small>
+                </a>
+                <a class="nav-link text-muted" href="{{ url_for('challenges.index') }}">
+                    <span class="material-symbols-outlined">emoji_events</span>
+                    <small class="d-block">Challenge</small>
+                </a>
             </nav>
         </footer>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Add Note Modal -->
+    <div class="modal fade" id="addNoteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Note</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="noteForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="noteTitle" class="form-label">Title</label>
+                            <input type="text" id="noteTitle" name="title" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="noteContent" class="form-label">Content</label>
+                            <textarea id="noteContent" name="content" class="form-control" rows="5" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Note</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Note Modal -->
+    <div class="modal fade" id="viewNoteModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewNoteTitle"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-3" id="viewNoteAuthor"></p>
+                    <div id="viewNoteContent"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-
-        document.addEventListener('DOMContentLoaded', function () {
-            try {
-                const navAreas = [];
-                const header = document.querySelector('header');
-                if (header) navAreas.push(header);
-                const footers = Array.from(document.querySelectorAll('footer'));
-                navAreas.push(...footers);
-                const parts = location.pathname.split('/').filter(Boolean);
-                const currentSlug = parts.length >= 2 ? parts[parts.length - 2] : (parts[0] || 'home');
-
-                navAreas.forEach(area => {
-                    const links = Array.from(area.querySelectorAll('a[href]'));
-                    links.forEach(a => {
-                        try {
-                            const url = new URL(a.getAttribute('href'), location.origin);
-                            const linkParts = url.pathname.split('/').filter(Boolean);
-                            const linkSlug = linkParts.length >= 2 ? linkParts[linkParts.length - 2] : (linkParts[0] || 'home');
-
-                            a.classList.remove('active', 'text-primary', 'fw-bold', 'text-white', 'btn-primary');
-
-                            if (linkSlug === currentSlug) {
-                                if (a.classList.contains('btn')) {
-                                    a.classList.remove('btn-light');
-                                    a.classList.add('btn-primary', 'text-white');
-                                } else {
-                                    a.classList.add('text-primary', 'fw-bold');
-                                }
-                                a.classList.add('active');
-                            } else {
-                                if (!a.classList.contains('btn')) {
-                                    a.classList.remove('text-primary', 'fw-bold');
-                                    a.classList.add('text-muted');
-                                }
-                                if (a.classList.contains('btn') && !a.classList.contains('btn-light')) {
-                                    a.classList.add('btn-light');
-                                }
-                            }
-                        } catch (e) { }
-                    });
-                });
-            } catch (e) { }
-        });
-        document.getElementById('noteForm').addEventListener('submit', function(e) {
+        // Add Note
+        document.getElementById('noteForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const formData = new FormData(this);
             const note = Object.fromEntries(formData.entries());
 
-          fetch('/api/notes', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(note)
-  })
-  .then(res => res.json())
-  .then(data => alert(data.message));
-});
+            try {
+                const res = await fetch('/community/api/notes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(note)
+                });
+                if (res.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('addNoteModal')).hide();
+                    location.reload();
+                } else {
+                    alert('Failed to add note');
+                }
+            } catch (e) {
+                alert('Error adding note');
+            }
+        });
 
-function viewNote(title) {
-  fetch(`/api/notes/${title}`)
-    .then(res => res.json())
-    .then(note => {
-      alert(`Note: ${note.title}\n${note.content}`);
-    });
-}
+        // View Note
+        async function viewNote(noteId) {
+            try {
+                const res = await fetch(`/community/api/notes/${noteId}`);
+                const note = await res.json();
+                document.getElementById('viewNoteTitle').textContent = note.title;
+                document.getElementById('viewNoteAuthor').textContent = `By ${note.author} • ${note.views || 0} views`;
+                document.getElementById('viewNoteContent').textContent = note.content;
+                new bootstrap.Modal(document.getElementById('viewNoteModal')).show();
+            } catch (e) {
+                alert('Error loading note');
+            }
+        }
 
+        // Delete Note
+        async function deleteNote(noteId) {
+            if (!confirm('Are you sure you want to delete this note?')) return;
+            try {
+                const res = await fetch(`/community/api/notes/${noteId}`, { method: 'DELETE' });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    alert('Failed to delete note');
+                }
+            } catch (e) {
+                alert('Error deleting note');
+            }
+        }
     </script>
 </body>
-
 </html>

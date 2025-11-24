@@ -1,101 +1,14 @@
-"""from bson import ObjectId
-from flask import Blueprint, render_template, g
-from routes.friends import notes
-from utils.auth import get_current_user_from_token
-from model.login_model import get_all_users
-from flask import request, jsonify
-from pymongo import MongoClient
-
-
-community_bp = Blueprint('community', __name__)
-client = MongoClient("mongodb://localhost:27017/")
-db = client.bookme
-
-
-@community_bp.before_request
-def require_auth():
-    user = get_current_user_from_token()
-    if not isinstance(user, str):
-        return user
-    g.current_user = user
-
-
-@community_bp.route('/', endpoint='index')
-def community_index():
-    notes = list(db.notes.find({}, {'_id': 0}))
-    return render_template('community.html', username=g.current_user, users=get_all_users(), notes=notes)
-
-
-comment @community_bp.route('/')
-def community_page():
-    notes = list(db.notes.find({}, {'_id': 0}))
-    return render_template('community.html', notes=notes) comment
-
-@community_bp.route('/friends', endpoint='friends')
-def friends():
-    return render_template('community_friends.html', username=g.current_user, users=get_all_users())
-
-@community_bp.route('/feed', endpoint='feed')
-def feed():
-    return render_template('community_feed.html', username=g.current_user, users=get_all_users())
-
-
-@community_bp.route('/api/notes/<title>', methods=['GET'])
-def view_note(title):                                               #Returns full content of that note
-    note = db.notes.find_one({'title': title})
-    if note:
-        db.notes.update_one({'title': title}, {'$inc': {'views': 1}})
-        note['_id'] = str(note['_id'])
-        return jsonify(note)
-    return jsonify({'error': 'Note not found'}), 404
-
-
-@community_bp.route('/api/community/posts', methods=['GET'])
-def get_posts():                     #Returns all posts in the community    
-    posts = list(db.posts.find({}, {'_id': 0}))
-    return jsonify(posts)
-
-
-@community_bp.route('/api/notes', methods=['POST'])
-def upload_note():                 #Uploads a new note to the community
-    data = request.get_json()
-    data['author'] = g.current_user
-    data['views'] = 0
-    db.notes.insert_one(data)
-    return jsonify({'message': 'Note uploaded successfully'}), 201
-
-@community_bp.route('/api/community/posts/<post_id>/comments', methods=['POST'])
-def add_comment(post_id):         #Adds a comment to a specific note
-    comment = request.get_json()
-    comment['author'] = g.current_user
-
-    db.posts.update_one(
-        {'_id': ObjectId(post_id)},
-        {'$push': {'comments': comment}}
-    )
-    return jsonify({'message': 'Comment added'}), 200
-
-@community_bp.route('/api/community/posts/<post_id>/like', methods=['POST'])
-def like_post(post_id):          #Likes a specific note
-    db.posts.update_one(
-        {'_id': ObjectId(post_id)},
-        {'$inc': {'likes': 1}}
-    )
-    return jsonify({'message': 'Post liked'}), 200"""
-
 from bson import ObjectId
 from flask import Blueprint, render_template, g, request, jsonify
 from utils.auth import get_current_user_from_token
 from model.login_model import get_all_users
-from pymongo import MongoClient
+from model.notes_model import upload_note as upload_note_model, view_note as view_note_model
+from model.mongo import get_db
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import os
 
 community_bp = Blueprint("community", __name__)
-
-client = MongoClient("mongodb://localhost:27017/")
-db = client.bookme
 
 
 @community_bp.before_request
@@ -108,6 +21,7 @@ def require_auth():
 #shows notes
 @community_bp.route("/", endpoint="index")
 def community_index():
+    db = get_db()
     notes = list(db.notes.find({}))
     for n in notes:
         n["_id"] = str(n["_id"])
@@ -118,31 +32,10 @@ def community_index():
         notes=notes
     )
 
-
-
-# COMMUNITY FRIENDS PAGE
-@community_bp.route("/friends", endpoint="friends")
-def friends():
-    return render_template(
-        "community_friends.html",
-        username=g.current_user,
-        users=get_all_users()
-    )
-
-
-
-# COMMUNITY FEED PAGE
-@community_bp.route("/feed", endpoint="feed")
-def feed():
-    return render_template(
-        "community_feed.html",
-        username=g.current_user,
-        users=get_all_users()
-    )
-
 # READ single note
 @community_bp.route("/api/notes/<note_id>", methods=["GET"])
-def view_note(note_id):
+def view_note_endpoint(note_id):
+    db = get_db()
     try:
         note = db.notes.find_one({"_id": ObjectId(note_id)})
         if not note:
@@ -158,24 +51,20 @@ def view_note(note_id):
 
 # CREATE new note
 @community_bp.route("/api/notes", methods=["POST"])
-def upload_note():
+def upload_note_endpoint():
     data = request.get_json()
-
-    new_note = {
+    note_data = {
         "title": data.get("title"),
         "content": data.get("content"),
-        "author": g.current_user,
-        "views": 0,
         "timestamp": datetime.utcnow(),
     }
-
-    db.notes.insert_one(new_note)
-
-    return jsonify({"message": "Note uploaded successfully"}), 201
+    note_id = upload_note_model(g.current_user, note_data)
+    return jsonify({"message": "Note uploaded successfully", "note_id": note_id}), 201
 
 # UPDATE existing note
 @community_bp.route("/api/notes/<note_id>", methods=["PUT"])
 def update_note(note_id):
+    db = get_db()
     data = request.get_json()
     update_fields = {
         "title": data.get("title"),
@@ -190,6 +79,7 @@ def update_note(note_id):
 # DELETE note
 @community_bp.route("/api/notes/<note_id>", methods=["DELETE"])
 def delete_note(note_id):
+    db = get_db()
     result = db.notes.delete_one({"_id": ObjectId(note_id)})
     if result.deleted_count == 0:
         return jsonify({"error": "Note not found"}), 404
@@ -198,6 +88,7 @@ def delete_note(note_id):
 # CREATE new note with file upload
 @community_bp.route("/api/notes/upload", methods=["POST"])
 def upload_note_with_file():
+    db = get_db()
     title = request.form.get("title")
     content = request.form.get("content")
     file = request.files.get("file")
@@ -226,6 +117,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 #
 @community_bp.route("/api/files", methods=["POST"])
 def upload_file():
+    db = get_db()
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
 
@@ -247,6 +139,7 @@ def upload_file():
 # READ all files
 @community_bp.route("/api/files", methods=["GET"])
 def get_files():
+    db = get_db()
     files = list(db.files.find({}))
     for f in files:
         f["_id"] = str(f["_id"])
@@ -255,12 +148,13 @@ def get_files():
 # DELETE file
 @community_bp.route("/api/files/<file_id>", methods=["DELETE"])
 def delete_file(file_id):
+    db = get_db()
     result = db.files.delete_one({"_id": ObjectId(file_id)})
     if result.deleted_count == 0:
         return jsonify({"error": "File not found"}), 404
     return jsonify({"message": "File deleted"}), 200
 
-
+"""
 notes = [
     {"name": "Derivatives Rules",
      "folder": "Mathematics",
@@ -272,4 +166,4 @@ notes = [
      "folder": "Biology",
      "owner": "Alice Chen" }
 
-]
+]"""

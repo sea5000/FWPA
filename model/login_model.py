@@ -179,8 +179,16 @@ def update_login_streak(username: str) -> bool:
             print(f"update_login_streak: user '{username}' not found in MongoDB")
             return False
         
-        # Get current studyData
+        # Get current studyData, preserving all existing fields
         study_data = user_doc.get('studyData', {})
+        # Ensure studyData has required structure, preserving existing fields
+        if not isinstance(study_data, dict):
+            study_data = {}
+        # Preserve existing fields like 'decks', 'loginHistory', etc.
+        # Only initialize if missing
+        if 'decks' not in study_data:
+            study_data['decks'] = []
+        
         current_streak = study_data.get('streak', 0)
         last_login_str = study_data.get('lastLogin')
         

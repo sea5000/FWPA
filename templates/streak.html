@@ -127,8 +127,11 @@
 
       <main class="container py-5">
         <div class="streak-container">
-          <h2 class="fw-bold mb-3">Your Study Streak & contributions</h2>
-          <div class="card p-3">
+          <h2 class="fw-bold mb-3">Your Login Streak</h2>
+          <div
+            class="card p-3"
+            data-streak="{{ studyData.streak | default(0) }}"
+          >
             <div class="month-labels" id="month-labels"></div>
             <div class="d-flex gap-2">
               <div class="weekday-labels">
@@ -146,13 +149,10 @@
             </div>
           </div>
           <div class="streak-legend">
-            <span>Less</span>
+            <span class="text-muted small">No login</span>
             <div class="streak-day" data-level="0"></div>
             <div class="streak-day" data-level="1"></div>
-            <div class="streak-day" data-level="2"></div>
-            <div class="streak-day" data-level="3"></div>
-            <div class="streak-day" data-level="4"></div>
-            <span>More</span>
+            <span class="text-muted small">Logged in</span>
           </div>
         </div>
 
@@ -210,25 +210,26 @@
         const today = new Date();
         const daysInGrid = 371; // 53 weeks * 7 days
 
-        // Use server-provided streak data
-        const streakDays = {{ studyData.streak | default(0) }};
-        const studyData = {};
+        // Use server-provided streak data from data attribute
+        const streakContainer = document.querySelector(
+          ".streak-container .card"
+        );
+        const streakDays =
+          parseInt(streakContainer.getAttribute("data-streak")) || 0;
+        const loginDays = new Set();
 
-        // Populate studyData: fill in consecutive days starting from today going backwards
-        // Each day gets incrementally more study time to visualize the streak
+        // Populate loginDays: mark consecutive days starting from today going backwards
+        // Only track login days, not minutes
         for (let i = 0; i < streakDays && i < daysInGrid; i++) {
           const date = new Date();
           date.setDate(today.getDate() - i);
-          // Assign increasing study time for streak visualization
-          studyData[date.toLocaleDateString()] = 30 + (i % 5) * 20; // 30-110 minutes per day
+          // Mark this day as logged in
+          loginDays.add(date.toLocaleDateString());
         }
 
-        function getLevel(minutes) {
-          if (minutes === 0) return 0;
-          if (minutes <= 15) return 1;
-          if (minutes <= 45) return 2;
-          if (minutes <= 90) return 3;
-          return 4;
+        function getLevel(isLoggedIn) {
+          // Binary: 0 = not logged in, 1 = logged in
+          return isLoggedIn ? 1 : 0;
         }
 
         const monthLabels = [
@@ -250,13 +251,15 @@
         for (let i = 0; i < daysInGrid; i++) {
           const date = new Date();
           date.setDate(today.getDate() - (daysInGrid - 1 - i));
-          const minutes = studyData[date.toLocaleDateString()] || 0;
-          const level = getLevel(minutes);
+          const isLoggedIn = loginDays.has(date.toLocaleDateString());
+          const level = getLevel(isLoggedIn);
 
           const day = document.createElement("div");
           day.className = "streak-day";
           day.dataset.level = level;
-          day.title = `${date.toDateString()}: ${minutes} minutes`;
+          day.title = isLoggedIn
+            ? `${date.toDateString()}: Logged in`
+            : `${date.toDateString()}: No login`;
           grid.appendChild(day);
 
           // For month labels
@@ -282,8 +285,8 @@
         const tooltipTriggerList = [].slice.call(
           document.querySelectorAll("[title]")
         );
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-          return new bootstrap.Tooltip(tooltipTriggerEl);
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+          new bootstrap.Tooltip(tooltipTriggerEl);
         });
       });
     </script>

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, g, request, jsonify, url_for, current_app
 from utils.auth import get_current_user_from_token
-from model.login_model import get_all_users, get_user_by_username
+from model.login_model import get_all_users, get_user_by_username, update_user_profile_pic
 import os
 from werkzeug.utils import secure_filename
 
@@ -53,8 +53,14 @@ def upload_avatar():
                     os.remove(path)
             except Exception:
                 pass
-        user.pop("profile_pic", None)
-        return jsonify({"success": True, "profile_pic": user.get("profile_pic", "")})
+        # Update MongoDB to remove profile_pic
+        print(f"upload_avatar: Attempting to remove profile_pic from MongoDB for user '{username}'")
+        update_success = update_user_profile_pic(username, None)
+        if not update_success:
+            print(f"ERROR: Failed to remove profile_pic from MongoDB for user '{username}'")
+        else:
+            print(f"SUCCESS: Profile picture removed from MongoDB for user '{username}'")
+        return jsonify({"success": True, "profile_pic": ""})
 
     # Handle upload
     if "avatar" not in request.files:
@@ -76,7 +82,20 @@ def upload_avatar():
     save_path = os.path.join(folder, save_name)
     file.save(save_path)
 
-    # Update in-memory user record to point to the static url
-    user["profile_pic"] = url_for("static", filename=f"profile_pics/{save_name}")
+    # Generate the URL for the saved file
+    profile_pic_url = url_for("static", filename=f"profile_pics/{save_name}")
+    
+    # Update MongoDB with the new profile picture URL
+    print(f"upload_avatar: Attempting to update MongoDB for user '{username}' with URL '{profile_pic_url}'")
+    update_success = update_user_profile_pic(username, profile_pic_url)
+    if not update_success:
+        # Log the error but still return success since file was saved
+        print(f"ERROR: Failed to update profile_pic in MongoDB for user '{username}'. File saved but DB not updated.")
+        # Try to verify what happened
+        user_after = get_user_by_username(username)
+        if user_after:
+            print(f"Current profile_pic in DB for '{username}': {user_after.get('profile_pic')}")
+    else:
+        print(f"SUCCESS: MongoDB updated for user '{username}'")
 
-    return jsonify({"success": True, "profile_pic": user["profile_pic"]})
+    return jsonify({"success": True, "profile_pic": profile_pic_url})

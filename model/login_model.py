@@ -151,3 +151,70 @@ def delete_user_by_username(username: str) -> bool:
     except Exception as e:
         print(f"delete_user_by_username (login_model): error deleting user: {e}")
         return False
+
+
+def update_user_profile_pic(username: str, profile_pic_url: Optional[str]) -> bool:
+    """Update a user's profile_pic field in MongoDB.
+    
+    Args:
+        username: The username of the user to update
+        profile_pic_url: The URL/path to the profile picture, or None to remove it
+        
+    Returns:
+        True on success, False on failure
+    """
+    if not username:
+        print(f"update_user_profile_pic: username is empty")
+        return False
+    
+    try:
+        # First verify the user exists
+        user_exists = _users_col.find_one({'username': username})
+        if not user_exists:
+            print(f"update_user_profile_pic: user '{username}' not found in MongoDB")
+            return False
+        
+        if profile_pic_url is None:
+            # Remove the profile_pic field
+            print(f"update_user_profile_pic: Removing profile_pic for user '{username}'")
+            res = _users_col.update_one(
+                {'username': username},
+                {'$unset': {'profile_pic': ''}}
+            )
+        else:
+            # Set or update the profile_pic field
+            print(f"update_user_profile_pic: Setting profile_pic='{profile_pic_url}' for user '{username}'")
+            res = _users_col.update_one(
+                {'username': username},
+                {'$set': {'profile_pic': profile_pic_url}}
+            )
+        
+        # Log the result
+        print(f"update_user_profile_pic: matched_count={res.matched_count}, modified_count={res.modified_count}")
+        
+        # Success if we matched the user (even if value was already the same)
+        if res.matched_count > 0:
+            # Verify the update actually happened
+            updated_user = _users_col.find_one({'username': username})
+            if updated_user:
+                stored_pic = updated_user.get('profile_pic')
+                if profile_pic_url is None:
+                    # For removal, check that field is gone or None
+                    if stored_pic is None or stored_pic == '':
+                        print(f"update_user_profile_pic: Successfully removed profile_pic for '{username}'")
+                        return True
+                else:
+                    # For setting, check that value matches
+                    if stored_pic == profile_pic_url:
+                        print(f"update_user_profile_pic: Successfully updated profile_pic for '{username}'")
+                        return True
+                    else:
+                        print(f"update_user_profile_pic: Warning - stored value '{stored_pic}' doesn't match expected '{profile_pic_url}'")
+            
+        print(f"update_user_profile_pic: Failed to update - matched_count={res.matched_count}")
+        return False
+    except Exception as e:
+        print(f"update_user_profile_pic (login_model): error updating profile picture: {e}")
+        import traceback
+        traceback.print_exc()
+        return False

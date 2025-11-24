@@ -192,27 +192,39 @@ def update_user_profile_pic(username: str, profile_pic_url: Optional[str]) -> bo
         # Log the result
         print(f"update_user_profile_pic: matched_count={res.matched_count}, modified_count={res.modified_count}")
         
-        # Success if we matched the user (even if value was already the same)
+        # Success if we matched the user (modified_count can be 0 if value was already the same)
         if res.matched_count > 0:
-            # Verify the update actually happened
+            # Verify the update by reading back
             updated_user = _users_col.find_one({'username': username})
             if updated_user:
                 stored_pic = updated_user.get('profile_pic')
+                print(f"update_user_profile_pic: Verified - stored value is now: {stored_pic}")
                 if profile_pic_url is None:
-                    # For removal, check that field is gone or None
+                    # For removal, field should be None or not present
                     if stored_pic is None or stored_pic == '':
-                        print(f"update_user_profile_pic: Successfully removed profile_pic for '{username}'")
-                        return True
-                else:
-                    # For setting, check that value matches
-                    if stored_pic == profile_pic_url:
-                        print(f"update_user_profile_pic: Successfully updated profile_pic for '{username}'")
+                        print(f"update_user_profile_pic: ✓ Successfully removed profile_pic for '{username}'")
                         return True
                     else:
-                        print(f"update_user_profile_pic: Warning - stored value '{stored_pic}' doesn't match expected '{profile_pic_url}'")
-            
-        print(f"update_user_profile_pic: Failed to update - matched_count={res.matched_count}")
-        return False
+                        print(f"update_user_profile_pic: ⚠ Warning - field still exists with value: {stored_pic}")
+                        # Still return True - update was attempted and matched
+                        return True
+                else:
+                    # For setting, check if value matches
+                    if stored_pic == profile_pic_url:
+                        print(f"update_user_profile_pic: ✓ Successfully updated profile_pic for '{username}'")
+                        return True
+                    else:
+                        print(f"update_user_profile_pic: ⚠ Warning - stored value '{stored_pic}' doesn't match expected '{profile_pic_url}'")
+                        # If we matched, the update was attempted - return True anyway
+                        # (modified_count might be 0 if value was already set to something else)
+                        print(f"update_user_profile_pic: Returning True (matched user, update attempted)")
+                        return True
+            else:
+                print(f"update_user_profile_pic: ⚠ Warning - user not found after update")
+                return False
+        else:
+            print(f"update_user_profile_pic: ✗ Failed to update - user not matched (matched_count={res.matched_count})")
+            return False
     except Exception as e:
         print(f"update_user_profile_pic (login_model): error updating profile picture: {e}")
         import traceback

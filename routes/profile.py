@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, g, request, jsonify, url_for, current_app
 from utils.auth import get_current_user_from_token
-from model.login_model import get_all_users, get_user_by_username, update_user_profile_pic
+from model.login_model import get_all_users, get_user_by_username, update_user_profile_pic, update_user_password
 import os
 from werkzeug.utils import secure_filename
 
@@ -99,3 +99,34 @@ def upload_avatar():
         print(f"SUCCESS: MongoDB updated for user '{username}'")
 
     return jsonify({"success": True, "profile_pic": profile_pic_url})
+
+
+@profile_bp.route("/change-password", methods=["POST"], endpoint="change_password")
+def change_password():
+    """Handle password change request.
+    
+    Expects JSON with 'new_password' field.
+    """
+    username = g.current_user
+    user = get_user_by_username(username)
+    if not user:
+        return jsonify({"error": "user not found"}), 404
+    
+    # Get the new password from request
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "no data provided"}), 400
+    
+    new_password = data.get("new_password")
+    if not new_password:
+        return jsonify({"error": "new_password is required"}), 400
+    
+    # Update password in MongoDB
+    print(f"change_password: Attempting to update password for user '{username}'")
+    update_success = update_user_password(username, new_password)
+    if not update_success:
+        print(f"ERROR: Failed to update password in MongoDB for user '{username}'")
+        return jsonify({"error": "Failed to update password"}), 500
+    else:
+        print(f"SUCCESS: Password updated for user '{username}'")
+        return jsonify({"success": True, "message": "Password updated successfully"})

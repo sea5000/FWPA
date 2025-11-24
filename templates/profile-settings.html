@@ -129,7 +129,7 @@
                             <p>Last changed 3 months ago</p>
                         </div>
                     </div>
-                    <button class="btn btn-outline-primary btn-sm">
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="changePasswordBtn">
                         <span class="material-symbols-outlined align-middle" style="font-size: 1rem;">edit</span>
                         Change
                     </button>
@@ -160,6 +160,38 @@
                     </button>
                 </div>
             </section>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title">
+                        <span class="material-symbols-outlined align-middle me-2">lock</span>
+                        Change Password
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p class="mb-3">Enter your new password below:</p>
+                    <form id="changePasswordForm">
+                        <div class="mb-3">
+                            <label for="newPasswordInput" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="newPasswordInput" placeholder="Enter new password" required>
+                            <div class="form-text">Your password will be updated immediately.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmChangePasswordBtn">
+                        <span class="material-symbols-outlined align-middle me-1">save</span>
+                        Change Password
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -309,11 +341,151 @@
         //     }, 3000);
         // });
 
-        // Handle sign out
-        document.getElementById('signOutBtn').addEventListener('click', function() {
-            // Add your sign out logic here
-            alert('Signing out...');
-        });
+        // Handle sign out (if button exists)
+        const signOutBtn = document.getElementById('signOutBtn');
+        if(signOutBtn) {
+            signOutBtn.addEventListener('click', function() {
+                // Add your sign out logic here
+                alert('Signing out...');
+            });
+        }
+
+        // Change Password functionality
+        (function(){
+            const changePasswordBtn = document.getElementById('changePasswordBtn');
+            const changePasswordModal = document.getElementById('changePasswordModal');
+            const confirmChangePasswordBtn = document.getElementById('confirmChangePasswordBtn');
+            const newPasswordInput = document.getElementById('newPasswordInput');
+            const changePasswordForm = document.getElementById('changePasswordForm');
+            
+            if(!changePasswordBtn) {
+                console.error('Change Password button not found');
+                return;
+            }
+            
+            if(!changePasswordModal) {
+                console.error('Change Password modal not found');
+                return;
+            }
+            
+            if(!confirmChangePasswordBtn) {
+                console.error('Confirm Change Password button not found');
+                return;
+            }
+            
+            if(!newPasswordInput) {
+                console.error('New Password input not found');
+                return;
+            }
+
+            // Show modal when Change Password button is clicked
+            changePasswordBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Change Password button clicked');
+                try {
+                    const modal = new bootstrap.Modal(changePasswordModal);
+                    modal.show();
+                    // Clear input when modal opens
+                    newPasswordInput.value = '';
+                } catch(err) {
+                    console.error('Error showing modal:', err);
+                    alert('Error opening password change dialog. Please refresh the page.');
+                }
+            });
+
+            // Handle form submission (if form exists)
+            if(changePasswordForm) {
+                changePasswordForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    confirmChangePasswordBtn.click();
+                });
+            }
+
+            // Handle confirm button click
+            confirmChangePasswordBtn.addEventListener('click', async function() {
+                const newPassword = newPasswordInput.value.trim();
+                
+                if(!newPassword) {
+                    alert('Please enter a new password');
+                    return;
+                }
+
+                if(newPassword.length < 3) {
+                    alert('Password must be at least 3 characters long');
+                    return;
+                }
+
+                // Disable button and show loading state
+                confirmChangePasswordBtn.disabled = true;
+                const originalHTML = confirmChangePasswordBtn.innerHTML;
+                confirmChangePasswordBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Updating...';
+
+                try {
+                    const resp = await fetch("{{ url_for('profile.change_password') }}", {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            new_password: newPassword
+                        })
+                    });
+
+                    let data = {};
+                    try {
+                        data = await resp.json();
+                    } catch(err) {
+                        console.error('Error parsing response:', err);
+                    }
+
+                    if(resp.ok && data.success) {
+                        // Show success toast
+                        const toastHTML = `
+                            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                                    <div class="toast-header bg-success text-white">
+                                        <strong class="me-auto">Password Updated</strong>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                                    </div>
+                                    <div class="toast-body">
+                                        Your password has been successfully updated.
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.body.insertAdjacentHTML('beforeend', toastHTML);
+
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(changePasswordModal);
+                        if(modal) modal.hide();
+
+                        // Clear input
+                        newPasswordInput.value = '';
+
+                        // Remove toast after 3 seconds
+                        setTimeout(() => {
+                            const toast = document.querySelector('.toast');
+                            if(toast && toast.parentElement) {
+                                try {
+                                    toast.parentElement.remove();
+                                } catch(e) {}
+                            }
+                        }, 3000);
+                    } else {
+                        alert(data.error || 'Failed to update password. Please try again.');
+                    }
+                } catch(err) {
+                    console.error('Error updating password:', err);
+                    alert('Failed to update password. Please try again.');
+                } finally {
+                    confirmChangePasswordBtn.disabled = false;
+                    confirmChangePasswordBtn.innerHTML = originalHTML;
+                }
+            });
+        })();
     </script>
     <script>
         // Profile picture edit behavior

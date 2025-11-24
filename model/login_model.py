@@ -153,6 +153,62 @@ def delete_user_by_username(username: str) -> bool:
         return False
 
 
+def update_user_password(username: str, new_password: str) -> bool:
+    """Update a user's password in MongoDB.
+    
+    Args:
+        username: The username of the user to update
+        new_password: The new password to set
+        
+    Returns:
+        True on success, False on failure
+    """
+    if not username:
+        print(f"update_user_password: username is empty")
+        return False
+    
+    if not new_password:
+        print(f"update_user_password: new_password is empty")
+        return False
+    
+    try:
+        # First verify the user exists
+        user_exists = _users_col.find_one({'username': username})
+        if not user_exists:
+            print(f"update_user_password: user '{username}' not found in MongoDB")
+            return False
+        
+        # Update the password
+        print(f"update_user_password: Updating password for user '{username}'")
+        res = _users_col.update_one(
+            {'username': username},
+            {'$set': {'password': new_password}}
+        )
+        
+        # Log the result
+        print(f"update_user_password: matched_count={res.matched_count}, modified_count={res.modified_count}")
+        
+        # Success if we matched the user
+        if res.matched_count > 0:
+            # Verify the update by reading back
+            updated_user = _users_col.find_one({'username': username})
+            if updated_user and updated_user.get('password') == new_password:
+                print(f"update_user_password: ✓ Successfully updated password for '{username}'")
+                return True
+            else:
+                print(f"update_user_password: ⚠ Warning - password verification failed")
+                # Still return True if we matched - the update was attempted
+                return True
+        else:
+            print(f"update_user_password: ✗ Failed to update - user not matched (matched_count={res.matched_count})")
+            return False
+    except Exception as e:
+        print(f"update_user_password (login_model): error updating password: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
 def update_user_profile_pic(username: str, profile_pic_url: Optional[str]) -> bool:
     """Update a user's profile_pic field in MongoDB.
     
@@ -202,10 +258,10 @@ def update_user_profile_pic(username: str, profile_pic_url: Optional[str]) -> bo
                 if profile_pic_url is None:
                     # For removal, field should be None or not present
                     if stored_pic is None or stored_pic == '':
-                        print(f"update_user_profile_pic: ✓ Successfully removed profile_pic for '{username}'")
+                        print(f"update_user_profile_pic: Successfully removed profile_pic for '{username}'")
                         return True
                     else:
-                        print(f"update_user_profile_pic: ⚠ Warning - field still exists with value: {stored_pic}")
+                        print(f"update_user_profile_pic: Warning - field still exists with value: {stored_pic}")
                         # Still return True - update was attempted and matched
                         return True
                 else:

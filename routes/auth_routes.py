@@ -8,6 +8,7 @@ from jwt.jwk import OctetJWK
 from datetime import datetime, timedelta
 from model.login_model import verify_user
 from model.login_model import delete_user_by_username
+from model.login_model import update_login_streak
 from utils.auth import JWT_SECRET_KEY, JWT_ALGORITHM
 from model.login_model import get_all_users
 
@@ -49,6 +50,9 @@ def login_post():
     user = verify_user(username, password)
     
     if user:
+        # Update login streak (track daily logins)
+        update_login_streak(user['username'])
+        
         # Create JWT token
         token_payload = {
             'username': user['username'],

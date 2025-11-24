@@ -153,6 +153,104 @@ def delete_user_by_username(username: str) -> bool:
         return False
 
 
+def update_login_streak(username: str) -> bool:
+    """Update user's login streak based on daily logins.
+    
+    Streak logic:
+    - If lastLogin was yesterday (consecutive day), increment streak
+    - If lastLogin was today (already logged in today), keep streak the same
+    - If lastLogin was more than 1 day ago, reset streak to 1
+    - Update lastLogin to today
+    
+    Args:
+        username: The username of the user
+        
+    Returns:
+        True on success, False on failure
+    """
+    if not username:
+        print(f"update_login_streak: username is empty")
+        return False
+    
+    try:
+        # Get current user data
+        user_doc = _users_col.find_one({'username': username})
+        if not user_doc:
+            print(f"update_login_streak: user '{username}' not found in MongoDB")
+            return False
+        
+        # Get current studyData
+        study_data = user_doc.get('studyData', {})
+        current_streak = study_data.get('streak', 0)
+        last_login_str = study_data.get('lastLogin')
+        
+        # Get current date (UTC, date only, no time)
+        now = dt.utcnow()
+        today = now.date()
+        
+        # Parse lastLogin if it exists
+        last_login_date = None
+        if last_login_str:
+            try:
+                # Parse ISO format datetime string
+                last_login_dt = dt.fromisoformat(last_login_str.replace('Z', '+00:00'))
+                last_login_date = last_login_dt.date()
+            except (ValueError, AttributeError) as e:
+                print(f"update_login_streak: Error parsing lastLogin '{last_login_str}': {e}")
+                last_login_date = None
+        
+        # Calculate new streak
+        new_streak = current_streak
+        
+        if last_login_date is None:
+            # First login ever - start streak at 1
+            new_streak = 1
+            print(f"update_login_streak: First login for '{username}', starting streak at 1")
+        elif last_login_date == today:
+            # Already logged in today - keep streak the same
+            new_streak = current_streak
+            print(f"update_login_streak: User '{username}' already logged in today, streak remains {current_streak}")
+        else:
+            # Calculate days difference
+            days_diff = (today - last_login_date).days
+            
+            if days_diff == 1:
+                # Consecutive day - increment streak
+                new_streak = current_streak + 1
+                print(f"update_login_streak: Consecutive login for '{username}', streak: {current_streak} -> {new_streak}")
+            elif days_diff > 1:
+                # Missed one or more days - reset streak to 1
+                new_streak = 1
+                print(f"update_login_streak: Missed login for '{username}' (last login {days_diff} days ago), resetting streak to 1")
+            else:
+                # This shouldn't happen (days_diff < 0 means future date)
+                print(f"update_login_streak: Warning - lastLogin is in the future for '{username}', keeping streak at {current_streak}")
+                new_streak = current_streak
+        
+        # Update studyData with new streak and lastLogin
+        study_data['streak'] = new_streak
+        study_data['lastLogin'] = now.isoformat()
+        
+        # Update MongoDB
+        res = _users_col.update_one(
+            {'username': username},
+            {'$set': {'studyData': study_data}}
+        )
+        
+        if res.matched_count > 0:
+            print(f"update_login_streak: ✓ Successfully updated streak for '{username}' to {new_streak}")
+            return True
+        else:
+            print(f"update_login_streak: ✗ Failed to update - user not matched")
+            return False
+            
+    except Exception as e:
+        print(f"update_login_streak (login_model): error updating login streak: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
 def update_user_password(username: str, new_password: str) -> bool:
     """Update a user's password in MongoDB.
     

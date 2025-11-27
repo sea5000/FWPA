@@ -71,11 +71,11 @@
                     </li>
                 </ul>
 
-                <!-- Notes Section -->
+                <!-- Subject Folders Section -->
                 <div class="row mb-4">
                     <div class="col-12">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h4 class="mb-0">Shared Notes</h4>
+                            <h4 class="mb-0">Study Subjects</h4>
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
                                 + Add Note
                             </button>
@@ -83,36 +83,27 @@
                     </div>
                 </div>
 
+                <!-- Subject Folders Grid -->
+                <div class="row g-4 mb-5" id="subjectFolders">
+                    <!-- Folders will be dynamically generated -->
+                </div>
+
+                <!-- Notes Display -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h4 class="mb-0" id="notesHeading">All Notes</h4>
+                        <button class="btn btn-sm btn-link" id="backToFolders" style="display: none;" onclick="showAllFolders()">← Back to Subjects</button>
+                    </div>
+                </div>
+
                 <!-- Notes Grid -->
                 <div class="row g-4" id="notesContainer">
-                    {% if notes %}
-                        {% for note in notes %}
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ note.title }}</h5>
-                                    <p class="text-muted small mb-2">
-                                        By {{ note.author }} • {{ note.views or 0 }} views
-                                    </p>
-                                    <p class="card-text">{{ note.content[:100] }}{% if note.content|length > 100 %}...{% endif %}</p>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-sm btn-outline-primary" onclick="viewNote('{{ note._id }}')">View</button>
-                                        {% if note.author == username %}
-                                        <button class="btn btn-sm btn-outline-secondary" onclick="editNote('{{ note._id }}')">Edit</button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteNote('{{ note._id }}')">Delete</button>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <span class="material-symbols-outlined" style="font-size: 64px; color: #ccc;">folder</span>
+                            <p class="text-muted mt-3">Select a subject folder to view notes</p>
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="col-12">
-                            <div class="alert alert-info">
-                                No notes shared yet. Be the first to share your knowledge!
-                            </div>
-                        </div>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
         </main>

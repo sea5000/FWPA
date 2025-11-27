@@ -87,10 +87,29 @@
                                 <div class="card h-100">
                                     <div class="card-body text-center">
                                         <div class="mb-3">
+                                            {% if user.profile_pic %}
+                                            <img src="{{ user.profile_pic }}" alt="{{ user.name }}" class="rounded-circle" width="80" height="80" style="object-fit: cover;">
+                                            {% else %}
                                             <span class="material-symbols-outlined" style="font-size: 64px; color: #2badee;">account_circle</span>
+                                            {% endif %}
                                         </div>
-                                        <h5 class="card-title mb-2">{{ user.username }}</h5>
-                                        <p class="text-muted small mb-3">Active member</p>
+                                        <h5 class="card-title mb-1">{{ user.name or user.username }}</h5>
+                                        <p class="text-muted small mb-2">@{{ user.username }}</p>
+                                        
+                                        <!-- Streak Badge -->
+                                        {% if user.studyData and user.studyData.streak %}
+                                        <div class="badge bg-warning text-dark mb-2">
+                                            🔥 {{ user.studyData.streak }} day streak
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <!-- Bio -->
+                                        {% if user.bio %}
+                                        <p class="text-muted small mb-3" style="font-size: 0.85rem;">{{ user.bio[:60] }}{% if user.bio|length > 60 %}...{% endif %}</p>
+                                        {% else %}
+                                        <p class="text-muted small mb-3">BookMe member</p>
+                                        {% endif %}
+                                        
                                         <div class="d-flex gap-2 justify-content-center">
                                             <button class="btn btn-primary btn-sm" onclick="followUser('{{ user.username }}')">
                                                 <span class="material-symbols-outlined" style="font-size: 16px;">person_add</span>

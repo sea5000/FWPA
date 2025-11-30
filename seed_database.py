@@ -2,6 +2,7 @@
 Seed script to populate MongoDB with sample data for development/testing.
 Populates: users, feed posts, notes (grouped by subjects), and followers.
 """
+
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 import random
@@ -10,22 +11,77 @@ import random
 client = MongoClient("mongodb://localhost:27017/")
 db = client.bookme
 
+
+def iso_days_ago(days: int):
+    return (datetime.utcnow() - timedelta(days=days)).isoformat()
+
+
 def clear_collections():
     """Clear existing data"""
     print("Clearing existing collections...")
     db.users.delete_many({})
+    db.decks.delete_many({})
     db.posts.delete_many({})
     db.notes.delete_many({})
     db.sessions.delete_many({})
     print("✓ Collections cleared")
 
+
 def seed_users():
     """Create sample users with study data and streaks"""
     print("\nSeeding users...")
-    
+
     users = [
         {
-            "id": "1",
+            "id": 1,
+            "username": "admin",
+            "password": "admin123",
+            "name": "Admin User",
+            "email": "admin@example.com",
+            "profile_pic": None,
+            "studyData": {
+                "streak": 50000,
+                "lastLogin": iso_days_ago(0),
+                "decks": ["1", "2"],
+                "loginHistory": {iso_days_ago(1): 1, iso_days_ago(2): 1},
+            },
+            "followers": [],
+            "following": [],
+        },
+        {
+            "id": 2,
+            "username": "student",
+            "password": "student123",
+            "name": "Student User",
+            "email": "student@example.com",
+            "profile_pic": "https://ui-avatars.com/api/?name=Student+User&background=0D6EFD&color=fff&size=200",
+            "studyData": {
+                "streak": 2,
+                "lastLogin": iso_days_ago(3),
+                "decks": ["2"],
+                "loginHistory": {iso_days_ago(3): 1, iso_days_ago(4): 1},
+            },
+            "followers": [],
+            "following": [],
+        },
+        {
+            "id": 3,
+            "username": "teacher",
+            "password": "teacher123",
+            "name": "Teacher User",
+            "email": "teacher@example.com",
+            "profile_pic": None,
+            "studyData": {
+                "streak": 400,
+                "lastLogin": iso_days_ago(10),
+                "decks": ["1"],
+                "loginHistory": {iso_days_ago(10): 1, iso_days_ago(11): 1},
+            },
+            "followers": [],
+            "following": [],
+        },
+        {
+            "id": 4,
             "username": "alice_chen",
             "name": "Alice Chen",
             "email": "alice@bookme.com",
@@ -35,14 +91,14 @@ def seed_users():
                 "streak": 15,
                 "lastLogin": (datetime.utcnow() - timedelta(hours=2)).isoformat(),
                 "totalStudyTime": 45000,  # in seconds
-                "decks": []
+                "decks": ["1", "2", "3"],
             },
             "bio": "Computer Science major | ML enthusiast | Coffee addict ☕",
             "followers": ["james_miller", "sophia_nguyen", "liam_smith"],
-            "following": ["james_miller", "emma_wilson", "noah_davis"]
+            "following": ["james_miller", "emma_wilson", "noah_davis"],
         },
         {
-            "id": "2",
+            "id": 5,
             "username": "james_miller",
             "name": "James Miller",
             "email": "james@bookme.com",
@@ -52,14 +108,14 @@ def seed_users():
                 "streak": 8,
                 "lastLogin": (datetime.utcnow() - timedelta(hours=5)).isoformat(),
                 "totalStudyTime": 32000,
-                "decks": []
+                "decks": [],
             },
             "bio": "Biology student 🧬 | Nature lover | Studying for med school",
             "followers": ["alice_chen", "sophia_nguyen"],
-            "following": ["alice_chen", "emma_wilson", "olivia_brown"]
+            "following": ["alice_chen", "emma_wilson", "olivia_brown"],
         },
         {
-            "id": "3",
+            "id": 6,
             "username": "sophia_nguyen",
             "name": "Sophia Nguyen",
             "email": "sophia@bookme.com",
@@ -69,14 +125,14 @@ def seed_users():
                 "streak": 23,
                 "lastLogin": (datetime.utcnow() - timedelta(minutes=30)).isoformat(),
                 "totalStudyTime": 67000,
-                "decks": []
+                "decks": [],
             },
             "bio": "Mathematics & Physics | Problem solver | Chess player ♟️",
             "followers": ["alice_chen", "james_miller", "liam_smith", "emma_wilson"],
-            "following": ["alice_chen", "james_miller", "noah_davis"]
+            "following": ["alice_chen", "james_miller", "noah_davis"],
         },
         {
-            "id": "4",
+            "id": 7,
             "username": "liam_smith",
             "name": "Liam Smith",
             "email": "liam@bookme.com",
@@ -86,14 +142,14 @@ def seed_users():
                 "streak": 12,
                 "lastLogin": (datetime.utcnow() - timedelta(hours=1)).isoformat(),
                 "totalStudyTime": 41000,
-                "decks": []
+                "decks": [],
             },
             "bio": "Psychology major | Book recommendations welcome 📚",
             "followers": ["sophia_nguyen", "emma_wilson"],
-            "following": ["alice_chen", "sophia_nguyen", "olivia_brown"]
+            "following": ["alice_chen", "sophia_nguyen", "olivia_brown"],
         },
         {
-            "id": "5",
+            "id": 8,
             "username": "emma_wilson",
             "name": "Emma Wilson",
             "email": "emma@bookme.com",
@@ -103,14 +159,14 @@ def seed_users():
                 "streak": 19,
                 "lastLogin": (datetime.utcnow() - timedelta(hours=3)).isoformat(),
                 "totalStudyTime": 54000,
-                "decks": []
+                "decks": [],
             },
             "bio": "Chemistry nerd ⚗️ | Lab enthusiast | Future researcher",
             "followers": ["james_miller", "liam_smith", "noah_davis"],
-            "following": ["sophia_nguyen", "james_miller", "olivia_brown"]
+            "following": ["sophia_nguyen", "james_miller", "olivia_brown"],
         },
         {
-            "id": "6",
+            "id": 9,
             "username": "noah_davis",
             "name": "Noah Davis",
             "email": "noah@bookme.com",
@@ -120,14 +176,14 @@ def seed_users():
                 "streak": 6,
                 "lastLogin": (datetime.utcnow() - timedelta(days=1)).isoformat(),
                 "totalStudyTime": 28000,
-                "decks": []
+                "decks": [],
             },
             "bio": "History buff 📜 | Aspiring teacher | Movie fan",
             "followers": ["alice_chen", "olivia_brown"],
-            "following": ["emma_wilson", "liam_smith"]
+            "following": ["emma_wilson", "liam_smith"],
         },
         {
-            "id": "7",
+            "id": 10,
             "username": "olivia_brown",
             "name": "Olivia Brown",
             "email": "olivia@bookme.com",
@@ -137,21 +193,114 @@ def seed_users():
                 "streak": 31,
                 "lastLogin": datetime.utcnow().isoformat(),
                 "totalStudyTime": 89000,
-                "decks": []
+                "decks": [],
             },
             "bio": "Engineering student ⚙️ | CAD lover | Robotics club president",
             "followers": ["james_miller", "emma_wilson", "noah_davis"],
-            "following": ["alice_chen", "sophia_nguyen"]
-        }
+            "following": ["alice_chen", "sophia_nguyen"],
+        },
     ]
-    
+
     db.users.insert_many(users)
     print(f"✓ Seeded {len(users)} users")
+
+
+def seed_decks():
+    """Create sample Flashcard Decks"""
+    print("\nSeeding Flashcard Decks...")
+
+    decks = [
+        {
+            "id": "1",
+            "name": "Spanish Basics",
+            "summary": "Spanish flashcard deck.",
+            "len": "3",
+            "cards": {
+                "1": {
+                    "front": "Hola",
+                    "back": "Hello",
+                    "tags": ["greeting", "basic"],
+                    "correct_count": 5,
+                    "incorrect_count": 1,
+                    "last_reviewed": iso_days_ago(1),
+                    "ease": 2.8,
+                    "interval": 3,
+                    "repetitions": 2,
+                },
+                "2": {
+                    "front": "Adiós",
+                    "back": "Goodbye",
+                    "tags": ["farewell", "basic"],
+                    "correct_count": 3,
+                    "incorrect_count": 2,
+                    "last_reviewed": iso_days_ago(4),
+                    "ease": 2.3,
+                    "interval": 1,
+                    "repetitions": 1,
+                },
+                "3": {
+                    "front": "Gracias",
+                    "back": "Thank you",
+                    "tags": ["politeness", "basic"],
+                    "correct_count": 10,
+                    "incorrect_count": 0,
+                    "last_reviewed": iso_days_ago(10),
+                    "ease": 3.2,
+                    "interval": 15,
+                    "repetitions": 5,
+                },
+            },
+        },
+        {
+            "id": "2",
+            "name": "French Basics",
+            "summary": "French flashcard deck.",
+            "len": "3",
+            "cards": {
+                "1": {
+                    "front": "Bonjour",
+                    "back": "Hello",
+                    "tags": ["greeting", "basic"],
+                    "correct_count": 7,
+                    "incorrect_count": 1,
+                    "last_reviewed": iso_days_ago(2),
+                    "ease": 2.9,
+                    "interval": 5,
+                    "repetitions": 3,
+                },
+                "2": {
+                    "front": "Au revoir",
+                    "back": "Goodbye",
+                    "tags": ["farewell", "basic"],
+                    "correct_count": 2,
+                    "incorrect_count": 3,
+                    "last_reviewed": iso_days_ago(7),
+                    "ease": 2.1,
+                    "interval": 0,
+                    "repetitions": 0,
+                },
+                "3": {
+                    "front": "Merci",
+                    "back": "Thank you",
+                    "tags": ["politeness", "basic"],
+                    "correct_count": 12,
+                    "incorrect_count": 0,
+                    "last_reviewed": iso_days_ago(30),
+                    "ease": 3.5,
+                    "interval": 30,
+                    "repetitions": 8,
+                },
+            },
+        },
+    ]
+    db.decks.insert_many(decks)
+    print(f"✓ Seeded {len(decks)} flashcard decks")
+
 
 def seed_notes():
     """Create sample notes grouped by subjects"""
     print("\nSeeding notes...")
-    
+
     notes = [
         # Mathematics notes
         {
@@ -176,7 +325,7 @@ Perfect for exam prep! 📐""",
             "views": 45,
             "timestamp": datetime.utcnow() - timedelta(days=3),
             "likes": 12,
-            "tags": ["calculus", "derivatives", "formulas"]
+            "tags": ["calculus", "derivatives", "formulas"],
         },
         {
             "title": "Linear Algebra - Matrix Operations",
@@ -200,7 +349,7 @@ Great for linear systems! 🔢""",
             "views": 32,
             "timestamp": datetime.utcnow() - timedelta(days=5),
             "likes": 8,
-            "tags": ["linear-algebra", "matrices"]
+            "tags": ["linear-algebra", "matrices"],
         },
         {
             "title": "Statistics - Probability Distributions",
@@ -224,9 +373,8 @@ Essential for hypothesis testing! 📊""",
             "views": 28,
             "timestamp": datetime.utcnow() - timedelta(days=7),
             "likes": 6,
-            "tags": ["statistics", "probability"]
+            "tags": ["statistics", "probability"],
         },
-        
         # Biology notes
         {
             "title": "Cell Biology - Mitosis vs Meiosis",
@@ -250,7 +398,7 @@ Key difference: Crossing over in Meiosis I! 🧬""",
             "views": 67,
             "timestamp": datetime.utcnow() - timedelta(days=2),
             "likes": 18,
-            "tags": ["cell-biology", "mitosis", "meiosis"]
+            "tags": ["cell-biology", "mitosis", "meiosis"],
         },
         {
             "title": "Photosynthesis Overview",
@@ -274,7 +422,7 @@ Equation: 6CO₂ + 6H₂O + light → C₆H₁₂O₆ + 6O₂ 🌿""",
             "views": 53,
             "timestamp": datetime.utcnow() - timedelta(days=4),
             "likes": 15,
-            "tags": ["photosynthesis", "plant-biology"]
+            "tags": ["photosynthesis", "plant-biology"],
         },
         {
             "title": "Human Anatomy - Nervous System",
@@ -299,9 +447,8 @@ Action potential travels at 100 m/s! ⚡""",
             "views": 41,
             "timestamp": datetime.utcnow() - timedelta(days=6),
             "likes": 11,
-            "tags": ["anatomy", "nervous-system"]
+            "tags": ["anatomy", "nervous-system"],
         },
-        
         # Programming notes
         {
             "title": "Python Basics - Data Structures",
@@ -338,7 +485,7 @@ Choose the right tool for the job! 💻""",
             "views": 89,
             "timestamp": datetime.utcnow() - timedelta(days=1),
             "likes": 24,
-            "tags": ["python", "data-structures"]
+            "tags": ["python", "data-structures"],
         },
         {
             "title": "JavaScript ES6 Features",
@@ -376,7 +523,7 @@ Makes code cleaner and more readable! 🚀""",
             "views": 76,
             "timestamp": datetime.utcnow() - timedelta(days=3),
             "likes": 19,
-            "tags": ["javascript", "es6"]
+            "tags": ["javascript", "es6"],
         },
         {
             "title": "Git Workflow Essentials",
@@ -410,9 +557,8 @@ Version control made easy! 🌿""",
             "views": 62,
             "timestamp": datetime.utcnow() - timedelta(days=5),
             "likes": 16,
-            "tags": ["git", "version-control"]
+            "tags": ["git", "version-control"],
         },
-        
         # Psychology notes
         {
             "title": "Cognitive Psychology - Memory Types",
@@ -441,7 +587,7 @@ Rehearsal moves STM → LTM! 🧠""",
             "views": 38,
             "timestamp": datetime.utcnow() - timedelta(days=4),
             "likes": 10,
-            "tags": ["cognitive-psychology", "memory"]
+            "tags": ["cognitive-psychology", "memory"],
         },
         {
             "title": "Developmental Psychology - Piaget's Stages",
@@ -472,9 +618,8 @@ Each stage builds on the previous! 👶""",
             "views": 44,
             "timestamp": datetime.utcnow() - timedelta(days=6),
             "likes": 12,
-            "tags": ["developmental-psychology", "piaget"]
+            "tags": ["developmental-psychology", "piaget"],
         },
-        
         # Chemistry notes
         {
             "title": "Organic Chemistry - Functional Groups",
@@ -506,7 +651,7 @@ Recognition is key! ⚗️""",
             "views": 51,
             "timestamp": datetime.utcnow() - timedelta(days=2),
             "likes": 14,
-            "tags": ["organic-chemistry", "functional-groups"]
+            "tags": ["organic-chemistry", "functional-groups"],
         },
         {
             "title": "Chemical Equilibrium Concepts",
@@ -534,9 +679,8 @@ Practice makes perfect! ⚖️""",
             "views": 47,
             "timestamp": datetime.utcnow() - timedelta(days=5),
             "likes": 13,
-            "tags": ["chemistry", "equilibrium"]
+            "tags": ["chemistry", "equilibrium"],
         },
-        
         # Physics notes
         {
             "title": "Classical Mechanics - Newton's Laws",
@@ -565,7 +709,7 @@ Foundation of classical mechanics! 🚀""",
             "views": 55,
             "timestamp": datetime.utcnow() - timedelta(days=3),
             "likes": 15,
-            "tags": ["physics", "mechanics", "newton"]
+            "tags": ["physics", "mechanics", "newton"],
         },
         {
             "title": "Electricity & Magnetism Basics",
@@ -594,17 +738,18 @@ Essential for circuits! ⚡""",
             "views": 49,
             "timestamp": datetime.utcnow() - timedelta(days=4),
             "likes": 13,
-            "tags": ["physics", "electricity", "magnetism"]
-        }
+            "tags": ["physics", "electricity", "magnetism"],
+        },
     ]
-    
+
     db.notes.insert_many(notes)
     print(f"✓ Seeded {len(notes)} notes across subjects")
+
 
 def seed_posts():
     """Create sample feed posts"""
     print("\nSeeding feed posts...")
-    
+
     posts = [
         {
             "author": "alice_chen",
@@ -616,14 +761,14 @@ def seed_posts():
                 {
                     "author": "james_miller",
                     "text": "That's awesome! Did you use numpy or pure Python?",
-                    "timestamp": datetime.utcnow() - timedelta(hours=1)
+                    "timestamp": datetime.utcnow() - timedelta(hours=1),
                 },
                 {
                     "author": "sophia_nguyen",
                     "text": "Amazing work! Would love to see your code 👀",
-                    "timestamp": datetime.utcnow() - timedelta(minutes=45)
-                }
-            ]
+                    "timestamp": datetime.utcnow() - timedelta(minutes=45),
+                },
+            ],
         },
         {
             "author": "james_miller",
@@ -635,9 +780,9 @@ def seed_posts():
                 {
                     "author": "liam_smith",
                     "text": "Been using this for months, absolute game changer!",
-                    "timestamp": datetime.utcnow() - timedelta(hours=4)
+                    "timestamp": datetime.utcnow() - timedelta(hours=4),
                 }
-            ]
+            ],
         },
         {
             "author": "sophia_nguyen",
@@ -649,19 +794,19 @@ def seed_posts():
                 {
                     "author": "alice_chen",
                     "text": "You've got this! Your derivative notes helped me so much!",
-                    "timestamp": datetime.utcnow() - timedelta(hours=7)
+                    "timestamp": datetime.utcnow() - timedelta(hours=7),
                 },
                 {
                     "author": "emma_wilson",
                     "text": "Good luck! Remember to breathe 🌟",
-                    "timestamp": datetime.utcnow() - timedelta(hours=6)
+                    "timestamp": datetime.utcnow() - timedelta(hours=6),
                 },
                 {
                     "author": "liam_smith",
                     "text": "Crush it! 🔥",
-                    "timestamp": datetime.utcnow() - timedelta(hours=5)
-                }
-            ]
+                    "timestamp": datetime.utcnow() - timedelta(hours=5),
+                },
+            ],
         },
         {
             "author": "liam_smith",
@@ -669,7 +814,7 @@ def seed_posts():
             "image": "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800&auto=format&fit=crop",
             "timestamp": datetime.utcnow() - timedelta(hours=12),
             "likes": 15,
-            "comments": []
+            "comments": [],
         },
         {
             "author": "emma_wilson",
@@ -681,9 +826,9 @@ def seed_posts():
                 {
                     "author": "james_miller",
                     "text": "Love lab days! Be careful with the acetic anhydride!",
-                    "timestamp": datetime.utcnow() - timedelta(hours=14)
+                    "timestamp": datetime.utcnow() - timedelta(hours=14),
                 }
-            ]
+            ],
         },
         {
             "author": "noah_davis",
@@ -695,9 +840,9 @@ def seed_posts():
                 {
                     "author": "sophia_nguyen",
                     "text": "Same with math! It's all about recognizing patterns",
-                    "timestamp": datetime.utcnow() - timedelta(hours=19)
+                    "timestamp": datetime.utcnow() - timedelta(hours=19),
                 }
-            ]
+            ],
         },
         {
             "author": "olivia_brown",
@@ -709,19 +854,19 @@ def seed_posts():
                 {
                     "author": "alice_chen",
                     "text": "THE STRUGGLE IS REAL 😂",
-                    "timestamp": datetime.utcnow() - timedelta(hours=22)
+                    "timestamp": datetime.utcnow() - timedelta(hours=22),
                 },
                 {
                     "author": "noah_davis",
                     "text": "This is why I switched to Python lol",
-                    "timestamp": datetime.utcnow() - timedelta(hours=21)
+                    "timestamp": datetime.utcnow() - timedelta(hours=21),
                 },
                 {
                     "author": "olivia_brown",
                     "text": "Python has its own special pain though 😅",
-                    "timestamp": datetime.utcnow() - timedelta(hours=20)
-                }
-            ]
+                    "timestamp": datetime.utcnow() - timedelta(hours=20),
+                },
+            ],
         },
         {
             "author": "sophia_nguyen",
@@ -733,9 +878,9 @@ def seed_posts():
                 {
                     "author": "emma_wilson",
                     "text": "Quantum is mind-blowing! Wave-particle duality still breaks my brain",
-                    "timestamp": datetime.utcnow() - timedelta(days=1, hours=5)
+                    "timestamp": datetime.utcnow() - timedelta(days=1, hours=5),
                 }
-            ]
+            ],
         },
         {
             "author": "james_miller",
@@ -747,9 +892,9 @@ def seed_posts():
                 {
                     "author": "alice_chen",
                     "text": "Anytime! Teaching helps me learn better too",
-                    "timestamp": datetime.utcnow() - timedelta(days=1, hours=23)
+                    "timestamp": datetime.utcnow() - timedelta(days=1, hours=23),
                 }
-            ]
+            ],
         },
         {
             "author": "emma_wilson",
@@ -761,14 +906,14 @@ def seed_posts():
                 {
                     "author": "liam_smith",
                     "text": "Needed to hear this today. Thank you! 🙏",
-                    "timestamp": datetime.utcnow() - timedelta(days=2, hours=7)
+                    "timestamp": datetime.utcnow() - timedelta(days=2, hours=7),
                 },
                 {
                     "author": "sophia_nguyen",
                     "text": "So true! Sleep is when your brain does the real learning",
-                    "timestamp": datetime.utcnow() - timedelta(days=2, hours=6)
-                }
-            ]
+                    "timestamp": datetime.utcnow() - timedelta(days=2, hours=6),
+                },
+            ],
         },
         {
             "author": "alice_chen",
@@ -780,9 +925,9 @@ def seed_posts():
                 {
                     "author": "olivia_brown",
                     "text": "Rubber duck debugging but for studying! Love it",
-                    "timestamp": datetime.utcnow() - timedelta(days=2, hours=22)
+                    "timestamp": datetime.utcnow() - timedelta(days=2, hours=22),
                 }
-            ]
+            ],
         },
         {
             "author": "olivia_brown",
@@ -794,58 +939,79 @@ def seed_posts():
                 {
                     "author": "alice_chen",
                     "text": "Congrats! That's incredible! 🎉",
-                    "timestamp": datetime.utcnow() - timedelta(days=3, hours=10)
+                    "timestamp": datetime.utcnow() - timedelta(days=3, hours=10),
                 },
                 {
                     "author": "noah_davis",
                     "text": "So proud of you! Can't wait to see it compete",
-                    "timestamp": datetime.utcnow() - timedelta(days=3, hours=9)
-                }
-            ]
-        }
+                    "timestamp": datetime.utcnow() - timedelta(days=3, hours=9),
+                },
+            ],
+        },
     ]
-    
+
     db.posts.insert_many(posts)
     print(f"✓ Seeded {len(posts)} feed posts")
+
 
 def seed_study_sessions():
     """Create sample study sessions"""
     print("\nSeeding study sessions...")
-    
-    users = ["alice_chen", "james_miller", "sophia_nguyen", "liam_smith", "emma_wilson", "noah_davis", "olivia_brown"]
-    subjects = ["Mathematics", "Biology", "Programming", "Chemistry", "Physics", "Psychology"]
+
+    users = [
+        "alice_chen",
+        "james_miller",
+        "sophia_nguyen",
+        "liam_smith",
+        "emma_wilson",
+        "noah_davis",
+        "olivia_brown",
+    ]
+    subjects = [
+        "Mathematics",
+        "Biology",
+        "Programming",
+        "Chemistry",
+        "Physics",
+        "Psychology",
+    ]
     modes = ["Pomodoro", "Deep Focus", "Quick Review", "Flashcards"]
-    
+
     sessions = []
     for _ in range(50):
         user = random.choice(users)
-        sessions.append({
-            "user": user,
-            "duration": random.randint(900, 7200),  # 15 min to 2 hours
-            "subject": random.choice(subjects),
-            "mode": random.choice(modes),
-            "timestamp": datetime.utcnow() - timedelta(days=random.randint(0, 30))
-        })
-    
+        sessions.append(
+            {
+                "user": user,
+                "duration": random.randint(900, 7200),  # 15 min to 2 hours
+                "subject": random.choice(subjects),
+                "mode": random.choice(modes),
+                "timestamp": datetime.utcnow() - timedelta(days=random.randint(0, 30)),
+            }
+        )
+
     db.sessions.insert_many(sessions)
     print(f"✓ Seeded {len(sessions)} study sessions")
+
 
 def main():
     print("=" * 60)
     print("MongoDB Seeding Script - BookMe")
     print("=" * 60)
-    
+
     clear_collections()
     seed_users()
+    seed_decks()
     seed_notes()
     seed_posts()
     seed_study_sessions()
-    
+
     print("\n" + "=" * 60)
     print("✓ Database seeding completed successfully!")
     print("=" * 60)
     print("\nData Summary:")
     print(f"  Users: {db.users.count_documents({})}")
+    print(f"  Decks: {db.decks.count_documents({})}")
     print(f"  Notes: {db.notes.count_documents({})}")
     print(f"  Posts: {db.posts.count_documents({})}")
     print(f"  Study Sessions: {db.sessions.count_documents({})}")
@@ -854,6 +1020,7 @@ def main():
     print("  - Friends: http://localhost:5000/friends/")
     print("  - Feed: http://localhost:5000/feed/")
     print("=" * 60)
+
 
 if __name__ == "__main__":
     main()

@@ -1,16 +1,14 @@
 from .login_model import get_user_by_username
 from datetime import datetime
-from pymongo import MongoClient
 import os
+from .mongo import get_db
 from typing import Optional, Dict
 from datetime import datetime as dt
 
 # MongoDB setup (configurable via MONGO_URI env)
-MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017')
-_client = MongoClient(MONGO_URI)
-_db = _client.get_database('mydatabase')
-_users_col = _db.get_collection('users')
-_decks_col = _db.get_collection('decks')
+_db = get_db()
+_users_col = _db.users
+_decks_col = _db.decks
 
 #_cards_col = _db.get_collection('cards')
 # ensure a unique index on username where possible (best-effort)

@@ -6,16 +6,13 @@ Functions here will attempt to read from the `users` collection in the
 document is missing, behavior falls back to the (possibly-empty) in-memory
 `USERS` if present.
 """
-from pymongo import MongoClient
+from .mongo import get_db
 from typing import Optional, Dict, List
 import os
 from datetime import datetime as dt
 
-# connect lazily/configurable via env var
-MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017')
-_client = MongoClient(MONGO_URI)
-_db = _client.get_database('mydatabase')
-_users_col = _db.get_collection('users')
+_db = get_db()
+_users_col = _db.users
 
 # ensure a unique index on username where possible (best-effort)
 try:

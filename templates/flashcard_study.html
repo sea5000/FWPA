@@ -95,18 +95,11 @@
 
           <div class="row">
             <div class="d-flex flex-column ">
-              <!-- col-12 col-lg-8 -->
               <hr class="">
-              <!-- Header row for list/table labels (visible on medium+ screens) -->
-              <div class="row fw-bold border-bottom py-2 d-none d-md-flex text-center">
-                <div class="col">Card</div>
-                <div class="col">Front</div>
-                <div class="col">Back</div>
-              </div>
-              <div class="card mx-auto" style="max-width:720px;">
+              <div class="card col-12 mh-80 mx-auto" style="max-width:720px;">
                 <div class="card-body text-center">
                   <div id="study-counter" class="mb-2 text-muted small">Card <span id="current-index">0</span> / <span id="total-cards">0</span></div>
-                  <h4 id="card-front" class="card-title">Front</h4>
+                  <h6 id="card-front" class="text-muted">Front</h6>
                   <p id="card-front-text" class="card-text fs-5"></p>
 
                   <div id="answer-area" class="mt-4 d-none">
@@ -123,7 +116,6 @@
               </div>
 
               <script>
-                // Build cards array from server-side deck (serialized safely)
                 const STUDY_CARDS = [
                   {% for cid, card in deck.cards.items() %}
                     {"id": {{ cid|tojson }}, "front": {{ card.front|tojson }}, "back": {{ card.back|tojson }}}{% if not loop.last %},{% endif %}
@@ -200,19 +192,6 @@
                   document.addEventListener('DOMContentLoaded', render);
                 })();
               </script>
-                <!-- <div class="list-group-item py-3">
-                  <div class="row align-items-center text-center">
-                    <div class="col">
-                      <a class="text-primary d-inline-block" href="#">Math and Stats II</a>
-                    </div>
-                    <div class="col-2">100</div>
-                    <div class="col">
-                      <a href="#" class="btn btn-sm btn-primary text-white me-2">Stats</a>
-                      <a href="#" class="btn btn-sm btn-secondary text-white">Edit</a>
-                    </div>
-                  </div>
-                </div>
-              </div> -->
               </div>
             </div>
           </div>

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, g, request, abort, redirect, url_for
 from utils.auth import get_current_user_from_token
 from model.login_model import get_all_users
-from model.studyData_model import get_user_decks, get_user_study_data, get_deck, update_card, add_card, delete_card, record_review, create_deck, add_deck_to_user
+from model.studyData_model import get_user_decks, get_user_study_data, get_deck, update_card, add_card, delete_card, record_review, create_deck, add_deck_to_user, get_deck_by_id
 from flask import jsonify
 
 
@@ -24,26 +24,48 @@ def flashcards_index():
 @flashcards_bp.route('/<deck_id>/', endpoint='deck')
 def flashcards_deck(deck_id):
     """Show a single deck's cards (deck view)."""
-    from model.studyData_model import get_deck_by_id
     deck_obj = get_deck_by_id(deck_id)
     if not deck_obj:
         return render_template('404.html'), 404
     return render_template('flashcard_deck.html', username=g.current_user, users=get_all_users(), deck=deck_obj, deck_id=deck_id)
 
-@flashcards_bp.route('/<deck_id>/stats', endpoint='stats')
+@flashcards_bp.route('/<deck_id>/stats', endpoint='stats', methods=['GET'])
 def flashcards_stats(deck_id):
-    """Show basic statistics for a deck. (placeholder for richer Anki-like stats)
-    """
-    from model.studyData_model import get_deck_by_id
+    # return JSON stats for use by JavaScript
     deck_obj = get_deck_by_id(deck_id)
     if not deck_obj:
-        return render_template('404.html'), 404
+        return jsonify({'ok': False, 'error': 'deck not found'}), 404
 
-    # compute simple stats from card dicts
-    cards = deck_obj.get('cards', {}) if isinstance(deck_obj, dict) else getattr(deck_obj, 'cards', {})
-    total_cards = len(cards)
-    total_correct = sum(int(c.get('correct_count', 0)) for c in cards.values())
-    total_incorrect = sum(int(c.get('incorrect_count', 0)) for c in cards.values())
+    # normalize cards mapping (cards may be stored as dicts or objects)
+    cards_map = deck_obj.get('cards', {}) if isinstance(deck_obj, dict) else getattr(deck_obj, 'cards', {}) or {}
+    total_cards = len(cards_map)
+    total_correct = 0
+    total_incorrect = 0
+
+    cards_list = []
+    for key, card in cards_map.items():
+        # card may be dict or object
+        if isinstance(card, dict):
+            front = card.get('front')
+            back = card.get('back')
+            correct_count = int(card.get('correct_count', 0))
+            incorrect_count = int(card.get('incorrect_count', 0))
+        else:
+            front = getattr(card, 'front', None)
+            back = getattr(card, 'back', None)
+            correct_count = int(getattr(card, 'correct_count', 0) or 0)
+            incorrect_count = int(getattr(card, 'incorrect_count', 0) or 0)
+
+        total_correct += correct_count
+        total_incorrect += incorrect_count
+
+        cards_list.append({
+            'id': str(key),
+            'front': front,
+            'back': back,
+            'correct_count': correct_count,
+            'incorrect_count': incorrect_count,
+        })
 
     stats = {
         'total_cards': total_cards,
@@ -51,7 +73,12 @@ def flashcards_stats(deck_id):
         'total_incorrect': total_incorrect,
     }
 
-    return render_template('flashcard_stats.html', username=g.current_user, users=get_all_users(), deck=deck_obj, stats=stats)
+    deck_meta = {
+        'id': deck_id,
+        'name': deck_obj.get('name') if isinstance(deck_obj, dict) else getattr(deck_obj, 'name', None)
+    }
+
+    return jsonify({'deck': deck_meta, 'stats': stats, 'cards': cards_list})
 
 @flashcards_bp.route('/<deck_id>/edit', endpoint='edit', methods=['GET', 'POST'])
 def flashcards_edit(deck_id):

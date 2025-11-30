@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Focus Tracker | BookMe</title>
-  <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin="">
-  <link href="https://fonts.googleapis.com/css2?display=swap&amp;family=Plus+Jakarta+Sans:wght@400;500;700;800" rel="stylesheet">
+  <!-- <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?display=swap&amp;family=Plus+Jakarta+Sans:wght@400;500;700;800"
+    rel="stylesheet"> -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
   <style>
     body {
-      font-family: "Plus Jakarta Sans", sans-serif;
+      /* font-family: "Plus Jakarta Sans", sans-serif; */
       background-color: #f6f7f8;
       color: #111;
       min-height: 100vh;
@@ -30,7 +33,7 @@
       background: #fff;
       padding: 2rem;
       border-radius: 1.5rem;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
       max-width: 450px;
       width: 100%;
       text-align: center;
@@ -61,23 +64,27 @@
       background: #fff;
       padding: 1.5rem;
       border-radius: 1rem;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
       max-width: 450px;
       width: 100%;
     }
   </style>
 </head>
+
 <body>
-  
+
   <!-- Header -->
   <header class="w-100 bg-white border-bottom">
     <div class="container d-flex align-items-center justify-content-between py-3">
-      <div class="d-flex align-items-center">
-        <span class="material-symbols-outlined fs-3 text-primary me-2">book</span>
-        <h1 class="h5 mb-0"><a href="{{ url_for('dashboard.index') }}" class="text-decoration-none text-reset">BookMe</a></h1>
+      <div class="col-1 d-flex align-items-center justify-content-center py-3">
+        <div class="col-1" style="width:40px;height:40px;color:var(--bs-primary);">
+          <span class="material-symbols-outlined fs-3 text-primary">book</span>
+        </div>
+        <a class="col-1 h3 text-decoration-none text-reset fw-bold"
+          href="{{ url_for('home.index') }}">Bookme</a>
       </div>
       <nav class="d-none d-md-flex align-items-center gap-2">
-        <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('dashboard.index') }}">Home</a>
+        <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('home.index') }}">Home</a>
         <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
         <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('community.index') }}">Community</a>
         <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('challenges.index') }}">Challenge</a>
@@ -91,9 +98,13 @@
             <span class="material-symbols-outlined fs-3">account_circle</span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><h6 class="dropdown-header">Account</h6></li>
+            <li>
+              <h6 class="dropdown-header">Account</h6>
+            </li>
             <li><a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a></li>
-            <li><hr class="dropdown-divider"></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
             <li>
               <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
                 <button type="submit" class="dropdown-item">Log out</button>
@@ -107,41 +118,42 @@
 
   <div class="timer-content">
     <div class="timer-container">
-    <h2 class="fw-bold mb-3">⏱ Study Timer</h2>
+      <h2 class="fw-bold mb-3">⏱ Study Timer</h2>
 
-    <div class="input-group mb-3">
-      <input type="number" id="custom-minutes" class="form-control" placeholder="Enter study duration (minutes)" min="1" max="240">
-      <button class="btn btn-outline-primary" id="set-time">Set</button>
+      <div class="input-group mb-3">
+        <input type="number" id="custom-minutes" class="form-control" placeholder="Enter study duration (minutes)"
+          min="1" max="240">
+        <button class="btn btn-outline-primary" id="set-time">Set</button>
+      </div>
+
+      <div class="timer-display" id="timer">00:00</div>
+      <div class="progress">
+        <div class="progress-bar bg-primary" id="progress-bar" style="width: 0%;"></div>
+      </div>
+
+      <div>
+        <button class="btn btn-primary control-btn" id="start">Start</button>
+        <button class="btn btn-warning control-btn" id="pause">Pause</button>
+        <button class="btn btn-secondary control-btn" id="reset">Reset</button>
+      </div>
+
+      <p class="mt-4 text-muted small">Study at least <strong>40 minutes/day</strong> to keep your streak alive 🔥</p>
     </div>
 
-    <div class="timer-display" id="timer">00:00</div>
-    <div class="progress">
-      <div class="progress-bar bg-primary" id="progress-bar" style="width: 0%;"></div>
+    <div class="stats-container">
+      <h4 class="fw-bold mb-3">📊 Your Progress</h4>
+      <p><strong>Daily Study Time:</strong> <span id="daily-time">0</span> minutes</p>
+      <p><strong>Current Streak:</strong> <span id="streak">0</span> days</p>
+
+      <h5 class="fw-bold mt-4 mb-2">🏆 Leaderboard (local)</h5>
+      <ol id="leaderboard"></ol>
     </div>
-
-    <div>
-      <button class="btn btn-primary control-btn" id="start">Start</button>
-      <button class="btn btn-warning control-btn" id="pause">Pause</button>
-      <button class="btn btn-secondary control-btn" id="reset">Reset</button>
-    </div>
-
-    <p class="mt-4 text-muted small">Study at least <strong>40 minutes/day</strong> to keep your streak alive 🔥</p>
-  </div>
-
-  <div class="stats-container">
-    <h4 class="fw-bold mb-3">📊 Your Progress</h4>
-    <p><strong>Daily Study Time:</strong> <span id="daily-time">0</span> minutes</p>
-    <p><strong>Current Streak:</strong> <span id="streak">0</span> days</p>
-
-    <h5 class="fw-bold mt-4 mb-2">🏆 Leaderboard (local)</h5>
-    <ol id="leaderboard"></ol>
-  </div>
   </div>
 
   <!-- Mobile Footer -->
   <footer class="d-md-none fixed-bottom bg-white border-top">
     <nav class="nav justify-content-around py-2">
-      <a class="nav-link text-muted" href="{{ url_for('dashboard.index') }}">
+      <a class="nav-link text-muted" href="{{ url_for('home.index') }}">
         <span class="material-symbols-outlined">home</span>
         <small class="d-block">Home</small>
       </a>
@@ -266,7 +278,7 @@
       document.getElementById("daily-time").textContent = dailyMinutes;
 
       let streak = 0;
-      const days = Object.keys(data).sort((a,b) => new Date(a) - new Date(b));
+      const days = Object.keys(data).sort((a, b) => new Date(a) - new Date(b));
       let current = new Date();
 
       for (let i = days.length - 1; i >= 0; i--) {
@@ -302,4 +314,5 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

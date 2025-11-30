@@ -7,8 +7,8 @@ from flask import Flask, redirect, url_for
 import os
 from routes import (
     auth_bp,
+    login_bp,
     home_bp,
-    dashboard_bp,
     study_bp,
     community_bp,
     challenges_bp,
@@ -29,8 +29,8 @@ app.secret_key = os.urandom(24)  # Secret key for session management
 # Register blueprints with sensible URL prefixes per feature
 # auth kept at root to preserve /login and /logout paths
 app.register_blueprint(auth_bp)
+app.register_blueprint(login_bp, url_prefix='/login')
 app.register_blueprint(home_bp, url_prefix='/home')
-app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
 app.register_blueprint(study_bp, url_prefix='/study')
 app.register_blueprint(community_bp, url_prefix='/community')
 app.register_blueprint(challenges_bp, url_prefix='/challenges')

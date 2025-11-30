@@ -10,10 +10,10 @@ the application can register them from `routes`.
 """
 
 # Import individual blueprint objects from their modules so they are
-# available as `routes.home_bp`, etc., to the app registration code.
+# available as `routes.login_bp`, etc., to the app registration code.
 from routes.auth_routes import auth_bp
+from routes.login import login_bp
 from routes.home import home_bp
-from routes.dashboard import dashboard_bp
 from routes.study import study_bp
 from routes.community import community_bp
 from routes.challenges import challenges_bp
@@ -25,12 +25,12 @@ from routes.signup import signup_bp
 from routes.profile import profile_bp
 from routes.streak import streak_bp
 from routes.timer import timer_bp
-#from routes.ai import ai_bp
+
 
 __all__ = [
 	'auth_bp',
+	'login_bp',
 	'home_bp',
-	'dashboard_bp',
 	'study_bp',
 	'community_bp',
 	'challenges_bp',
@@ -42,5 +42,4 @@ __all__ = [
 	'profile_bp',
 	'streak_bp',
 	'timer_bp',
-    #'ai_bp',
 ]

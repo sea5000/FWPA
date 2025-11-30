@@ -26,11 +26,11 @@ def login():
             _jwt = JWT()
             _key = OctetJWK(JWT_SECRET_KEY.encode())
             _jwt.decode(session['token'], _key, do_verify=True, algorithms={JWT_ALGORITHM})
-            return redirect(url_for('home.home'))
+            return redirect(url_for('home.index'))
         except Exception:
             session.pop('token', None)
     
-    return render_template('home.html', users=get_all_users())
+    return render_template('login.html', users=get_all_users())
 
 
 @auth_bp.route('/login', methods=['POST'])
@@ -44,7 +44,7 @@ def login_post():
     
     # Validate that username and password were provided
     if not username or not password:
-        return render_template('home.html', error='Please provide both username and password', users=get_all_users())
+        return render_template('login.html', error='Please provide both username and password', users=get_all_users())
     
     # Verify user credentials using the model
     user = verify_user(username, password)
@@ -70,10 +70,10 @@ def login_post():
         session['username'] = user['username']
 
         # Redirect to dashboard page
-        return redirect(url_for('dashboard.index'))
+        return redirect(url_for('home.index'))
     else:
         # Invalid credentials
-        return render_template('home.html', error='Invalid username or password', users=get_all_users(),login=True)
+        return render_template('login.html', error='Invalid username or password', users=get_all_users(),login=True)
 
 
 @auth_bp.route('/logout', methods=['GET', 'POST'])

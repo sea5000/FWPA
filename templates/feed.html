@@ -102,7 +102,12 @@
                 <!-- Create Post Section -->
                 <div class="card p-4 mb-4">
                     <div class="d-flex align-items-start gap-3 mb-3">
-                        <img src="https://i.pravatar.cc/60?u={{ username }}" class="post-avatar" alt="Your avatar">
+                        {% if profileData and profileData.profile_pic %}
+                        <img src="{{ profileData.profile_pic }}" class="post-avatar" alt="Your avatar">
+                        {% else %}
+                        <img src="https://ui-avatars.com/api/?name={{ profileData.name or username }}&background=0D6EFD&color=fff&size=60"
+                            class="post-avatar" alt="Your avatar">
+                        {% endif %}
                         <textarea id="postText" class="form-control" rows="3" placeholder="Share your study progress, notes, or thoughts..."></textarea>
                     </div>
                     <div class="mb-3">
@@ -347,7 +352,10 @@
                     card.innerHTML = `
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div class="d-flex align-items-center gap-3">
-                                <img src="https://i.pravatar.cc/60?u=${post.author}" class="post-avatar" alt="${post.author}">
+                                ${post.author_profile_pic 
+                                    ? `<img src="${post.author_profile_pic}" class="post-avatar" alt="${post.author}">`
+                                    : `<img src="https://ui-avatars.com/api/?name=${encodeURIComponent(post.author)}&background=0D6EFD&color=fff&size=60" class="post-avatar" alt="${post.author}">`
+                                }
                                 <div>
                                     <h6 class="mb-0 fw-bold">${post.author}</h6>
                                     <small class="text-muted">${formatPostTime(post.timestamp)}</small>

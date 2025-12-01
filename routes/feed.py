@@ -1,8 +1,14 @@
 from flask import Blueprint, request, jsonify, render_template, g
 from datetime import datetime
 from utils.auth import get_current_user_from_token
-from model.login_model import get_all_users
-from model.feed_post_model import list_posts, get_post, create_post, like_post, add_comment
+from model.login_model import get_user_by_username
+from model.feed_post_model import (
+    list_posts,
+    get_post,
+    create_post,
+    like_post,
+    add_comment,
+)
 
 feed_bp = Blueprint("feed", __name__)
 
@@ -17,15 +23,27 @@ def require_auth():
 
 
 # FEED PAGE
-@feed_bp.route('/', endpoint='index')
+@feed_bp.route("/", endpoint="index")
 def feed_page():
-    return render_template("feed.html", username=g.current_user)
+    # Fetch the full profile data for the current user
+    profile_data = get_user_by_username(g.current_user)
+    # Pass the profile data to the template
+    return render_template(
+        "feed.html", username=g.current_user, profileData=profile_data
+    )
 
 
 # GET ALL POSTS
 @feed_bp.route("/api/feed/posts", methods=["GET"])
 def get_posts():
     posts = list_posts()
+    # Enrich posts with author profile pictures
+    for p in posts:
+        author = p.get("author")
+        if author:
+            u = get_user_by_username(author)
+            if u and u.get("profile_pic"):
+                p["author_profile_pic"] = u["profile_pic"]
     return jsonify(posts)
 
 
@@ -54,6 +72,20 @@ def get_single_post(post_id):
     post = get_post(post_id)
     if not post:
         return jsonify({"error": "Not found"}), 404
+    # Enrich main post author
+    author = post.get("author")
+    if author:
+        u = get_user_by_username(author)
+        if u and u.get("profile_pic"):
+            post["author_profile_pic"] = u["profile_pic"]
+    # Enrich comments with author profile pictures
+    comments = post.get("comments") or []
+    for c in comments:
+        ca = c.get("author")
+        if ca:
+            cu = get_user_by_username(ca)
+            if cu and cu.get("profile_pic"):
+                c["author_profile_pic"] = cu["profile_pic"]
     return jsonify(post)
 
 

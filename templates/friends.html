@@ -91,12 +91,24 @@
                     </div>
                 </div>
 
+                <!-- Search Bar -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <span class="material-symbols-outlined" style="font-size: 1.2rem;">search</span>
+                            </span>
+                            <input type="text" id="friendSearch" class="form-control" placeholder="Find friends by username or name...">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Friends Grid -->
-                <div class="row g-4">
+                <div class="row g-4" id="friendsGrid">
                     {% if users %}
                     {% for user in users %}
                     {% if user.username != username %}
-                    <div class="col-md-6 col-lg-4">
+                    <div class="col-md-6 col-lg-4 user-card">
                         <div class="card h-100">
                             <div class="card-body text-center">
                                 <div class="mb-3">
@@ -144,7 +156,7 @@
                     {% endfor %}
                     {% else %}
                     <div class="col-12">
-                        <div class="alert alert-info">
+                        <div class="alert alert-info" id="noUsersMessage">
                             No other users found. Invite your friends to join BookMe!
                         </div>
                     </div>
@@ -228,6 +240,29 @@
             localStorage.setItem('following', JSON.stringify(updated));
             location.reload();
         }
+
+        // Friend search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('friendSearch');
+            const friendsGrid = document.getElementById('friendsGrid');
+            const userCards = friendsGrid.querySelectorAll('.user-card');
+            const noUsersMessage = document.getElementById('noUsersMessage');
+
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = searchInput.value.toLowerCase();
+                let visibleCards = 0;
+                userCards.forEach(card => {
+                    const name = card.querySelector('.card-title').textContent.toLowerCase();
+                    const username = card.querySelector('.text-muted.small').textContent.toLowerCase();
+                    if (name.includes(searchTerm) || username.includes(searchTerm)) {
+                        card.style.display = '';
+                        visibleCards++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
     </script>
 </body>
 

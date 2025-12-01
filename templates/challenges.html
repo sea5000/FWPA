@@ -38,10 +38,18 @@
           <a class="btn btn-sm btn-primary rounded-pill text-white"
             href="{{ url_for('challenges.index') }}">Challenge</a>
         </nav>
-        <div class="d-none d-md-flex align-items-center header-actions">
-          <button type="button" class="btn btn-link text-muted p-0" aria-label="Notifications" title="Notifications">
-            <span class="material-symbols-outlined">notifications</span>
-          </button>
+        <div class="d-none d-md-flex align-items-center gap-3">
+          <div class="dropdown">
+            <button type="button" class="btn btn-link text-muted p-0" data-bs-toggle="dropdown" aria-expanded="false"
+              aria-label="Notifications">
+              <span class="material-symbols-outlined">notifications</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 300px;">
+              <li class="text-center text-muted small py-3">
+                No new notifications. <br>Can't start procrastinating now!
+              </li>
+            </ul>
+          </div>
           <div class="dropdown">
             <a class="btn btn-link text-muted p-0 dropdown-toggle" href="{{ url_for('profile.index') }}"
               id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile" title="Profile">

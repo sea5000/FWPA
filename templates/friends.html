@@ -98,7 +98,7 @@
                             <span class="input-group-text">
                                 <span class="material-symbols-outlined" style="font-size: 1.2rem;">search</span>
                             </span>
-                            <input type="text" id="friendSearch" class="form-control" placeholder="Find friends by username or name...">
+                            <input type="text" id="friendSearch" class="form-control" placeholder="Find friends by @username...">
                         </div>
                     </div>
                 </div>
@@ -251,10 +251,13 @@
             searchInput.addEventListener('keyup', function() {
                 const searchTerm = searchInput.value.toLowerCase();
                 let visibleCards = 0;
+
+                // Only search if the term starts with '@' and has more than one character
+                const shouldSearch = searchTerm.startsWith('@') && searchTerm.length > 1;
+
                 userCards.forEach(card => {
-                    const name = card.querySelector('.card-title').textContent.toLowerCase();
                     const username = card.querySelector('.text-muted.small').textContent.toLowerCase();
-                    if (name.includes(searchTerm) || username.includes(searchTerm)) {
+                    if (!shouldSearch || username.includes(searchTerm)) {
                         card.style.display = '';
                         visibleCards++;
                     } else {

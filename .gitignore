@@ -4,3 +4,4 @@ legacy_copy/
 __pycache__
 .env
 *.bak
+static/profile_pics/Eli.jpg

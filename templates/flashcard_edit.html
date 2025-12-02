@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap"
     rel="stylesheet"> -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles-flashcards.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
         .material-symbols-outlined {
@@ -75,46 +75,49 @@
         </header>
         <main>
             <div class="bg-body container p-4">
-                <div class="row">
-                    <div class="col">
-                        <!-- col-12 col-lg-8 -->
-                        <h2 class="h2 fw-bold">{{deck.name}}</h2>
-                        <t class="text-muted mt-1">{{deck.summary}}</t>
-                    </div>
-                    <div class="col text-center align-content-center">
-                        <div class="d-flex justify-content-center justify-content-md-end gap-2">
-                            <a href="{{ url_for('flashcards.index', deck_id = deck_id) }}"
-                                class="btn btn-outline-warning btn-sm rounded-pill d-inline-flex align-items-center gap-2">
-                                <span class="material-symbols-outlined" aria-hidden="true"
-                                    style="font-size:18px;">Arrow_back</span>
-                                <span class="fw-semibold">Back to Decks</span>
-                            </a>
-                            <a href="{{ url_for('flashcards.deck',deck_id = deck_id) }}"
-                                class="btn btn-warning btn-sm rounded-pill d-inline-flex align-items-center gap-2">
-                                <span class="material-symbols-outlined" aria-hidden="true"
-                                    style="font-size:18px;">arrow_back</span>
-                                <span class="fw-semibold">Exit</span>
-                            </a>
-                            <a href=""
-                                class="btn btn-outline-danger btn-sm rounded-pill d-inline-flex align-items-center gap-2">
-                                <span class="material-symbols-outlined" aria-hidden="true"
-                                    style="font-size:18px;">delete</span>
-                                <span>Delete</span>
-                            </a>
-                        </div>
-                    </div>
-
+                <form method="POST">
                     <div class="row">
-                        <div class="d-flex flex-column ">
+                        <div class="col">
                             <!-- col-12 col-lg-8 -->
-                            <hr class="">
-                            <!-- Header row for list/table labels (visible on medium+ screens) -->
-                            <div class="row fw-bold border-bottom py-2 d-none d-md-flex text-center">
-                                <div class="col">Card</div>
-                                <div class="col">Front</div>
-                                <div class="col">Back</div>
+                            <h2 class="h2 fw-bold"><input class="form-control" name="deck_name"
+                                    placeholder="{% if deck.name%}{{deck.name}}{% else %}Deck name{%endif%}" /></h2>
+                            <t class="text-muted mt-1"><input class="form-control" name="deck_summary"
+                                    placeholder="{% if deck.summary%}{{deck.summary}}{% else %}Deck summary{%endif%}" />
+                            </t>
+                        </div>
+                        <div class="col text-center align-content-center">
+                            <div class="d-flex justify-content-center justify-content-md-end gap-2">
+                                <a href="{{ url_for('flashcards.index', deck_id = deck_id) }}"
+                                    class="btn btn-outline-warning btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                                    <span class="material-symbols-outlined" aria-hidden="true"
+                                        style="font-size:18px;">Arrow_back</span>
+                                    <span class="fw-semibold">Back to Decks</span>
+                                </a>
+                                <a href="{{ url_for('flashcards.deck',deck_id = deck_id) }}"
+                                    class="btn btn-warning btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                                    <span class="material-symbols-outlined" aria-hidden="true"
+                                        style="font-size:18px;">arrow_back</span>
+                                    <span class="fw-semibold">Exit</span>
+                                </a>
+                                <a href=""
+                                    class="btn btn-outline-danger btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                                    <span class="material-symbols-outlined" aria-hidden="true"
+                                        style="font-size:18px;">delete</span>
+                                    <span>Delete</span>
+                                </a>
                             </div>
-                            <form method="POST">
+                        </div>
+                        <div class="row">
+                            <div class="d-flex flex-column ">
+                                <!-- col-12 col-lg-8 -->
+                                <hr class="">
+                                <!-- Header row for list/table labels (visible on medium+ screens) -->
+                                <div class="row fw-bold border-bottom py-2 d-none d-md-flex text-center">
+                                    <div class="col">Card</div>
+                                    <div class="col">Front</div>
+                                    <div class="col">Back</div>
+                                </div>
+
                                 <input type="hidden" name="deck_id" value="{{deck.id}}" />
                                 <div class="list-group list-group-flush">
                                     {% for cardn, card in deck.cards.items() %}
@@ -179,41 +182,141 @@
                                         <button type="submit" class="btn btn-primary">Save changes</button>
                                     </div>
                                 </div>
-                            </form>
-                            <!-- <div class="list-group-item py-3">
-                  <div class="row align-items-center text-center">
-                    <div class="col">
-                      <a class="text-primary d-inline-block" href="#">Math and Stats II</a>
-                    </div>
-                    <div class="col-2">100</div>
-                    <div class="col">
-                      <a href="#" class="btn btn-sm btn-primary text-white me-2">Stats</a>
-                      <a href="#" class="btn btn-sm btn-secondary text-white">Edit</a>
-                    </div>
-                  </div>
-                </div>
-              </div> -->
-                        </div>
-                    </div>
-                </div>
-        </main>
-        <footer class="d-md-none fixed-bottom bg-white border-top">
-            <nav class="nav justify-content-around py-2">
-                <a class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="{{ url_for('home.index') }}"><span class="material-symbols-outlined fs-4">home</span> <small
-                        class="d-block">Home</small></a> <a
-                    class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="{{ url_for('study.index') }}"><span class="material-symbols-outlined fs-4">school</span>
-                    <small class="d-block">Study</small></a> <a
-                    class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="{{ url_for('community.index') }}"><span class="material-symbols-outlined fs-4">groups</span>
-                    <small class="d-block">Community</small></a> <a
-                    class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="{{ url_for('challenges.index') }}"><span
-                        class="material-symbols-outlined fs-4">emoji_events</span>
-                    <small class="d-block">Challenge</small></a>
-            </nav>
-        </footer>
+                </form>
+
+            </div>
+    </div>
+    </div>
+    </main>
+    <!-- Floating chat button + UI (place here) -->
+
+
+    <!-- Floating button -->
+    <button id="floating-chat-button" class="btn btn-primary d-inline-flex align-items-center justify-content-center"
+        aria-label="Open chat" title="Chat">
+        <span class="material-symbols-outlined" style="font-size:22px;">chat</span>
+    </button>
+
+    <!-- Chat panel -->
+    <div id="floating-chat-panel" role="dialog" aria-hidden="true" aria-label="Chat window">
+        <div id="floating-chat-header">
+            <div>
+                <div class="chat-title">AI Assistant</div>
+                <div class="chat-sub">Flashcard Maker</div>
+            </div>
+
+            <button id="floating-chat-close" type="button" class="btn btn-sm btn-light" aria-label="Close"
+                title="Close">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div id="floating-chat-body">
+            <!-- Message area (placeholder) -->
+            <div class="text-muted small">This is a UI-only chat window. Functional hooks left for implementation.</div>
+        </div>
+
+        <div id="floating-chat-footer">
+            <!-- File drop area (UI-only) -->
+            <div id="file-drop" class="file-drop" title="Drop a file here or click">
+                <span class="material-symbols-outlined">attach_file</span>
+                <input id="file-drop-input" type="file" style="display:none" />
+            </div>
+
+            <!-- Text input -->
+            <input id="chat-message-input" class="form-control form-control-sm chat-input" type="text"
+                placeholder="Write a message..." aria-label="Message" />
+
+            <!-- Send button (UI-only) -->
+            <button id="chat-send-btn" class="btn btn-primary send-btn" type="button" aria-label="Send" title="Send">
+                <span class="material-symbols-outlined">send</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const openBtn = document.getElementById('floating-chat-button');
+            const panel = document.getElementById('floating-chat-panel');
+            const closeBtn = document.getElementById('floating-chat-close');
+            const minimizeBtn = document.getElementById('floating-chat-minimize');
+            const fileDrop = document.getElementById('file-drop');
+            const fileInput = document.getElementById('file-drop-input');
+            const sendBtn = document.getElementById('chat-send-btn');
+            const msgInput = document.getElementById('chat-message-input');
+
+            function showPanel() {
+                panel.classList.add('show');
+                panel.setAttribute('aria-hidden', 'false');
+                msgInput.focus();
+            }
+            function hidePanel() {
+                panel.classList.remove('show');
+                panel.setAttribute('aria-hidden', 'true');
+            }
+            function togglePanel() {
+                panel.classList.contains('show') ? hidePanel() : showPanel();
+            }
+
+            openBtn.addEventListener('click', function () { togglePanel(); });
+
+            closeBtn.addEventListener('click', function () { hidePanel(); });
+
+            // File drop UI (no functional upload)
+            fileDrop.addEventListener('click', () => fileInput.click());
+            ['dragenter', 'dragover'].forEach(ev => {
+                fileDrop.addEventListener(ev, function (e) {
+                    e.preventDefault(); e.stopPropagation();
+                    fileDrop.classList.add('dragover');
+                });
+            });
+            ['dragleave', 'drop'].forEach(ev => {
+                fileDrop.addEventListener(ev, function (e) {
+                    e.preventDefault(); e.stopPropagation();
+                    fileDrop.classList.remove('dragover');
+                });
+            });
+            fileDrop.addEventListener('drop', function (e) {
+                // e.dataTransfer.files is available here; left for implementation
+                // const files = e.dataTransfer.files;
+            });
+            fileInput.addEventListener('change', function (e) {
+                // selected files are available via fileInput.files; left for implementation
+            });
+
+
+            // Close on ESC
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') hidePanel();
+            });
+
+            // Close when clicking outside panel (except the floating button)
+            document.addEventListener('click', function (e) {
+                const target = e.target;
+                if (!panel.contains(target) && !openBtn.contains(target)) {
+                    // do not auto-close if panel is not shown
+                    if (panel.classList.contains('show')) hidePanel();
+                }
+            });
+        })();
+    </script>
+    <footer class="d-md-none fixed-bottom bg-white border-top">
+        <nav class="nav justify-content-around py-2">
+            <a class="nav-link d-flex flex-column align-items-center text-muted"
+                href="{{ url_for('home.index') }}"><span class="material-symbols-outlined fs-4">home</span> <small
+                    class="d-block">Home</small></a> <a
+                class="nav-link d-flex flex-column align-items-center text-muted"
+                href="{{ url_for('study.index') }}"><span class="material-symbols-outlined fs-4">school</span>
+                <small class="d-block">Study</small></a> <a
+                class="nav-link d-flex flex-column align-items-center text-muted"
+                href="{{ url_for('community.index') }}"><span class="material-symbols-outlined fs-4">groups</span>
+                <small class="d-block">Community</small></a> <a
+                class="nav-link d-flex flex-column align-items-center text-muted"
+                href="{{ url_for('challenges.index') }}"><span
+                    class="material-symbols-outlined fs-4">emoji_events</span>
+                <small class="d-block">Challenge</small></a>
+        </nav>
+    </footer>
     </div>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script>
@@ -237,6 +340,9 @@
                 }
                 document.getElementById('new-cards-container').appendChild(clone);
             }
+
+            // expose for other scripts to programmatically add new card rows
+            window.addNewCardRow = addNewCardRow;
 
             document.addEventListener('DOMContentLoaded', function () {
                 const addBtn = document.getElementById('add-new-card');
@@ -297,6 +403,305 @@
                 });
             } catch (e) { }
         });
+    </script>
+    <script>
+        //Chat API logic
+        document.addEventListener('DOMContentLoaded', function() {
+        const sendBtn = document.getElementById('chat-send-btn');
+        // preserve original button content so we can restore after loading
+        const sendBtnOriginalHTML = sendBtn ? sendBtn.innerHTML : '';
+        const messageInput = document.getElementById('chat-message-input');
+        const chatBody = document.getElementById('floating-chat-body');
+        const fileInput = document.getElementById('file-drop-input');
+        const fileDropArea = document.getElementById('file-drop');
+
+        // Attempt to parse AI responses that may be wrapped or slightly malformed.
+        function tryParseAIJSON(text) {
+            if (!text || typeof text !== 'string') return null;
+            let candidate = text.trim();
+
+            // 1) Extract fenced ```json blocks first
+            const fence = candidate.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+            if (fence && fence[1]) {
+                candidate = fence[1].trim();
+            } else {
+                // 2) Fallback: find first {...} substring
+                const s = candidate.indexOf('{');
+                const e = candidate.lastIndexOf('}');
+                if (s !== -1 && e !== -1 && e > s) {
+                    candidate = candidate.slice(s, e + 1).trim();
+                }
+            }
+
+            // 3) Try straight JSON.parse
+            try {
+                return JSON.parse(candidate);
+            } catch (e) {
+                // continue to fallbacks
+            }
+
+            // 4) Conservative cleanup: remove trailing commas, replace single quotes
+            try {
+                let cand2 = candidate.replace(/,\s*([}\]])/g, '$1');
+                cand2 = cand2.replace(/\u2018|\u2019|\u201C|\u201D/g, '"'); // smart quotes
+                // Replace single quotes with double quotes only when likely delimiting keys/strings
+                cand2 = cand2.replace(/([:\[,\{\s])'([^']*)'/g, '$1"$2"');
+                // fix a few common transcription typos (e.g. Turkish 'ş' in 'flaşcards')
+                cand2 = cand2.replace(/flaşcards/gi, 'flashcards');
+                // final attempt
+                return JSON.parse(cand2);
+            } catch (e2) {
+                return null;
+            }
+        }
+
+        // Helper: Add message to UI
+        function appendMessage(text, sender) {
+            const msgDiv = document.createElement('div');
+            msgDiv.style.marginBottom = "10px";
+            msgDiv.style.padding = "8px";
+            msgDiv.style.borderRadius = "5px";
+            
+            if (sender === 'user') {
+                msgDiv.style.background = "#e9ecef";
+                msgDiv.style.textAlign = "right";
+                msgDiv.innerHTML = `<strong>You:</strong> ${text}`;
+            } else {
+                msgDiv.style.background = "#d1e7dd";
+                msgDiv.innerHTML = `<strong>AI:</strong> ${text}`;
+            }
+            chatBody.appendChild(msgDiv);
+            chatBody.scrollTop = chatBody.scrollHeight; // Auto-scroll
+        }
+
+        // 1. Handle Sending
+        async function sendMessage() {
+            const text = messageInput.value.trim();
+            const file = fileInput.files[0];
+
+            if (!text && !file) return;
+
+            // Clear input
+            messageInput.value = '';
+            
+            // Show user message immediately
+            appendMessage(text + (file ? ` [Attached: ${file.name}]` : ''), 'user');
+
+            // Show loading state
+            const loadingDiv = document.createElement('div');
+            loadingDiv.textContent = "AI is thinking...";
+            loadingDiv.classList.add("text-muted", "small");
+            chatBody.appendChild(loadingDiv);
+
+            // Prepare Data
+            const formData = new FormData();
+            formData.append('message', text);
+            if (file) {
+                formData.append('file', file);
+            }
+
+            // Show loading state on send button and disable it to prevent duplicates
+            if (sendBtn) {
+                try {
+                    sendBtn.disabled = true;
+                } catch (e) {}
+                sendBtn.setAttribute('aria-busy', 'true');
+                sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            }
+
+            try {
+                const response = await fetch('/api/chat-proxy', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                // Remove loading indicator from chat body
+                chatBody.removeChild(loadingDiv);
+
+                if (data.status === 'success') {
+                    // Prefer structured JSON response from the AI proxy
+                    const jsonResp = data.json || data.jsonResp || null;
+                    const feedback = data.feedback || null;
+
+                    if (feedback) {
+                        appendMessage(feedback, 'ai');
+                    }
+
+                    if (jsonResp) {
+                        // jsonResp may already be an object or a JSON string
+                        let parsed = jsonResp;
+                        console.log(parsed)
+                        if (typeof parsed === 'string') {
+                            // First try native parse, then fallbacks that extract code fences
+                            try {
+                                parsed = JSON.parse(parsed);
+                            } catch (e) {
+                                const tried = tryParseAIJSON(parsed);
+                                if (tried) {
+                                    parsed = tried;
+                                } else {
+                                    console.error('Failed to parse AI JSON response (client fallback)', e);
+                                    // show raw text in chat UI but continue (no DOM insertion)
+                                    appendMessage(jsonResp, 'ai');
+                                    parsed = null;
+                                }
+                            }
+                        }
+
+                        // Normalize common alternative keys from different LLMs
+                        if (parsed && typeof parsed === 'object') {
+                            if (!parsed.name && parsed.deck_name) parsed.name = parsed.deck_name;
+                            if (!parsed.summary && parsed.deck_summary) parsed.summary = parsed.deck_summary;
+                            if (!parsed.flashcards && parsed.flaşcards) parsed.flashcards = parsed.flaşcards; 
+                            // sometimes feedback may be embedded in the JSON
+                            if (!feedback && parsed.user_feedback) {
+                                appendMessage(parsed.user_feedback, 'ai');
+                            }
+                        }
+
+                        // Try a few alternative places for flashcards array
+                        // Accept common misspellings/variants from different LLMs (e.g. "flaashcards")
+                        let flashcardsArray = null;
+                        if (parsed && typeof parsed === 'object') {
+                            const candidateKeys = ['flashcards', 'cards', 'items', 'flaashcards', 'flaash_cards', 'flaashcard', 'flaşcards'];
+                            for (let i = 0; i < candidateKeys.length; i++) {
+                                const k = candidateKeys[i];
+                                if (parsed[k] && Array.isArray(parsed[k])) {
+                                    flashcardsArray = parsed[k];
+                                    break;
+                                }
+                            }
+                            // If we found a misspelled key, normalize it for downstream code
+                            if (!flashcardsArray && parsed.flaashcards && Array.isArray(parsed.flaashcards)) {
+                                flashcardsArray = parsed.flaashcards;
+                                parsed.flashcards = parsed.flaashcards;
+                            }
+                        }
+
+                        if (flashcardsArray && Array.isArray(flashcardsArray)) {
+                            // For each returned flashcard, add a new row to the edit form
+                            flashcardsArray.forEach(fc => {
+                                const front = fc.front || fc.question || fc.prompt || '';
+                                const back = fc.back || fc.answer || fc.response || '';
+                                if (window.addNewCardRow) {
+                                    window.addNewCardRow(front, back);
+                                } else {
+                                    // fallback: clone template manually
+                                    const tmpl = document.getElementById('new-card-template');
+                                    if (tmpl) {
+                                        const clone = tmpl.cloneNode(true);
+                                        clone.id = '';
+                                        clone.classList.remove('d-none');
+                                        const f = clone.querySelector('input[name="new_front[]"]');
+                                        const b = clone.querySelector('input[name="new_back[]"]');
+                                        if (f) f.value = front;
+                                        if (b) b.value = back;
+                                        const btn = clone.querySelector('.remove-new-card');
+                                        if (btn) btn.addEventListener('click', () => clone.remove());
+                                        document.getElementById('new-cards-container').appendChild(clone);
+                                    }
+                                }
+                            });
+
+                            // Optionally update deck name/summary on the page if provided
+                            //document.getElementsByName('deck_name')[0].value = 
+                            if (parsed && parsed.name) {
+                                const nameField = document.getElementsByName('deck_name')[0];
+                                if (nameField) nameField.value = parsed.name;
+                            }
+                            if (parsed && parsed.summary) {
+                                const summaryField = document.getElementsByName('deck_summary')[0];
+                                if (summaryField) summaryField.value = parsed.summary;
+                            }
+
+                            // Do NOT auto-submit. Let user review the AI-added rows and click
+                            // the existing "Save changes" button to persist them.
+                            // Add a non-intrusive notice with an optional "Save now" button.
+                            const form = document.querySelector('form');
+                            const noticeId = 'ai-save-notice-container';
+                            let notice = document.getElementById(noticeId);
+                            if (!notice) {
+                                notice = document.createElement('div');
+                                notice.id = noticeId;
+                                notice.className = 'mb-3';
+                                // insert the notice just above the Save changes area
+                                const saveArea = document.querySelector('.list-group-item.py-3.text-end');
+                                if (saveArea && saveArea.parentNode) {
+                                    saveArea.parentNode.insertBefore(notice, saveArea);
+                                } else if (form) {
+                                    form.insertBefore(notice, form.firstChild);
+                                }
+                            }
+                            notice.innerHTML = `
+                                <div class="alert alert-info d-flex justify-content-between align-items-center mb-0">
+                                    <div>AI added <strong>${flashcardsArray.length}</strong> card(s) to this form. Review them and click <strong>Save changes</strong> to persist.</div>
+                                    <div><button type="submit" class="btn btn-sm btn-primary" id="ai-save-now">Save now</button></div>
+                                </div>`;
+                            // wire the save-now button to submit the form
+                            // const saveNowBtn = notice.querySelector('#ai-save-now');
+                            // if (saveNowBtn) {
+                            //     saveNowBtn.addEventListener('click', function () {
+                            //         const form = document.querySelector('form');
+                            //         if (form) form.submit();
+                            //     });
+                            // }
+                            // const saveNowBtn = document.getElementById('ai-save-now');
+                            // if (saveNowBtn && form) {
+                            //     saveNowBtn.addEventListener('click', function () { form.submit(); });
+                            // }
+                            // Also append a short confirmation in the chat UI
+                            appendMessage('Added ' + flashcardsArray.length + ' card(s) to the edit form. Click Save changes to persist.', 'ai');
+                        } else {
+                            // No flashcards array found — show raw reply
+                            appendMessage(data.reply || JSON.stringify(parsed), 'ai');
+                        }
+                    } else {
+                        // Structured JSON not present — fall back to reply text if available
+                        appendMessage(data.reply || 'No structured content returned', 'ai');
+                    }
+                } else {
+                    appendMessage("Error: " + data.message, 'ai');
+                }
+
+                // Reset file input
+                fileInput.value = ""; 
+
+            } catch (error) {
+                // Remove loading indicator from chat body if present
+                try { chatBody.removeChild(loadingDiv); } catch (e) {}
+                appendMessage("Network Error", 'ai');
+            } finally {
+                // Restore send button state
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.removeAttribute('aria-busy');
+                    sendBtn.innerHTML = sendBtnOriginalHTML;
+                }
+            }
+        }
+
+        // Event Listeners
+        sendBtn.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // File Drop Logic (Click trigger)
+        // Note: the primary fileDrop click handler is registered earlier in the floating chat
+        // panel script. Avoid duplicating `.click()` to prevent the browser opening the
+        // file picker twice. We only forward focus here when the user explicitly clicks
+        // the input element itself (no extra handler needed).
+        
+        fileInput.addEventListener('change', () => {
+            if(fileInput.files.length > 0) {
+                fileDropArea.style.color = "green"; // Visual feedback
+                alert(`File selected: ${fileInput.files[0].name}`);
+            }
+        });
+    });
     </script>
 </body>
 

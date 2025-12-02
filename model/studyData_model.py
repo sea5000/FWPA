@@ -144,6 +144,28 @@ def get_deck(deck_id):
     # Alias to get_deck_by_id which already handles DECKS list
     return get_deck_by_id(deck_id)
 
+def update_deckInfo(deck_id, name: Optional[str]=None, summary: Optional[str]=None):
+    """Update deck's name and/or summary.
+
+    Returns True if updated, False if deck not found.
+    """
+    deck = get_deck_by_id(deck_id)
+    if not deck:
+        return False
+
+    sid = str(deck_id)
+    update_doc = {}
+    if name is not None:
+        deck['name'] = name
+        update_doc['name'] = name
+    if summary is not None:
+        deck['summary'] = summary
+        update_doc['summary'] = summary
+
+    if update_doc:
+        _decks_col.update_one({'id': sid}, {'$set': update_doc})
+    return True
+
 def update_card(deck_id, card_id, front, back):
     """Update an existing card's front/back in the in-memory deck.
 

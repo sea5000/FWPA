@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, g, request, abort, redirect, url_for
 from utils.auth import get_current_user_from_token
 from model.login_model import get_all_users
-from model.studyData_model import get_user_decks, get_user_study_data, get_deck, update_card, add_card, delete_card, record_review, create_deck, add_deck_to_user, get_deck_by_id
+from model.studyData_model import get_user_decks, get_user_study_data, get_deck, update_card, add_card, delete_card, record_review, create_deck, add_deck_to_user, get_deck_by_id, update_deckInfo
 from flask import jsonify
 
 
@@ -110,6 +110,11 @@ def flashcards_edit(deck_id):
                 update_card(deck_id, card_key, front, back)
 
         # new cards arrays
+        if form.get('deck_name'):
+            update_deckInfo(deck_id, name=form.get('deck_name'))
+        if form.get('deck_summary'):
+            update_deckInfo(deck_id, summary=form.get('deck_summary'))
+
         new_fronts = form.getlist('new_front[]')
         new_backs = form.getlist('new_back[]')
         for f, b in zip(new_fronts, new_backs):

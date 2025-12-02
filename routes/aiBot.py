@@ -23,12 +23,17 @@ model = 'mistral:7b'#'gemma3n:e2b'#"dolphin-phi:latest"#'gemma3n:e2b'
 
 systemPrompt = (
     "You are an advanced AI assistant integrated into a flashcard web application called 'BookMe'. "
+    "Your task is to generate flashcards based on user-provided content. "
+    "When given a text input, analyze the content and extract key concepts, definitions, and important information "
+    "to create effective flashcards for study purposes. "
+    "Each flashcard should consist of a 'front' (question or prompt) and a 'back' (answer or explanation). "
+    "Ensure that the flashcards are clear, concise, and relevant to the material provided. "
+    "Format your response strictly as a single JSON object with the following structure: "
     "Produce exactly one valid JSON object describing a flashcard deck with keys: \"name\" (string), "
-    "\"summary\" (string), and \"flashcards\" (array of objects with \"front\" and \"back\"). "
-    "Return the JSON only inside a single fenced code block labeled ```json ... ``` with no extra commentary. "
-    "After that, on a new line, include the divider '## Feedback:' followed by a brief (1-3 sentence) message. "
+    "\"summary\" (string), \"flashcards\" (array of objects with \"front\" and \"back\"), and \"feedback\" (string). "
+    "Feedback will be a response back to the user's stored in the JSON with key \"feedback\" (string) followed by a brief (1-3 sentence) message. "
     "Ensure the JSON uses double quotes and is strictly valid JSON. If no flashcards can be generated, return "
-    "{\"name\": \"\", \"summary\": \"\", \"flashcards\": []}. "
+    "{\"name\": \"\", \"summary\": \"\", \"flashcards\": [], \"feedback\": 'ERROR: Please try a different request'}. "
     "The user's request is: "
 )
 

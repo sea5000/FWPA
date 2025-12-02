@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, g, request, abort, redirect, url_for
 from utils.auth import get_current_user_from_token
 from model.login_model import get_all_users
-from model.studyData_model import get_user_decks, get_user_study_data, get_deck, update_card, add_card, delete_card, record_review, create_deck, add_deck_to_user, get_deck_by_id, update_deckInfo
+from model.studyData_model import get_user_decks, get_user_study_data, get_deck, update_card, add_card, delete_card, record_review, create_deck, add_deck_to_user, get_deck_by_id, update_deckInfo, delete_deck
 from flask import jsonify
 
 
@@ -28,6 +28,14 @@ def flashcards_deck(deck_id):
     if not deck_obj:
         return render_template('404.html'), 404
     return render_template('flashcard_deck.html', username=g.current_user, users=get_all_users(), deck=deck_obj, deck_id=deck_id)
+
+@flashcards_bp.route('/<deck_id>/delete', endpoint='delete', methods=['POST'])
+def flashcards_delete(deck_id):
+    """Delete a deck by its ID."""
+    success = delete_deck(deck_id)
+    if not success:
+        return render_template('404.html'), 404
+    return redirect(url_for('flashcards.index'))
 
 @flashcards_bp.route('/<deck_id>/stats', endpoint='stats', methods=['GET'])
 def flashcards_stats(deck_id):

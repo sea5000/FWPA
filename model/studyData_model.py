@@ -294,6 +294,12 @@ def delete_card(deck_id, card_id):
 
     return False
 
+def delete_deck(deck_id):
+    """Delete a deck by its ID. Returns True if deleted, False otherwise."""
+    sid = str(deck_id)
+    result = _decks_col.delete_one({'id': sid})
+    return result.deleted_count > 0
+
 def record_review(deck_id, card_id, correct: bool):
     """Record a review result for a card. Increment correct/incorrect_count and set last_reviewed.
 

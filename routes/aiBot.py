@@ -6,7 +6,6 @@ import requests
 from dotenv import load_dotenv
 import os
 import json
-from openai import OpenAI
 import ast
 
 load_dotenv()
@@ -14,10 +13,6 @@ load_dotenv()
 chatProxy_bp = Blueprint('chatProxy', __name__)
 OPENWEBUI_API_URL = os.environ.get('OPENWEBUI_API_URL', 'http://ai.spencer-anderson.com/api/')
 OPENWEBUI_API_KEY = os.environ.get('OPENWEBUI_API_KEY')
-
-client = OpenAI(
-    api_key=OPENWEBUI_API_KEY,
-    base_url=OPENWEBUI_API_URL)
 
 model = 'mistral:7b'#'gemma3n:e2b'#"dolphin-phi:latest"#'gemma3n:e2b'
 

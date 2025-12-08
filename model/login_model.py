@@ -9,7 +9,7 @@ from typing import Optional, Dict, List
 import os
 from datetime import datetime as dt
 from utils.auth import get_current_pepper_version, get_pepper_by_version, combine_password_and_pepper, ph
-
+from argon2.exceptions import VerifyMismatchError
 _db = get_db()
 _users_col = _db.users
 
@@ -112,10 +112,12 @@ def verify_user(username: str, pepperedPassword: str) -> Optional[Dict]:
     Returns a small user dict (no password) on success, or None.
     """
     user = get_user_by_username(username)
-
-    if user and ph.verify(user.get('password_hash'), pepperedPassword):
-        return {'id': user['id'], 'username': user['username'], 'email': user.get('email')}
-    return None
+    try:
+        if user and ph.verify(user.get('password_hash'), pepperedPassword):
+            return {'id': user['id'], 'username': user['username'], 'email': user.get('email')}
+        return None
+    except VerifyMismatchError:
+        return False
 
 
 def get_all_users() -> List[Dict]:

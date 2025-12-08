@@ -1,15 +1,14 @@
 """
-Login model backed by MongoDB (with a small in-memory fallback).
+Login model backed by MongoDB
 
 Functions here will attempt to read from the `users` collection in the
-`mydatabase` MongoDB instance on localhost. If the DB call fails or the
-document is missing, behavior falls back to the (possibly-empty) in-memory
-`USERS` if present.
+`mydatabase` MongoDB instance on localhost.
 """
 from .mongo import get_db
 from typing import Optional, Dict, List
 import os
 from datetime import datetime as dt
+from utils.auth import get_current_pepper_version, get_pepper_by_version, combine_password_and_pepper, ph
 
 _db = get_db()
 _users_col = _db.users
@@ -21,7 +20,7 @@ except Exception:
     pass
 
 
-def create_user(username: str, email: str, password: str, name: str) -> bool:
+def create_user(username: str, email: str, password_hash: str, pepper_version:str, name: str) -> bool:
     """Create a new user in the users collection.
 
     Returns True on success, False on failure (duplicate username, DB error, or invalid input).
@@ -44,7 +43,8 @@ def create_user(username: str, email: str, password: str, name: str) -> bool:
         user_doc = {
             'id': nid,
             'username': username,
-            'password': password,
+            'password_hash': password_hash,
+            'pepper_version': pepper_version,
             'name': name,
             'email': email,
             # store ISO string for timestamps to avoid datetime/tz handling issues
@@ -76,7 +76,7 @@ def _doc_to_user(doc: Dict) -> Dict:
         'email': email,
         'profile_pic': profile_pic,
         # include password only for internal checks; callers should trim it
-        'password': doc.get('password'),
+        'password_hash': doc.get('password_hash'),
         'studyData': studyData,
     }
 
@@ -98,7 +98,7 @@ def get_user_by_username(username: str) -> Optional[Dict]:
                     'id': u.get('id'),
                     'username': u.get('username'),
                     'email': u.get('email'),
-                    'password': u.get('password')
+                    'password_hash': u.get('password_hash')
                 }
     except Exception:
         pass
@@ -106,13 +106,14 @@ def get_user_by_username(username: str) -> Optional[Dict]:
     return None
 
 
-def verify_user(username: str, password: str) -> Optional[Dict]:
+def verify_user(username: str, pepperedPassword: str) -> Optional[Dict]:
     """Verify credentials against the users collection.
 
     Returns a small user dict (no password) on success, or None.
     """
     user = get_user_by_username(username)
-    if user and user.get('password') == password:
+
+    if user and ph.verify(user.get('password_hash'), pepperedPassword):
         return {'id': user['id'], 'username': user['username'], 'email': user.get('email')}
     return None
 
@@ -137,6 +138,7 @@ def get_all_users() -> List[Dict]:
             pass
 
     return out
+
 
 def delete_user_by_username(username: str) -> bool:
     """Delete a user by username. Returns True if a user was deleted, False otherwise."""
@@ -281,11 +283,21 @@ def update_user_password(username: str, new_password: str) -> bool:
             print(f"update_user_password: user '{username}' not found in MongoDB")
             return False
         
+        current_version = get_current_pepper_version()
+        if not current_version:
+            print(f"update_user_password: user '{username}' not found in MongoDB")
+            return False
+        pepper = get_pepper_by_version(current_version)
+        combined = combine_password_and_pepper(new_password, pepper)
+
+        # Argon2 will automatically salt and produce a safe encoded hash
+        password_hash = ph.hash(combined)
+        
         # Update the password
         print(f"update_user_password: Updating password for user '{username}'")
         res = _users_col.update_one(
             {'username': username},
-            {'$set': {'password': new_password}}
+            {'$set': {'password_hash': password_hash, 'pepper_version': current_version}}
         )
         
         # Log the result
@@ -295,7 +307,7 @@ def update_user_password(username: str, new_password: str) -> bool:
         if res.matched_count > 0:
             # Verify the update by reading back
             updated_user = _users_col.find_one({'username': username})
-            if updated_user and updated_user.get('password') == new_password:
+            if updated_user and updated_user.get('password_hash') == password_hash:
                 print(f"update_user_password: ✓ Successfully updated password for '{username}'")
                 return True
             else:

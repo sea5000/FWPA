@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from model.login_model import verify_user
 from model.login_model import delete_user_by_username
 from model.login_model import update_login_streak
-from utils.auth import JWT_SECRET_KEY, JWT_ALGORITHM
+from utils.auth import JWT_SECRET_KEY, JWT_ALGORITHM, get_pepper_by_version, combine_password_and_pepper, ph, get_current_pepper_version
 from model.login_model import get_all_users
 
 #__all__ = ['auth_bp']
@@ -42,12 +42,21 @@ def login_post():
     username = request.form.get('username')
     password = request.form.get('password')
     
-    # Validate that username and password were provided
-    if not username or not password:
-        return render_template('login.html', error='Please provide both username and password', users=get_all_users())
+    # Get current pepper version and corresponding pepper from env/config
+    current_version = get_current_pepper_version()
+    if not current_version:
+        return render_template('signup.html', error='Server not configured properly.', users=get_all_users())
+    pepper = get_pepper_by_version(current_version)
+    pepperedPassword = combine_password_and_pepper(password, pepper)
+    #Combines the password with the pepper
     
+    # Validate that username and password were provided
+    if not username or not pepperedPassword:
+        return render_template('login.html', error='Please provide both username and password', users=get_all_users())
+    #print(f"Password hash for login attempt: {pepperedPassword}")
     # Verify user credentials using the model
-    user = verify_user(username, password)
+    user = verify_user(username, pepperedPassword)
+    
     
     if user:
         # Update login streak (track daily logins)

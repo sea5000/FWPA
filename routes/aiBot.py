@@ -20,13 +20,13 @@ systemPrompt = (
     "You are an advanced AI assistant integrated into a flashcard web application called 'BookMe'. "
     "Your task is to generate flashcards based on user-provided content. "
     "When given a text input, analyze the content and extract key concepts, definitions, and important information "
-    "to create effective flashcards for study purposes. "
+    "to create effective flashcards for study purposes. Be sure to create as many flashcards as requested, if specified."
     "Each flashcard should consist of a 'front' (question or prompt) and a 'back' (answer or explanation). "
     "Ensure that the flashcards are clear, concise, and relevant to the material provided. "
     "Format your response strictly as a single JSON object with the following structure: "
     "Produce exactly one valid JSON object describing a flashcard deck with keys: \"name\" (string), "
     "\"summary\" (string), \"flashcards\" (array of objects with \"front\" and \"back\"), and \"feedback\" (string). "
-    "Feedback will be a response back to the user's stored in the JSON with key \"feedback\" (string) followed by a brief (1-3 sentence) message. "
+    "Feedback will be a response back to the user's stored in the JSON with key \"feedback\" (string) a brief (1-3 sentence) message. "
     "Ensure the JSON uses double quotes and is strictly valid JSON. If no flashcards can be generated, return "
     "{\"name\": \"\", \"summary\": \"\", \"flashcards\": [], \"feedback\": 'ERROR: Please try a different request'}. "
     "The user's request is: "
@@ -45,6 +45,7 @@ def upload_file(file_path):
         response = requests.post(url, headers=headers, files=files, timeout=120)
     # forward upstream response (may raise on non-json)
     try:
+        print(response.status_code, response.text)
         return response.json()
     except Exception:
         # return a dict with status/text for debugging
@@ -88,7 +89,9 @@ def chat_proxy():
     payload = {
         'model': model,
         'messages': [{'role': 'user', 'content': fullPrompt}],
-        'files': [{'type': 'file', 'id': file_id} for file_id in uploadId]
+        'files': [{'type': 'file', 'id': file_id} for file_id in uploadId],
+        "max_tokens": 800,
+        "enable_web_search": True
     } 
 
     headers = {

@@ -6,13 +6,20 @@ from flask import request, redirect, url_for, session, jsonify
 from functools import wraps
 import os
 
-# Use the installed `python-jwt` package's API (JWT class + JWK octet key)
 from jwt import JWT
 from jwt.jwk import OctetJWK
 from jwt.exceptions import JWTDecodeError
 
+from argon2 import PasswordHasher, exceptions as argon2_exceptions
+from dotenv import load_dotenv
+import secrets
+
+# Load .env when in development
+load_dotenv()
+load_dotenv('dev.env')
+
 # JWT secret key (in production, use environment variable)
-JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
+JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'RANDOMSECRET_KEY_CHANGE_ME')
 JWT_ALGORITHM = 'HS256'
 
 # Prepare reusable JWT instance and symmetric key
@@ -88,3 +95,30 @@ def get_current_user_from_token():
 
     return current_user
 
+#PASWORD HASHING UTILITIES
+# Argon2 password hasher instance
+ph = PasswordHasher(time_cost=2, memory_cost=102400, parallelism=8)
+
+def get_peppers():
+    """
+    Returns mapping of pepper_version -> pepper_value (strings).
+    For rotation: add new pepper entries and increment CURRENT_PEPPER_VERSION.
+    """
+    # Example: load all env vars that start with PEPPER_
+    peppers = {}
+    for k, v in os.environ.items():
+        if k.startswith("PEPPER_"):
+            version = k[len("PEPPER_"):]  # e.g. "v1"
+            peppers[version] = v
+    return peppers
+
+def get_current_pepper_version():
+    return os.environ.get("CURRENT_PEPPER_VERSION", None)
+
+def get_pepper_by_version(version):
+    return os.environ.get(f"PEPPER_{version}")
+
+# Helper: combine password and pepper (you can choose prepend/append, keep consistent)
+def combine_password_and_pepper(password: str, pepper: str) -> str:
+    # simple append; either is fine. Use str, not bytes.
+    return password + pepper

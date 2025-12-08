@@ -5,6 +5,7 @@ Populates: users, feed posts, notes (grouped by subjects), and followers.
 
 from pymongo import MongoClient
 from datetime import datetime, timedelta
+from utils.auth import get_current_user_from_token, get_pepper_by_version, combine_password_and_pepper, ph, get_current_pepper_version
 import random
 
 # Connect to MongoDB
@@ -35,7 +36,6 @@ def seed_users():
         {
             "id": 1,
             "username": "admin",
-            "password": "admin123",
             "name": "Admin User",
             "email": "admin@example.com",
             "profile_pic": None,
@@ -51,7 +51,6 @@ def seed_users():
         {
             "id": 2,
             "username": "student",
-            "password": "student123",
             "name": "Student User",
             "email": "student@example.com",
             "profile_pic": "https://ui-avatars.com/api/?name=Student+User&background=0D6EFD&color=fff&size=200",
@@ -67,7 +66,6 @@ def seed_users():
         {
             "id": 3,
             "username": "teacher",
-            "password": "teacher123",
             "name": "Teacher User",
             "email": "teacher@example.com",
             "profile_pic": None,
@@ -85,7 +83,6 @@ def seed_users():
             "username": "alice_chen",
             "name": "Alice Chen",
             "email": "alice@bookme.com",
-            "password": "password123",
             "profile_pic": "https://i.pravatar.cc/150?img=5",
             "studyData": {
                 "streak": 15,
@@ -102,7 +99,6 @@ def seed_users():
             "username": "james_miller",
             "name": "James Miller",
             "email": "james@bookme.com",
-            "password": "password123",
             "profile_pic": "https://i.pravatar.cc/150?img=12",
             "studyData": {
                 "streak": 8,
@@ -119,7 +115,6 @@ def seed_users():
             "username": "sophia_nguyen",
             "name": "Sophia Nguyen",
             "email": "sophia@bookme.com",
-            "password": "password123",
             "profile_pic": "https://i.pravatar.cc/150?img=16",
             "studyData": {
                 "streak": 23,
@@ -136,7 +131,6 @@ def seed_users():
             "username": "liam_smith",
             "name": "Liam Smith",
             "email": "liam@bookme.com",
-            "password": "password123",
             "profile_pic": "https://i.pravatar.cc/150?img=8",
             "studyData": {
                 "streak": 12,
@@ -153,7 +147,6 @@ def seed_users():
             "username": "emma_wilson",
             "name": "Emma Wilson",
             "email": "emma@bookme.com",
-            "password": "password123",
             "profile_pic": "https://i.pravatar.cc/150?img=10",
             "studyData": {
                 "streak": 19,
@@ -170,7 +163,6 @@ def seed_users():
             "username": "noah_davis",
             "name": "Noah Davis",
             "email": "noah@bookme.com",
-            "password": "password123",
             "profile_pic": "https://i.pravatar.cc/150?img=13",
             "studyData": {
                 "streak": 6,
@@ -187,7 +179,6 @@ def seed_users():
             "username": "olivia_brown",
             "name": "Olivia Brown",
             "email": "olivia@bookme.com",
-            "password": "password123",
             "profile_pic": "https://i.pravatar.cc/150?img=9",
             "studyData": {
                 "streak": 31,
@@ -204,6 +195,28 @@ def seed_users():
     db.users.insert_many(users)
     print(f"✓ Seeded {len(users)} users")
 
+
+def genHashedPassword(password:str) -> str:
+    """Generate a hashed password with current pepper."""
+    current_version = get_current_pepper_version()
+    if not current_version:
+        raise ValueError("Current pepper version not set in environment.")
+    pepper = get_pepper_by_version(current_version)
+    combined = combine_password_and_pepper(password, pepper)
+    password_hash = ph.hash(combined)
+    return password_hash
+def addHashedPasswords():
+    """Add hashed passwords to existing users for testing."""
+    print("\nAdding hashed passwords to users...")
+    users = db.users.find({})
+    password_hash = genHashedPassword('password123')
+    for user in users:
+        current_version = get_current_pepper_version()
+        db.users.update_one(
+            {'_id': user['_id']},
+            {'$set': {'password_hash': password_hash, 'pepper_version': current_version}}
+        )
+    print("✓ Hashed passwords added to users")
 
 def seed_decks():
     """Create sample Flashcard Decks"""
@@ -1011,6 +1024,8 @@ def main():
     print("=" * 60)
     print("\nData Summary:")
     print(f"  Users: {db.users.count_documents({})}")
+    print("  #Adding user's Hashed Passwords")
+    addHashedPasswords()
     print(f"  Decks: {db.decks.count_documents({})}")
     print(f"  Notes: {db.notes.count_documents({})}")
     print(f"  Posts: {db.posts.count_documents({})}")

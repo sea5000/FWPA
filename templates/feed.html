@@ -1,31 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- Meta tags for charset and responsive design -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin=""> -->
-    <!-- <link href="https://fonts.googleapis.com/css2?display=swap&amp;family=Plus+Jakarta+Sans:wght@400;500;700;800" rel="stylesheet"> -->
+    
+    <!-- Bootstrap CSS Framework for responsive layout and components -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    
+    <!-- Material Symbols Icons library -->
     <link
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
       rel="stylesheet"
     />
+    
     <title>Community - Feed | BookMe</title>
+    
+    <!-- Custom styles for feed elements -->
     <style>
+      /* Post avatar - circular user profile pictures */
       .post-avatar {
         width: 50px;
         height: 50px;
-        border-radius: 50%;
-        object-fit: cover;
+        border-radius: 50%;  /* Make circular */
+        object-fit: cover;   /* Crop image to fill circle */
       }
+      /* Images posted in posts */
       .post-image {
         max-width: 100%;
         border-radius: 8px;
         margin-top: 12px;
       }
+      /* Like/comment/share action buttons */
       .post-actions button {
         background: none;
         border: none;
@@ -34,6 +43,7 @@
         cursor: pointer;
         transition: color 0.2s;
       }
+      /* Button hover effect - change to primary color */
       .post-actions button:hover {
         color: #2badee;
       }
@@ -41,11 +51,14 @@
   </head>
   <body class="bg-light">
     <div class="d-flex flex-column min-vh-100">
-      <!-- Header -->
+      <!-- ============================================================================
+           HEADER SECTION - Navigation and User Menu
+           ============================================================================ -->
       <header class="w-100 bg-white border-bottom">
         <div
           class="container d-flex align-items-center justify-content-between py-3"
         >
+          <!-- Logo Section -->
           <div
             class="col-1 d-flex align-items-center justify-content-center py-3"
           >
@@ -53,10 +66,12 @@
               class="col-1"
               style="width: 40px; height: 40px; color: var(--bs-primary)"
             >
+              <!-- Book icon from Material Symbols -->
               <span class="material-symbols-outlined fs-3 text-primary"
                 >book</span
               >
             </div>
+            <!-- App title/logo - links to home -->
             <a
               class="col-1 h3 text-decoration-none text-reset fw-bold"
               id="logoButton"
@@ -64,29 +79,38 @@
               >Bookme</a
             >
           </div>
+          
+          <!-- Navigation Links (hidden on mobile, visible on medium+ screens) -->
           <nav class="d-none d-md-flex align-items-center gap-2">
+            <!-- Home link -->
             <a
               class="btn btn-sm btn-light rounded-pill"
               href="{{ url_for('home.index') }}"
               >Home</a
             >
+            <!-- Study link -->
             <a
               class="btn btn-sm btn-light rounded-pill"
               href="{{ url_for('study.index') }}"
               >Study</a
             >
+            <!-- Community link - highlighted as current page -->
             <a
               class="btn btn-sm btn-primary rounded-pill text-white"
               href="{{ url_for('community.index') }}"
               >Community</a
             >
+            <!-- Challenges link -->
             <a
               class="btn btn-sm btn-light rounded-pill"
               href="{{ url_for('challenges.index') }}"
               >Challenge</a
             >
           </nav>
+          
+          <!-- User Controls (Notifications and Profile) -->
           <div class="d-none d-md-flex align-items-center gap-3">
+            <!-- Notifications Dropdown -->
             <div class="dropdown">
               <button
                 type="button"
@@ -106,6 +130,8 @@
                 </li>
               </ul>
             </div>
+            
+            <!-- Profile Dropdown Menu -->
             <div class="dropdown">
               <a
                 class="btn btn-link text-muted p-0 dropdown-toggle"
@@ -115,10 +141,12 @@
                 aria-expanded="false"
                 aria-label="Profile"
               >
+                <!-- Account circle icon -->
                 <span class="material-symbols-outlined fs-3"
                   >account_circle</span
                 >
               </a>
+              <!-- Profile menu items -->
               <ul class="dropdown-menu dropdown-menu-end">
                 <li><h6 class="dropdown-header">Account</h6></li>
                 <li>
@@ -127,6 +155,7 @@
                   >
                 </li>
                 <li><hr class="dropdown-divider" /></li>
+                <!-- Logout form -->
                 <li>
                   <form
                     method="POST"
@@ -142,10 +171,12 @@
         </div>
       </header>
 
-      <!-- Main Content -->
+      <!-- ============================================================================
+           MAIN CONTENT AREA
+           ============================================================================ -->
       <main class="flex-grow-1">
         <div class="container my-5">
-          <!-- Page Header -->
+          <!-- Page Title -->
           <div class="d-flex align-items-center justify-content-between mb-4">
             <div>
               <h2 class="h3 mb-0">Community</h2>
@@ -153,41 +184,50 @@
             </div>
           </div>
 
-          <!-- Navigation Tabs -->
+          <!-- Navigation Tabs: Notes | Friends | Feed -->
           <ul class="nav nav-tabs mb-4">
             <li class="nav-item">
+              <!-- Link to Notes section -->
               <a class="nav-link" href="{{ url_for('community.index') }}"
                 >📝 Notes</a
               >
             </li>
             <li class="nav-item">
+              <!-- Link to Friends section -->
               <a class="nav-link" href="{{ url_for('friends.index') }}"
                 >👥 Friends</a
               >
             </li>
             <li class="nav-item">
+              <!-- Feed tab - active (current page) -->
               <a class="nav-link active" href="{{ url_for('feed.index') }}"
                 >📰 Feed</a
               >
             </li>
           </ul>
 
-          <!-- Create Post Section -->
+          <!-- ============================================================================
+               CREATE POST SECTION
+               ============================================================================ -->
           <div class="card p-4 mb-4">
+            <!-- User avatar + text input -->
             <div class="d-flex align-items-start gap-3 mb-3">
               {% if profileData and profileData.profile_pic %}
+              <!-- Show user's uploaded profile picture -->
               <img
                 src="{{ profileData.profile_pic }}"
                 class="post-avatar"
                 alt="Your avatar"
               />
               {% else %}
+              <!-- Generate default avatar from initials if no picture -->
               <img
                 src="https://ui-avatars.com/api/?name={{ profileData.name or username }}&background=0D6EFD&color=fff&size=60"
                 class="post-avatar"
                 alt="Your avatar"
               />
               {% endif %}
+              <!-- Text input for post content -->
               <textarea
                 id="postText"
                 class="form-control"
@@ -195,6 +235,8 @@
                 placeholder="Share your study progress, notes, or thoughts..."
               ></textarea>
             </div>
+            
+            <!-- Image upload input -->
             <div class="mb-3">
               <input
                 type="file"

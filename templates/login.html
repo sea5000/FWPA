@@ -45,14 +45,12 @@
 
       body {
         font-family: "Plus Jakarta Sans", sans-serif;
-        background: #f0f9ff; /* Blue Fallback */
-        background-image: var(--bg-gradient);
-        background-attachment: fixed;
-        background-size: cover;
+        background-color: transparent; /* Allow video background to show */
         min-height: 100vh;
         color: var(--color-text-main);
         overflow-x: hidden;
       }
+
 
       /* --- Animations --- */
       @keyframes floatUp {
@@ -237,12 +235,23 @@
         /* Blue focus ring */
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
       }
+
+      #background-video {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        min-width: 100%;
+        min-height: 100%;
+        z-index: -1;
+        object-fit: cover; /* Ensure it covers the screen without distortion */
+      }
     </style>
 
     <script>
       document.addEventListener('DOMContentLoaded', function () {
           const lc = document;
           const overlay = lc.querySelector('#loginOverlay');
+          if (!overlay) return;
           const closeBtn = lc.querySelector('#loginClose');
           {% if login%}
               overlay.classList.remove('d-none');
@@ -276,6 +285,10 @@
   </head>
 
   <body>
+    <video autoplay muted loop id="background-video">
+      <source src="{{ url_for('static', filename='BackVid.mp4') }}" type="video/mp4">
+      Your browser does not support HTML5 video.
+    </video>
     <div
       class="d-flex flex-column min-vh-100 w-100 position-relative overflow-hidden"
     >

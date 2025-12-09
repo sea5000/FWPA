@@ -1,199 +1,528 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0">
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <head>
+    <meta
+      name="generator"
+      content="HTML Tidy for HTML5 for Linux version 5.6.0"
+    />
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>BookMe - Login</title>
-    <!-- <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon">
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"> -->
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
 
     <style>
-        /* hide the login container by default; the script will turn it into a centered overlay */
-        /* .login-container {
-            display: none;
-        } */
+      :root {
+        /* Light Blue Theme Palette */
+        --bg-gradient: radial-gradient(
+          circle at 50% 0%,
+          #f0f9ff 0%,
+          #dbeafe 40%,
+          #e0e7ff 100%
+        );
+        --color-primary: #3b82f6; /* Bright Blue */
+        --color-primary-hover: #2563eb; /* darker Blue */
+        --color-text-main: #0f172a; /* Cool Dark Slate */
+        --color-text-sub: #475569; /* Muted Slate */
+        --glass-bg: rgba(255, 255, 255, 0.65);
+        --pill-bg: rgba(255, 255, 255, 0.5);
+        --pill-border: rgba(255, 255, 255, 0.8);
+      }
 
-        /* overlay styles (visible when shown) */
-        .login-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 1050;
-            background-color: rgba(0, 0, 0, .45);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background-color: transparent; /* Allow video background to show */
+        min-height: 100vh;
+        color: var(--color-text-main);
+        overflow-x: hidden;
+      }
 
-        /* card sizing */
-        .login-overlay .login-card {
-            max-width: 480px;
-            width: 100%;
+
+      /* --- Animations --- */
+      @keyframes floatUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
         }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-up {
+        animation: floatUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      /* --- Header/Nav --- */
+      .site-header {
+        background: transparent;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 10;
+      }
+
+      /* --- Hero Section Elements --- */
+      /* The "Study smarter" top badge - Blue theme */
+      .top-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 20px;
+        background: rgba(59, 130, 246, 0.1); /* Light blue tint */
+        border: 1px solid rgba(59, 130, 246, 0.25);
+        border-radius: 50px;
+        color: #1e40af; /* Dark blue text */
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(4px);
+      }
+
+      /* Main Headings */
+      h2.display-6 {
+        font-weight: 800 !important;
+        font-size: 4rem;
+        letter-spacing: -1.5px;
+        color: var(--color-text-main);
+        margin-bottom: 0.5rem;
+        line-height: 1.1;
+      }
+
+      .brand-highlight {
+        color: var(--color-primary);
+        /* Blue text shadow for depth */
+        text-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+      }
+
+      .lead {
+        font-weight: 500;
+        color: var(--color-text-sub);
+        font-size: 1.25rem;
+        max-width: 600px;
+        margin: 0 auto 2.5rem auto;
+        line-height: 1.6;
+      }
+
+      /* --- Buttons --- */
+      .btn-lg {
+        border-radius: 12px; /* Soft square/pill hybrid */
+        padding: 14px 48px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      /* Primary (Blue gradient) */
+      .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        border: none;
+        color: white;
+        box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+      }
+      .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px -5px rgba(59, 130, 246, 0.5);
+        color: white;
+      }
+
+      /* Secondary (Outline/Glass) */
+      .btn-outline-secondary {
+        background: rgba(255, 255, 255, 0.4);
+        border: 2px solid rgba(203, 213, 225, 0.6);
+        color: #475569;
+        backdrop-filter: blur(4px);
+      }
+      .btn-outline-secondary:hover {
+        background: #fff;
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px -10px rgba(59, 130, 246, 0.2);
+      }
+
+      /* --- Bottom Feature Pills --- */
+      .feature-pills-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 3.5rem;
+      }
+
+      .feature-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        padding: 10px 24px;
+        border-radius: 50px;
+        color: #475569;
+        font-weight: 600;
+        font-size: 0.9rem;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s;
+      }
+
+      .feature-pill:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.8);
+      }
+
+      .pill-icon {
+        font-size: 1.1rem;
+        color: var(--color-primary);
+      }
+
+      /* --- Login Overlay & Card --- */
+      .login-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1050;
+        background-color: rgba(15, 23, 42, 0.2); /* Cool slate tint */
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        opacity: 0;
+        animation: fadeIn 0.3s forwards;
+      }
+
+      @keyframes fadeIn {
+        to {
+          opacity: 1;
+        }
+      }
+
+      .login-overlay .login-card {
+        max-width: 440px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(255, 255, 255, 1);
+        border-radius: 24px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Form Inputs */
+      .form-control {
+        background-color: rgba(255, 255, 255, 0.6);
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px 16px;
+      }
+      .form-control:focus {
+        background-color: #fff;
+        border-color: var(--color-primary);
+        /* Blue focus ring */
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+      }
+
+      #background-video {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        min-width: 100%;
+        min-height: 100%;
+        z-index: -1;
+        object-fit: cover; /* Ensure it covers the screen without distortion */
+      }
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const lc = document;
-            const overlay = lc.querySelector('#loginOverlay');
-            const closeBtn = lc.querySelector('#loginClose');
-            {% if login%}
-                overlay.classList.remove('d-none');
-            {%endif%}
-            function showLogin() {
-                overlay.classList.remove('d-none');
-            }
-            function hideLogin() {
-                overlay.classList.add('d-none');
-            }
+      document.addEventListener('DOMContentLoaded', function () {
+          const lc = document;
+          const overlay = lc.querySelector('#loginOverlay');
+          if (!overlay) return;
+          const closeBtn = lc.querySelector('#loginClose');
+          {% if login%}
+              overlay.classList.remove('d-none');
+          {%endif%}
+          function showLogin() {
+              overlay.classList.remove('d-none');
+          }
+          function hideLogin() {
+              overlay.classList.add('d-none');
+          }
 
-            // Select the login button by ID and hijack its click to show the login overlay
-            const loginTrigger = document.getElementById('login-button');
+          // Select the login button by ID and hijack its click to show the login overlay
+          const loginTrigger = document.getElementById('login-button');
 
-            if (loginTrigger) {
-                loginTrigger.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    showLogin();
-                });
-            }
+          if (loginTrigger) {
+              loginTrigger.addEventListener('click', function (e) {
+                  e.preventDefault();
+                  showLogin();
+              });
+          }
 
-            // close handlers
-            if (closeBtn) closeBtn.addEventListener('click', hideLogin);
-            if (overlay) {
-                overlay.addEventListener('click', function (e) {
-                    if (e.target === overlay) hideLogin();
-                });
-            }
-        });
+          // close handlers
+          if (closeBtn) closeBtn.addEventListener('click', hideLogin);
+          if (overlay) {
+              overlay.addEventListener('click', function (e) {
+                  if (e.target === overlay) hideLogin();
+              });
+          }
+      });
     </script>
-</head>
+  </head>
 
-<body class="bg-light text-dark">
-    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-        <div class="flex h-full grow flex-col">
-            <header class="w-100 site-header">
-                <div class="col d-flex align-items-center justify-content-center py-3">
-                    <div class="col-1" style="width:40px;height:40px;color:var(--bs-primary);">
-                        <span class="material-symbols-outlined fs-3 text-primary">book</span>
-                    </div>
-                    <a class="col-1 h3 text-decoration-none text-reset fw-bold" id="logoButton"
-                        href="{{ url_for('home.index') }}">Bookme</a>
-                </div>
-            </header>
-            <main class="py-5">
-                <div class="container text-center">
-                    <div class="mx-auto mb-4"
-                        style="max-width:320px; aspect-ratio:1/1; background-image:url('https://lh3.googleusercontent.com/aida-public/AB6AXuDUj6Z49TaYE8P4FbLOT8Ry1Sdd0jt_rlrWmw-TpMbJa27_gmbSlsfdKwzZLLlp_4jb37j95sNHGKUtbco0ZYcdSY_bbM2UiUHsxyARkUcP-2VkTPyMKmuqmZMlqsW77J4EZFcfHwdHT6vGL48esrYfAeJ8AuiCWpkUXu1d2SsB_wHY8umL0X3pJtYz_vU-QexudjiWePu7gU57Z5ofsDoRgHR3e9nRsjXEsq_OdOwiOF8oBhwipN-iILoHStC04o9t-CDIrTzLJGTb'); background-size:cover; background-position:center; border-radius:.5rem;">
-                    </div>
-                    <h2 class="display-6 fw-bold">Welcome to BookMe!</h2>
-                    <p class="lead text-muted">Study smarter together.</p>
-                    <div class="mt-4 d-flex flex-column gap-2 align-items-center">
-                        <a href="{{ url_for('signup.index') }}" id="signup-button" class="btn btn-primary btn-lg px-4">Sign
-                            Up</a>
-                        <a href="{{ url_for('auth.login') }}" id="login-button"
-                            class="btn btn-outline-secondary btn-lg px-4">Log In</a>
-                    </div>
-                </div>
-            </main>
+  <body>
+    <video autoplay muted loop id="background-video">
+      <source src="{{ url_for('static', filename='BackVid.mp4') }}" type="video/mp4">
+      Your browser does not support HTML5 video.
+    </video>
+    <div
+      class="d-flex flex-column min-vh-100 w-100 position-relative overflow-hidden"
+    >
+      <header class="site-header w-100">
+        <div class="col d-flex align-items-center justify-content-center py-4">
+          <a
+            id="logoButton"
+            href="{{ url_for('home.index') }}"
+            class="d-flex align-items-center gap-2 text-decoration-none"
+          >
+            <img
+              src="/static/logo.png"
+              alt="BookMe Logo"
+              style="height: 145px; width: auto"
+            />
+          </a>
         </div>
-    </div>
-    <div class="login-overlay d-none" id="loginOverlay">
-        <div class="login-card card shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <h5 class="card-title mb-0">Login</h5>
-                    <button type="button" class="btn-close" id="loginClose" aria-label="Close"></button>
-                </div>
+      </header>
 
-                <div class="login-container text-center w-100">
-                    {% if error %}
-                    <div class="alert alert-danger mb-3" role="alert">{{ error }}</div>
-                    {% endif %}
-
-                    <form method="POST" action="{{ url_for('auth.login') }}" class="mx-auto" style="max-width: 400px;">
-                        <div class="mb-3 text-start">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" required autofocus>
-                        </div>
-
-                        <div class="mb-3 text-start">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100">Login</button>
-                    </form>
-
-                    <div class="mt-3 small text-muted">
-                        <strong>Demo Credentials</strong>
-                        <div class="mt-2">
-                            {% for user in users %}
-                            <div class="d-block">Username: {{ user.username }}</div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
+      <main
+        class="flex-grow-1 d-flex align-items-center justify-content-center w-100"
+      >
+        <div class="container text-center">
+          <div class="animate-up">
+            <div class="top-badge">
+              <span class="material-symbols-outlined" style="font-size: 1.1rem"
+                >auto_awesome</span
+              >
+              Study smarter, not harder
             </div>
+          </div>
+
+          <div class="animate-up" style="animation-delay: 0.1s">
+            <h2 class="display-6">
+              Welcome to <span class="brand-highlight">BookMe!</span>
+            </h2>
+            <p class="lead">
+              Connect with fellow learners, organize study sessions, and achieve
+              your academic goals together. Learning is better when shared.
+            </p>
+          </div>
+
+          <div
+            class="mt-5 d-flex flex-row justify-content-center gap-3 animate-up"
+            style="animation-delay: 0.2s"
+          >
+            <a
+              href="{{ url_for('signup.index') }}"
+              id="signup-button"
+              class="btn btn-primary btn-lg"
+            >
+              Sign Up
+            </a>
+            <a
+              href="{{ url_for('auth.login') }}"
+              id="login-button"
+              class="btn btn-outline-secondary btn-lg"
+              >Log In</a
+            >
+          </div>
+
+          <div
+            class="feature-pills-container animate-up"
+            style="animation-delay: 0.3s"
+          >
+            <div class="feature-pill">
+              <span class="material-symbols-outlined pill-icon">groups</span>
+              Group Study
+            </div>
+            <div class="feature-pill">
+              <span class="material-symbols-outlined pill-icon"
+                >library_books</span
+              >
+              Resource Sharing
+            </div>
+            <div class="feature-pill">
+              <span class="material-symbols-outlined pill-icon">bolt</span>
+              Smart Scheduling
+            </div>
+          </div>
         </div>
+      </main>
     </div>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <div class="login-overlay d-none" id="loginOverlay">
+      <div class="login-card card border-0">
+        <div class="card-body p-4 p-md-5">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="card-title mb-0 fw-bold">Welcome Back</h5>
+            <button
+              type="button"
+              class="btn-close"
+              id="loginClose"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="login-container text-center w-100">
+            {% if error %}
+            <div
+              class="alert alert-danger mb-3 rounded-3 border-0 bg-danger-subtle text-danger"
+              role="alert"
+            >
+              {{ error }}
+            </div>
+            {% endif %}
+
+            <form
+              method="POST"
+              action="{{ url_for('auth.login') }}"
+              class="mx-auto"
+              style="max-width: 400px"
+            >
+              <div class="mb-3 text-start">
+                <label
+                  for="username"
+                  class="form-label small fw-bold text-muted text-uppercase"
+                  style="font-size: 0.75rem"
+                  >Username</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="username"
+                  name="username"
+                  required
+                  autofocus
+                />
+              </div>
+
+              <div class="mb-4 text-start">
+                <label
+                  for="password"
+                  class="form-label small fw-bold text-muted text-uppercase"
+                  style="font-size: 0.75rem"
+                  >Password</label
+                >
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  name="password"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn-primary w-100 py-3 rounded-3"
+              >
+                Login
+              </button>
+            </form>
+
+            <div class="mt-4 pt-3 border-top border-light-subtle">
+              <span class="small text-muted">Demo Credentials</span>
+              <div class="mt-2 d-flex flex-wrap justify-content-center gap-2">
+                {% for user in users %}
+                <span
+                  class="badge bg-light text-dark border fw-normal py-2 px-3"
+                  >{{ user.username }}</span
+                >
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
+      // Highlight header/footer nav link for current page using folder-slug matching
+      document.addEventListener("DOMContentLoaded", function () {
+        try {
+          const navAreas = [];
+          const header = document.querySelector("header");
+          if (header) navAreas.push(header);
+          const footers = Array.from(document.querySelectorAll("footer"));
+          navAreas.push(...footers);
 
-        // Highlight header/footer nav link for current page using folder-slug matching
-        document.addEventListener('DOMContentLoaded', function () {
-            try {
-                const navAreas = [];
-                const header = document.querySelector('header');
-                if (header) navAreas.push(header);
-                const footers = Array.from(document.querySelectorAll('footer'));
-                navAreas.push(...footers);
+          const parts = location.pathname.split("/").filter(Boolean);
+          const currentSlug =
+            parts.length >= 2 ? parts[parts.length - 2] : parts[0] || "home";
 
-                const parts = location.pathname.split('/').filter(Boolean);
-                // Use the parent folder (the slug) as the page key, e.g. 'bookme_challenge_home'
-                const currentSlug = parts.length >= 2 ? parts[parts.length - 2] : (parts[0] || 'home');
+          navAreas.forEach((area) => {
+            const links = Array.from(area.querySelectorAll("a[href]"));
+            links.forEach((a) => {
+              try {
+                if (a.id === "logoButton") return;
+                const url = new URL(a.getAttribute("href"), location.origin);
+                const linkParts = url.pathname.split("/").filter(Boolean);
+                const linkSlug =
+                  linkParts.length >= 2
+                    ? linkParts[linkParts.length - 2]
+                    : linkParts[0] || "home";
 
-                navAreas.forEach(area => {
-                    const links = Array.from(area.querySelectorAll('a[href]'));
-                    links.forEach(a => {
-                        try {
-                            if (a.id === "logoButton") return;
-                            const url = new URL(a.getAttribute('href'), location.origin);
-                            const linkParts = url.pathname.split('/').filter(Boolean);
-                            const linkSlug = linkParts.length >= 2 ? linkParts[linkParts.length - 2] : (linkParts[0] || 'home');
+                // Reset classes we control
+                a.classList.remove(
+                  "active",
+                  "text-primary",
+                  "fw-bold",
+                  "text-white",
+                  "btn-primary"
+                );
 
-                            // Reset classes we control
-                            a.classList.remove('active', 'text-primary', 'fw-bold', 'text-white', 'btn-primary');
-
-                            if (linkSlug === currentSlug) {
-                                if (a.classList.contains('btn')) {
-                                    a.classList.remove('btn-light');
-                                    a.classList.add('btn-primary', 'text-white');
-                                } else {
-                                    a.classList.add('text-primary', 'fw-bold');
-                                }
-                                a.classList.add('active');
-                            } else {
-                                if (!a.classList.contains('btn')) {
-                                    a.classList.remove('text-primary', 'fw-bold');
-                                    a.classList.add('text-muted');
-                                }
-                                if (a.classList.contains('btn') && !a.classList.contains('btn-light')) {
-                                    a.classList.add('btn-light');
-                                }
-                            }
-                        } catch (e) { /* ignore malformed hrefs */ }
-                    });
-                });
-            } catch (e) { /* noop */ }
-        });
+                if (linkSlug === currentSlug) {
+                  if (a.classList.contains("btn")) {
+                    a.classList.remove("btn-light");
+                    a.classList.add("btn-primary", "text-white");
+                  } else {
+                    a.classList.add("text-primary", "fw-bold");
+                  }
+                  a.classList.add("active");
+                } else {
+                  if (!a.classList.contains("btn")) {
+                    a.classList.remove("text-primary", "fw-bold");
+                    a.classList.add("text-muted");
+                  }
+                  if (
+                    a.classList.contains("btn") &&
+                    !a.classList.contains("btn-light")
+                  ) {
+                    a.classList.add("btn-light");
+                  }
+                }
+              } catch (e) {
+                /* ignore malformed hrefs */
+              }
+            });
+          });
+        } catch (e) {
+          /* noop */
+        }
+      });
     </script>
-</body>
-
+  </body>
 </html>

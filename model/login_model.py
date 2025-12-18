@@ -121,7 +121,7 @@ def verify_user(username: str, pepperedPassword: str) -> Optional[Dict]:
 
 
 def get_all_users() -> List[Dict]:
-    """Return a list of users (including password field) for admin/debug uses.
+    """Return a list of users for admin/debug uses.
 
     Note: callers should avoid exposing passwords in production.
     """
@@ -135,7 +135,7 @@ def get_all_users() -> List[Dict]:
         try:
             from .login_model import USERS as _USERS  # type: ignore
             for u in _USERS:
-                out.append({'id': u.get('id'), 'username': u.get('username'), 'email': u.get('email'), 'password': u.get('password')})
+                out.append({'id': u.get('id'), 'username': u.get('username'), 'email': u.get('email')})
         except Exception:
             pass
 

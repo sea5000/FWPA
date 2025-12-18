@@ -95,7 +95,7 @@ def get_current_user_from_token():
 
     return current_user
 
-#PASWORD HASHING UTILITIES
+# PASWORD HASHING UTILITIES
 # Argon2 password hasher instance
 ph = PasswordHasher(time_cost=2, memory_cost=102400, parallelism=8)
 

@@ -25,6 +25,10 @@ def clear_collections():
     db.posts.delete_many({})
     db.notes.delete_many({})
     db.sessions.delete_many({})
+    db.groups.delete_many({})
+    db.achievements.delete_many({})
+    db.reminders.delete_many({})
+    db.resources.delete_many({})
     print("✓ Collections cleared")
 
 
@@ -41,10 +45,17 @@ def seed_users():
             "profile_pic": None,
             "studyData": {
                 "streak": 50000,
+                "currentStreak": 50000,
+                "weeklyGoalMinutes": 300,
                 "lastLogin": iso_days_ago(0),
+                "lastStudySessionAt": iso_days_ago(0),
+                "lastFlashcardReviewAt": iso_days_ago(0),
+                "notesCreatedCount": 5,
                 "decks": ["1", "2"],
                 "loginHistory": {iso_days_ago(1): 1, iso_days_ago(2): 1},
             },
+            "interests": ["productivity", "python", "security"],
+            "recentSearches": ["pomodoro", "hashing", "mongodb index"],
             "followers": [],
             "following": [],
         },
@@ -56,10 +67,17 @@ def seed_users():
             "profile_pic": "https://ui-avatars.com/api/?name=Student+User&background=0D6EFD&color=fff&size=200",
             "studyData": {
                 "streak": 2,
+                "currentStreak": 2,
+                "weeklyGoalMinutes": 120,
                 "lastLogin": iso_days_ago(3),
+                "lastStudySessionAt": iso_days_ago(2),
+                "lastFlashcardReviewAt": iso_days_ago(2),
+                "notesCreatedCount": 1,
                 "decks": ["2"],
                 "loginHistory": {iso_days_ago(3): 1, iso_days_ago(4): 1},
             },
+            "interests": ["math", "biology"],
+            "recentSearches": ["calculus rules", "spanish greetings"],
             "followers": [],
             "following": [],
         },
@@ -71,10 +89,17 @@ def seed_users():
             "profile_pic": None,
             "studyData": {
                 "streak": 400,
+                "currentStreak": 400,
+                "weeklyGoalMinutes": 240,
                 "lastLogin": iso_days_ago(10),
+                "lastStudySessionAt": iso_days_ago(7),
+                "lastFlashcardReviewAt": iso_days_ago(8),
+                "notesCreatedCount": 9,
                 "decks": ["1"],
                 "loginHistory": {iso_days_ago(10): 1, iso_days_ago(11): 1},
             },
+            "interests": ["education", "history"],
+            "recentSearches": ["lesson plans", "review intervals"],
             "followers": [],
             "following": [],
         },
@@ -86,10 +111,17 @@ def seed_users():
             "profile_pic": "https://i.pravatar.cc/150?img=5",
             "studyData": {
                 "streak": 15,
+                "currentStreak": 15,
+                "weeklyGoalMinutes": 200,
                 "lastLogin": (datetime.utcnow() - timedelta(hours=2)).isoformat(),
+                "lastStudySessionAt": (datetime.utcnow() - timedelta(hours=4)).isoformat(),
+                "lastFlashcardReviewAt": (datetime.utcnow() - timedelta(hours=5)).isoformat(),
                 "totalStudyTime": 45000,  # in seconds
                 "decks": ["1", "2", "3"],
+                "notesCreatedCount": 6,
             },
+            "interests": ["machine learning", "python", "productivity"],
+            "recentSearches": ["transformers", "anki ease factor", "linux shortcuts"],
             "bio": "Computer Science major | ML enthusiast | Coffee addict ☕",
             "followers": ["james_miller", "sophia_nguyen", "liam_smith"],
             "following": ["james_miller", "emma_wilson", "noah_davis"],
@@ -102,10 +134,17 @@ def seed_users():
             "profile_pic": "https://i.pravatar.cc/150?img=12",
             "studyData": {
                 "streak": 8,
+                "currentStreak": 8,
+                "weeklyGoalMinutes": 180,
                 "lastLogin": (datetime.utcnow() - timedelta(hours=5)).isoformat(),
+                "lastStudySessionAt": (datetime.utcnow() - timedelta(hours=8)).isoformat(),
+                "lastFlashcardReviewAt": (datetime.utcnow() - timedelta(hours=9)).isoformat(),
                 "totalStudyTime": 32000,
                 "decks": [],
+                "notesCreatedCount": 3,
             },
+            "interests": ["biology", "health", "outdoors"],
+            "recentSearches": ["cell division", "flashcard tips"],
             "bio": "Biology student 🧬 | Nature lover | Studying for med school",
             "followers": ["alice_chen", "sophia_nguyen"],
             "following": ["alice_chen", "emma_wilson", "olivia_brown"],
@@ -118,10 +157,17 @@ def seed_users():
             "profile_pic": "https://i.pravatar.cc/150?img=16",
             "studyData": {
                 "streak": 23,
+                "currentStreak": 23,
+                "weeklyGoalMinutes": 210,
                 "lastLogin": (datetime.utcnow() - timedelta(minutes=30)).isoformat(),
+                "lastStudySessionAt": (datetime.utcnow() - timedelta(hours=6)).isoformat(),
+                "lastFlashcardReviewAt": (datetime.utcnow() - timedelta(hours=7)).isoformat(),
                 "totalStudyTime": 67000,
                 "decks": [],
+                "notesCreatedCount": 7,
             },
+            "interests": ["physics", "math", "chess"],
+            "recentSearches": ["eigenvalues", "spaced repetition"],
             "bio": "Mathematics & Physics | Problem solver | Chess player ♟️",
             "followers": ["alice_chen", "james_miller", "liam_smith", "emma_wilson"],
             "following": ["alice_chen", "james_miller", "noah_davis"],
@@ -134,10 +180,17 @@ def seed_users():
             "profile_pic": "https://i.pravatar.cc/150?img=8",
             "studyData": {
                 "streak": 12,
+                "currentStreak": 12,
+                "weeklyGoalMinutes": 150,
                 "lastLogin": (datetime.utcnow() - timedelta(hours=1)).isoformat(),
+                "lastStudySessionAt": (datetime.utcnow() - timedelta(hours=12)).isoformat(),
+                "lastFlashcardReviewAt": (datetime.utcnow() - timedelta(hours=14)).isoformat(),
                 "totalStudyTime": 41000,
                 "decks": [],
+                "notesCreatedCount": 2,
             },
+            "interests": ["psychology", "neuroscience", "reading"],
+            "recentSearches": ["cognitive bias", "memory techniques"],
             "bio": "Psychology major | Book recommendations welcome 📚",
             "followers": ["sophia_nguyen", "emma_wilson"],
             "following": ["alice_chen", "sophia_nguyen", "olivia_brown"],
@@ -150,10 +203,17 @@ def seed_users():
             "profile_pic": "https://i.pravatar.cc/150?img=10",
             "studyData": {
                 "streak": 19,
+                "currentStreak": 19,
+                "weeklyGoalMinutes": 240,
                 "lastLogin": (datetime.utcnow() - timedelta(hours=3)).isoformat(),
+                "lastStudySessionAt": (datetime.utcnow() - timedelta(hours=9)).isoformat(),
+                "lastFlashcardReviewAt": (datetime.utcnow() - timedelta(hours=10)).isoformat(),
                 "totalStudyTime": 54000,
                 "decks": [],
+                "notesCreatedCount": 4,
             },
+            "interests": ["chemistry", "labs", "data viz"],
+            "recentSearches": ["organic mechanisms", "lab safety"],
             "bio": "Chemistry nerd ⚗️ | Lab enthusiast | Future researcher",
             "followers": ["james_miller", "liam_smith", "noah_davis"],
             "following": ["sophia_nguyen", "james_miller", "olivia_brown"],
@@ -166,10 +226,17 @@ def seed_users():
             "profile_pic": "https://i.pravatar.cc/150?img=13",
             "studyData": {
                 "streak": 6,
+                "currentStreak": 6,
+                "weeklyGoalMinutes": 120,
                 "lastLogin": (datetime.utcnow() - timedelta(days=1)).isoformat(),
+                "lastStudySessionAt": (datetime.utcnow() - timedelta(days=2)).isoformat(),
+                "lastFlashcardReviewAt": (datetime.utcnow() - timedelta(days=2, hours=4)).isoformat(),
                 "totalStudyTime": 28000,
                 "decks": [],
+                "notesCreatedCount": 1,
             },
+            "interests": ["history", "movies", "education"],
+            "recentSearches": ["ww2 timeline", "flashcard scheduling"],
             "bio": "History buff 📜 | Aspiring teacher | Movie fan",
             "followers": ["alice_chen", "olivia_brown"],
             "following": ["emma_wilson", "liam_smith"],
@@ -182,10 +249,17 @@ def seed_users():
             "profile_pic": "https://i.pravatar.cc/150?img=9",
             "studyData": {
                 "streak": 31,
+                "currentStreak": 31,
+                "weeklyGoalMinutes": 300,
                 "lastLogin": datetime.utcnow().isoformat(),
+                "lastStudySessionAt": (datetime.utcnow() - timedelta(hours=1)).isoformat(),
+                "lastFlashcardReviewAt": (datetime.utcnow() - timedelta(hours=2)).isoformat(),
                 "totalStudyTime": 89000,
                 "decks": [],
+                "notesCreatedCount": 5,
             },
+            "interests": ["engineering", "robotics", "cad"],
+            "recentSearches": ["robot kinematics", "anki steps"],
             "bio": "Engineering student ⚙️ | CAD lover | Robotics club president",
             "followers": ["james_miller", "emma_wilson", "noah_davis"],
             "following": ["alice_chen", "sophia_nguyen"],
@@ -228,6 +302,7 @@ def seed_decks():
             "name": "Spanish Basics",
             "summary": "Spanish flashcard deck.",
             "len": "3",
+            "difficulty": "easy",
             "cards": {
                 "1": {
                     "front": "Hola",
@@ -269,6 +344,7 @@ def seed_decks():
             "name": "French Basics",
             "summary": "French flashcard deck.",
             "len": "3",
+            "difficulty": "easy",
             "cards": {
                 "1": {
                     "front": "Bonjour",
@@ -336,6 +412,7 @@ def seed_notes():
 Perfect for exam prep! 📐""",
             "author": "sophia_nguyen",
             "views": 45,
+            "readTimeSeconds": 240,
             "timestamp": datetime.utcnow() - timedelta(days=3),
             "likes": 12,
             "tags": ["calculus", "derivatives", "formulas"],
@@ -360,6 +437,7 @@ C[i,j] = Σ A[i,k] × B[k,j]
 Great for linear systems! 🔢""",
             "author": "alice_chen",
             "views": 32,
+            "readTimeSeconds": 210,
             "timestamp": datetime.utcnow() - timedelta(days=5),
             "likes": 8,
             "tags": ["linear-algebra", "matrices"],
@@ -384,6 +462,7 @@ Great for linear systems! 🔢""",
 Essential for hypothesis testing! 📊""",
             "author": "sophia_nguyen",
             "views": 28,
+            "readTimeSeconds": 180,
             "timestamp": datetime.utcnow() - timedelta(days=7),
             "likes": 6,
             "tags": ["statistics", "probability"],
@@ -409,6 +488,7 @@ Essential for hypothesis testing! 📊""",
 Key difference: Crossing over in Meiosis I! 🧬""",
             "author": "james_miller",
             "views": 67,
+            "readTimeSeconds": 260,
             "timestamp": datetime.utcnow() - timedelta(days=2),
             "likes": 18,
             "tags": ["cell-biology", "mitosis", "meiosis"],
@@ -433,6 +513,7 @@ Key difference: Crossing over in Meiosis I! 🧬""",
 Equation: 6CO₂ + 6H₂O + light → C₆H₁₂O₆ + 6O₂ 🌿""",
             "author": "james_miller",
             "views": 53,
+            "readTimeSeconds": 200,
             "timestamp": datetime.utcnow() - timedelta(days=4),
             "likes": 15,
             "tags": ["photosynthesis", "plant-biology"],
@@ -458,6 +539,7 @@ Dendrites → Cell Body → Axon → Synaptic Terminals
 Action potential travels at 100 m/s! ⚡""",
             "author": "emma_wilson",
             "views": 41,
+            "readTimeSeconds": 230,
             "timestamp": datetime.utcnow() - timedelta(days=6),
             "likes": 11,
             "tags": ["anatomy", "nervous-system"],
@@ -496,6 +578,7 @@ my_set.add(4)
 Choose the right tool for the job! 💻""",
             "author": "alice_chen",
             "views": 89,
+            "readTimeSeconds": 190,
             "timestamp": datetime.utcnow() - timedelta(days=1),
             "likes": 24,
             "tags": ["python", "data-structures"],
@@ -534,6 +617,7 @@ const data = await fetchData();
 Makes code cleaner and more readable! 🚀""",
             "author": "alice_chen",
             "views": 76,
+            "readTimeSeconds": 170,
             "timestamp": datetime.utcnow() - timedelta(days=3),
             "likes": 19,
             "tags": ["javascript", "es6"],
@@ -720,6 +804,7 @@ Forces always come in pairs
 Foundation of classical mechanics! 🚀""",
             "author": "sophia_nguyen",
             "views": 55,
+            "readTimeSeconds": 160,
             "timestamp": datetime.utcnow() - timedelta(days=3),
             "likes": 15,
             "tags": ["physics", "mechanics", "newton"],
@@ -749,6 +834,7 @@ P = IV = I²R = V²/R
 Essential for circuits! ⚡""",
             "author": "olivia_brown",
             "views": 49,
+            "readTimeSeconds": 150,
             "timestamp": datetime.utcnow() - timedelta(days=4),
             "likes": 13,
             "tags": ["physics", "electricity", "magnetism"],
@@ -967,6 +1053,155 @@ def seed_posts():
     print(f"✓ Seeded {len(posts)} feed posts")
 
 
+def seed_groups():
+    """Create sample study groups"""
+    print("\nSeeding groups...")
+
+    groups = [
+        {
+            "name": "AI Study Circle",
+            "description": "Weekly discussions on ML papers and coding exercises.",
+            "members": ["alice_chen", "sophia_nguyen", "james_miller"],
+            "admins": ["alice_chen"],
+            "tags": ["ai", "ml", "python"],
+            "deckIds": ["1"],
+            "createdAt": datetime.utcnow() - timedelta(days=5),
+            "visibility": "public",
+        },
+        {
+            "name": "Exam Crunch - Biology",
+            "description": "Shared notes and mock questions for upcoming bio exams.",
+            "members": ["james_miller", "emma_wilson", "noah_davis"],
+            "admins": ["james_miller"],
+            "tags": ["biology", "exam", "review"],
+            "deckIds": [],
+            "createdAt": datetime.utcnow() - timedelta(days=10),
+            "visibility": "private",
+        },
+        {
+            "name": "French Speaking Buddies",
+            "description": "Pair up to practice conversation and vocab.",
+            "members": ["student", "alice_chen"],
+            "admins": ["student"],
+            "tags": ["french", "language", "speaking"],
+            "deckIds": ["2"],
+            "createdAt": datetime.utcnow() - timedelta(days=2),
+            "visibility": "public",
+        },
+    ]
+
+    db.groups.insert_many(groups)
+    print(f"✓ Seeded {len(groups)} groups")
+
+
+def seed_achievements():
+    """Create sample achievements and user unlocks"""
+    print("\nSeeding achievements...")
+
+    achievements = [
+        {
+            "user": "alice_chen",
+            "code": "streak_7",
+            "title": "7-Day Streak",
+            "description": "Studied for 7 days in a row.",
+            "points": 50,
+            "unlockedAt": datetime.utcnow() - timedelta(days=1),
+        },
+        {
+            "user": "sophia_nguyen",
+            "code": "cards_500",
+            "title": "500 Cards Reviewed",
+            "description": "Reviewed 500 flashcards in total.",
+            "points": 80,
+            "unlockedAt": datetime.utcnow() - timedelta(days=3),
+        },
+        {
+            "user": "james_miller",
+            "code": "notes_10",
+            "title": "Notes Contributor",
+            "description": "Created 10 study notes.",
+            "points": 60,
+            "unlockedAt": datetime.utcnow() - timedelta(days=4),
+        },
+    ]
+
+    db.achievements.insert_many(achievements)
+    print(f"✓ Seeded {len(achievements)} achievements")
+
+
+def seed_reminders():
+    """Create sample reminders"""
+    print("\nSeeding reminders...")
+
+    reminders = [
+        {
+            "user": "alice_chen",
+            "message": "Review Spanish deck",
+            "dueAt": datetime.utcnow() + timedelta(hours=6),
+            "channel": "in-app",
+            "status": "pending",
+        },
+        {
+            "user": "student",
+            "message": "Finish biology notes",
+            "dueAt": datetime.utcnow() + timedelta(days=1),
+            "channel": "email",
+            "status": "pending",
+        },
+        {
+            "user": "emma_wilson",
+            "message": "Schedule group study",
+            "dueAt": datetime.utcnow() + timedelta(hours=12),
+            "channel": "in-app",
+            "status": "pending",
+        },
+    ]
+
+    db.reminders.insert_many(reminders)
+    print(f"✓ Seeded {len(reminders)} reminders")
+
+
+def seed_resources():
+    """Create sample shared resources"""
+    print("\nSeeding resources...")
+
+    resources = [
+        {
+            "owner": "teacher",
+            "title": "Calculus Cheat Sheet PDF",
+            "type": "pdf",
+            "url": "https://example.com/calculus-cheatsheet.pdf",
+            "tags": ["calculus", "reference"],
+            "visibility": "public",
+            "subject": "Mathematics",
+            "createdAt": datetime.utcnow() - timedelta(days=2),
+        },
+        {
+            "owner": "alice_chen",
+            "title": "Intro to Neural Nets (video)",
+            "type": "video",
+            "url": "https://example.com/neural-nets-intro",
+            "tags": ["ai", "neural-networks"],
+            "visibility": "public",
+            "subject": "Programming",
+            "createdAt": datetime.utcnow() - timedelta(days=1),
+        },
+        {
+            "owner": "james_miller",
+            "title": "Photosynthesis summary",
+            "type": "link",
+            "url": "https://example.com/photosynthesis-notes",
+            "tags": ["biology", "summary"],
+            "visibility": "private",
+            "subject": "Biology",
+            "createdAt": datetime.utcnow() - timedelta(days=3),
+        },
+    ]
+
+    db.resources.insert_many(resources)
+    print(f"✓ Seeded {len(resources)} resources")
+
+
 def seed_study_sessions():
     """Create sample study sessions"""
     print("\nSeeding study sessions...")
@@ -989,6 +1224,7 @@ def seed_study_sessions():
         "Psychology",
     ]
     modes = ["Pomodoro", "Deep Focus", "Quick Review", "Flashcards"]
+    session_types = ["flashcards", "notes", "pomodoro", "review"]
 
     sessions = []
     for _ in range(50):
@@ -999,6 +1235,9 @@ def seed_study_sessions():
                 "duration": random.randint(900, 7200),  # 15 min to 2 hours
                 "subject": random.choice(subjects),
                 "mode": random.choice(modes),
+                "sessionType": random.choice(session_types),
+                "breaksTaken": random.randint(0, 3),
+                "distractions": random.randint(0, 5),
                 "timestamp": datetime.utcnow() - timedelta(days=random.randint(0, 30)),
             }
         )
@@ -1017,6 +1256,10 @@ def main():
     seed_decks()
     seed_notes()
     seed_posts()
+    seed_groups()
+    seed_achievements()
+    seed_reminders()
+    seed_resources()
     seed_study_sessions()
 
     print("\n" + "=" * 60)
@@ -1029,6 +1272,10 @@ def main():
     print(f"  Decks: {db.decks.count_documents({})}")
     print(f"  Notes: {db.notes.count_documents({})}")
     print(f"  Posts: {db.posts.count_documents({})}")
+    print(f"  Groups: {db.groups.count_documents({})}")
+    print(f"  Achievements: {db.achievements.count_documents({})}")
+    print(f"  Reminders: {db.reminders.count_documents({})}")
+    print(f"  Resources: {db.resources.count_documents({})}")
     print(f"  Study Sessions: {db.sessions.count_documents({})}")
     print("\nYou can now view the data at:")
     print("  - Community (Notes): http://localhost:5000/community/")

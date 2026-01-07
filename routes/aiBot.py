@@ -16,8 +16,15 @@ chatProxy_bp = Blueprint('chatProxy', __name__)
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 MODEL_NAME = "gemini-2.5-flash"
 
-# Initialize the Gemini client
-client = genai.Client(api_key=GEMINI_API_KEY)
+# Initialize the Gemini client (lazy-load if key is missing)
+client = None
+if GEMINI_API_KEY:
+    try:
+        client = genai.Client(api_key=GEMINI_API_KEY)
+    except ValueError as e:
+        print(f"Warning: Could not initialize Gemini client: {e}")
+else:
+    print("Warning: GEMINI_API_KEY not set. AI chat features will not work.")
 
 systemPrompt = (
     "You are an advanced AI assistant integrated into a flashcard web application called 'BookMe'. "
@@ -37,6 +44,9 @@ systemPrompt = (
 
 def upload_file_to_gemini(file_path):
     """Uploads a file to Gemini and returns the file object."""
+    if not client:
+        print("Error: Gemini client not initialized. GEMINI_API_KEY may be missing.")
+        return None
     try:
         file = client.files.upload(path=file_path)
         print(f"Uploaded file: {file.name}")
@@ -57,6 +67,9 @@ def require_auth():
 
 @chatProxy_bp.route('/', methods=['POST'], endpoint='chatProxy')
 def chat_proxy():
+    if not client:
+        return jsonify({"error": "AI service not available. GEMINI_API_KEY is not configured."}), 503
+    
     user_message = request.form.get('message')
     uploaded_file = request.files.get('file')
 

@@ -1,30 +1,22 @@
 from .login_model import get_user_by_username
 from datetime import datetime
-import os
 from .mongo import get_db
-from typing import Optional, Dict
-from datetime import datetime as dt
+from typing import Optional
 
 # MongoDB setup (configurable via MONGO_URI env)
 _db = get_db()
-_users_col = _db.users
+_profiles_col = _db.profiles
 _decks_col = _db.decks
+_cards_col = _db.cards
+_permissions_col = _db.user_permissions
+_deck_tags_col = _db.deck_tags
+_ai_logs_col = _db.ai_generation_logs
 
-#_cards_col = _db.get_collection('cards')
-# ensure a unique index on username where possible (best-effort)
-# try:
-#     _users_col.create_index('username', unique=True)
-# except Exception:
-#     # don't fail import if index creation is not allowed / DB not available
-#     pass
-"""
-Login model with hardcoded user data for teaching purposes.
-No database connection required.
-"""
-# client = MongoClient("mongodb://localhost:27017")
 
-# db = client["mydatabase"]
-# cards = db["cards"]
+def _refresh_deck_length(deck_id: str) -> None:
+    """Keep the deck length in sync with the cards collection."""
+    count = _cards_col.count_documents({'deck_id': deck_id})
+    _decks_col.update_one({'id': deck_id}, {'$set': {'len': str(count)}})
 
 def _make_card_dict(cid, front, back, tags=None, correct_count=0, incorrect_count=0, last_reviewed=None, ease=2.5, interval=0, repetitions=0):
     """Create a plain dict representing a card (no classes)."""
@@ -41,12 +33,15 @@ def _make_card_dict(cid, front, back, tags=None, correct_count=0, incorrect_coun
         'repetitions': int(repetitions),
     }
 
-def _make_deck_dict(did, name, summary, cards_map):
+def _make_deck_dict(did, name, summary, cards_map, subject=None, category=None, tags=None):
     """Create a plain dict representing a deck; cards_map values should be card dicts."""
     return {
         'id': str(did),
         'name': name,
         'summary': summary,
+        'subject': subject,
+        'category': category,
+        'tags': tags or [],
         'len': str(len(cards_map)),
         'cards': cards_map,
     }
@@ -77,17 +72,38 @@ def get_deck_by_id(deck_id):
     # primary source: 'decks' collection
     doc = _decks_col.find_one({'id': sid})
     if doc:
-        # convert doc -> deck dict
         cards = {}
-        for cid, cdoc in (doc.get('cards') or {}).items():
+        for cdoc in _cards_col.find({'deck_id': sid}).sort('id', 1):
+            cid = cdoc.get('id') or cdoc.get('_id')
             try:
                 last = cdoc.get('last_reviewed')
                 last_dt = datetime.fromisoformat(last) if last else None
             except Exception:
                 last_dt = None
-            # normalize keys to strings so in-memory deck matches DB storage keys
-            cards[str(cid)] = _make_card_dict(cid, cdoc.get('front'), cdoc.get('back'), tags=cdoc.get('tags', []), correct_count=cdoc.get('correct_count', 0), incorrect_count=cdoc.get('incorrect_count', 0), last_reviewed=last_dt, ease=cdoc.get('ease',2.5), interval=cdoc.get('interval',0), repetitions=cdoc.get('repetitions',0))
-        deck = _make_deck_dict(doc.get('id'), doc.get('name'), doc.get('summary',''), cards)
+            cards[str(cid)] = _make_card_dict(
+                cid,
+                cdoc.get('front'),
+                cdoc.get('back'),
+                tags=cdoc.get('tags', []),
+                correct_count=cdoc.get('correct_count', 0),
+                incorrect_count=cdoc.get('incorrect_count', 0),
+                last_reviewed=last_dt,
+                ease=cdoc.get('ease', 2.5),
+                interval=cdoc.get('interval', 0),
+                repetitions=cdoc.get('repetitions', 0),
+            )
+
+        tags_doc = list(_deck_tags_col.find({'deck_id': sid}))
+        tag_values = [t.get('tag') for t in tags_doc if t.get('tag')]
+        deck = _make_deck_dict(
+            doc.get('id'),
+            doc.get('name'),
+            doc.get('summary', ''),
+            cards,
+            subject=doc.get('subject'),
+            category=doc.get('category'),
+            tags=tag_values,
+        )
         return deck
 
 def get_user_study_data(username):
@@ -99,9 +115,17 @@ def get_user_study_data(username):
     # prefer DB-backed users
     if not username:
         return None
-    doc = _users_col.find_one({'username': username})
+    doc = _profiles_col.find_one({'username': username}) or get_user_by_username(username)
+    study_data = None
     if doc and 'studyData' in doc:
-        return doc.get('studyData')
+        study_data = doc.get('studyData') or {}
+
+    # derive deck ids from user_permissions to keep templates working
+    if study_data is None:
+        study_data = {}
+    permitted = list(_permissions_col.find({'username': username}))
+    study_data['decks'] = [p.get('deck_id') for p in permitted if p.get('deck_id')]
+    return study_data
 
     # fallback to in-memory user
     user = get_user_by_username(username)
@@ -119,11 +143,21 @@ def get_user_decks(username):
     Returns:
         list: List of deck dictionaries associated with the user
     """
-    study = get_user_study_data(username)
-    if not study:
+    if not username:
         return []
-
-    deck_ids = study.get('decks', [])
+    
+    # Code to give admin access to all decks, should probably be removed for production.
+    if username == "admin":
+        # admin gets all decks
+        deck_ids = [d.get('id') for d in _decks_col.find({}) if d.get('id')]
+        decks = []
+        for deck_id in deck_ids:
+            deck = get_deck_by_id(deck_id)
+            if deck:
+                decks.append(deck)
+        return decks
+    ### END admin special case ###
+    deck_ids = [p.get('deck_id') for p in _permissions_col.find({'username': username}) if p.get('deck_id')]
     decks = []
     for deck_id in deck_ids:
         deck = get_deck_by_id(deck_id)
@@ -144,11 +178,8 @@ def get_deck(deck_id):
     # Alias to get_deck_by_id which already handles DECKS list
     return get_deck_by_id(deck_id)
 
-def update_deckInfo(deck_id, name: Optional[str]=None, summary: Optional[str]=None):
-    """Update deck's name and/or summary.
-
-    Returns True if updated, False if deck not found.
-    """
+def update_deckInfo(deck_id, name: Optional[str] = None, summary: Optional[str] = None, subject: Optional[str] = None, category: Optional[str] = None, tags: Optional[list] = None):
+    """Update deck metadata fields."""
     deck = get_deck_by_id(deck_id)
     if not deck:
         return False
@@ -161,9 +192,18 @@ def update_deckInfo(deck_id, name: Optional[str]=None, summary: Optional[str]=No
     if summary is not None:
         deck['summary'] = summary
         update_doc['summary'] = summary
+    if subject is not None:
+        update_doc['subject'] = subject
+    if category is not None:
+        update_doc['category'] = category
 
     if update_doc:
         _decks_col.update_one({'id': sid}, {'$set': update_doc})
+
+    if tags is not None:
+        _deck_tags_col.delete_many({'deck_id': sid})
+        if tags:
+            _deck_tags_col.insert_many([{'deck_id': sid, 'tag': t} for t in tags])
     return True
 
 def update_card(deck_id, card_id, front, back):
@@ -177,46 +217,18 @@ def update_card(deck_id, card_id, front, back):
     # normalize key to string for storage keys
     card_key = str(card_id)
 
-    # if deck is stored in DB, update subdocument directly
     sid = str(deck_id)
-    doc = _decks_col.find_one({'id': sid})
-    if doc:
-        update_doc = {
-            f'cards.{card_key}.front': front,
-            f'cards.{card_key}.back': back,
-        }
-        _decks_col.update_one({'id': sid}, {'$set': update_doc})
-        return True
-
-    # otherwise operate on in-memory deck dict
-    cards = deck.get('cards', {})
-    if card_key in cards:
-        cards[card_key]['front'] = front
-        cards[card_key]['back'] = back
-        # update derived length
-        deck['len'] = str(len(cards))
-        return True
-
-    # create new card dict and add
-    new_card = _make_card_dict(card_key, front, back)
-    cards[card_key] = new_card
-    deck['len'] = str(len(cards))
-
-    # persist to DB if deck document exists (double-check)
-    doc = _decks_col.find_one({'id': sid})
-    if doc:
-        cdoc = {
-            'front': new_card['front'],
-            'back': new_card['back'],
-            'tags': new_card['tags'],
-            'correct_count': new_card['correct_count'],
-            'incorrect_count': new_card['incorrect_count'],
-            'last_reviewed': new_card['last_reviewed'],
-            'ease': new_card['ease'],
-            'interval': new_card['interval'],
-            'repetitions': new_card['repetitions'],
-        }
-        _decks_col.update_one({'id': sid}, {'$set': {f'cards.{card_key}': cdoc, 'len': str(len(cards))}})
+    update_doc = {
+        'front': front,
+        'back': back,
+    }
+    res = _cards_col.update_one({'deck_id': sid, 'id': card_key}, {'$set': update_doc})
+    if res.matched_count == 0:
+        # create if missing to keep API lenient
+        new_card = _make_card_dict(card_key, front, back)
+        new_card['deck_id'] = sid
+        _cards_col.insert_one(new_card)
+    _refresh_deck_length(sid)
     return True
 
 def add_card(deck_id, front, back):
@@ -228,44 +240,26 @@ def add_card(deck_id, front, back):
     if not deck:
         return None
 
-    cards = deck.get('cards', {})
+    sid = str(deck_id)
+    existing_cards = list(_cards_col.find({'deck_id': sid}))
 
-    # determine next id (prefer numeric sequence when possible)
     numeric_keys = []
-    for k in cards.keys():
-        if isinstance(k, int) or (isinstance(k, str) and k.isdigit()):
-            try:
-                numeric_keys.append(int(k))
-            except Exception:
-                pass
+    for c in existing_cards:
+        cid = c.get('id')
+        if isinstance(cid, int) or (isinstance(cid, str) and str(cid).isdigit()):
+            numeric_keys.append(int(cid))
 
     if numeric_keys:
         next_id = max(numeric_keys) + 1
     else:
-        next_id = len(cards) + 1
+        next_id = len(existing_cards) + 1
 
     card_key = str(next_id)
     new_card = _make_card_dict(card_key, front, back)
-    cards[card_key] = new_card
-    deck['len'] = str(len(cards))
+    new_card['deck_id'] = sid
 
-    # persist to DB if deck document exists
-    sid = str(deck_id)
-    doc = _decks_col.find_one({'id': sid})
-    if doc:
-        cdoc = {
-            'front': new_card['front'],
-            'back': new_card['back'],
-            'tags': new_card['tags'],
-            'correct_count': new_card['correct_count'],
-            'incorrect_count': new_card['incorrect_count'],
-            'last_reviewed': new_card['last_reviewed'],
-            'ease': new_card['ease'],
-            'interval': new_card['interval'],
-            'repetitions': new_card['repetitions'],
-        }
-        _decks_col.update_one({'id': sid}, {'$set': {f'cards.{card_key}': cdoc, 'len': str(len(cards))}})
-
+    _cards_col.insert_one(new_card)
+    _refresh_deck_length(sid)
     return new_card
 
 def delete_card(deck_id, card_id):
@@ -275,28 +269,19 @@ def delete_card(deck_id, card_id):
         return False
 
     card_key = str(card_id)
-
     sid = str(deck_id)
-    doc = _decks_col.find_one({'id': sid})
-    if doc:
-        # remove card subdocument and update length
-        _decks_col.update_one({'id': sid}, {'$unset': {f'cards.{card_key}': ''}})
-        remaining = doc.get('cards', {}).copy()
-        remaining.pop(card_key, None)
-        _decks_col.update_one({'id': sid}, {'$set': {'len': str(len(remaining))}})
+    res = _cards_col.delete_one({'deck_id': sid, 'id': card_key})
+    if res.deleted_count > 0:
+        _refresh_deck_length(sid)
         return True
-
-    cards = deck.get('cards', {})
-    if card_key in cards:
-        cards.pop(card_key, None)
-        deck['len'] = str(len(cards))
-        return True
-
     return False
 
 def delete_deck(deck_id):
     """Delete a deck by its ID. Returns True if deleted, False otherwise."""
     sid = str(deck_id)
+    _cards_col.delete_many({'deck_id': sid})
+    _deck_tags_col.delete_many({'deck_id': sid})
+    _permissions_col.delete_many({'deck_id': sid})
     result = _decks_col.delete_one({'id': sid})
     return result.deleted_count > 0
 
@@ -309,7 +294,6 @@ def record_review(deck_id, card_id, correct: bool):
     if not deck:
         return None
 
-    # find matching key (keys may be int or str)
     found_key = None
     for k in deck.get('cards', {}).keys():
         if str(k) == str(card_id):
@@ -328,29 +312,24 @@ def record_review(deck_id, card_id, correct: bool):
     else:
         card['incorrect_count'] = int(card.get('incorrect_count', 0)) + 1
 
-    # update last reviewed timestamp
     card['last_reviewed'] = datetime.now().isoformat()
 
-    # persist to DB if deck exists there
     sid = str(deck_id)
-    doc = _decks_col.find_one({'id': sid})
-    if doc:
-        _decks_col.update_one({'id': sid}, {'$set': {
-            f'cards.{found_key}.correct_count': card.get('correct_count', 0),
-            f'cards.{found_key}.incorrect_count': card.get('incorrect_count', 0),
-            f'cards.{found_key}.last_reviewed': card.get('last_reviewed')
-        }})
+    _cards_col.update_one(
+        {'deck_id': sid, 'id': found_key},
+        {'$set': {
+            'correct_count': card.get('correct_count', 0),
+            'incorrect_count': card.get('incorrect_count', 0),
+            'last_reviewed': card.get('last_reviewed'),
+        }},
+    )
 
     return card
 
-def create_deck(name, summary):
-    """Create a new deck with the given name and summary.
-
-    Returns the new deck dict.
-    """
-    # determine next deck id
+def create_deck(name, summary, subject: Optional[str] = None, category: Optional[str] = None, tags: Optional[list] = None):
+    """Create a new deck with the given name and summary."""
     existing_ids = []
-    for deck in _db.decks.find({}):
+    for deck in _decks_col.find({}):
         try:
             existing_ids.append(int(deck['id']))
         except Exception:
@@ -361,17 +340,19 @@ def create_deck(name, summary):
         next_id = 1
 
     deck_id = str(next_id)
-    new_deck = _make_deck_dict(deck_id, name, summary, cards_map={})
+    new_deck = _make_deck_dict(deck_id, name, summary, cards_map={}, subject=subject, category=category, tags=tags)
 
-    # persist to DB
     cdoc = {
         'id': deck_id,
         'name': name,
         'summary': summary,
+        'subject': subject,
+        'category': category,
         'len': '0',
-        'cards': {},
     }
     _decks_col.insert_one(cdoc)
+    if tags:
+        _deck_tags_col.insert_many([{'deck_id': deck_id, 'tag': t} for t in tags])
 
     return new_deck
 
@@ -384,17 +365,13 @@ def add_deck_to_user(username, deck_id):
         return False
 
     sid = str(deck_id)
-    user_doc = _users_col.find_one({'username': username})
+    user_doc = _profiles_col.find_one({'username': username})
     if not user_doc:
         return False
 
-    study_data = user_doc.get('studyData', {})
-    decks = study_data.get('decks', [])
-    if sid in decks:
-        return True  # already present
+    existing = _permissions_col.find_one({'username': username, 'deck_id': sid})
+    if existing:
+        return True
 
-    decks.append(sid)
-    study_data['decks'] = decks
-
-    _users_col.update_one({'username': username}, {'$set': {'studyData': study_data}})
+    _permissions_col.insert_one({'username': username, 'deck_id': sid, 'role': 'owner'})
     return True

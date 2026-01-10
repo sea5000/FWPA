@@ -22,6 +22,10 @@ import os
 
 community_bp = Blueprint("community", __name__)
 
+db = get_db()
+notes_col = db.notes
+interactions_col = db.interactions
+
 # Define upload directory and create if it doesn't exist
 UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -58,12 +62,14 @@ def community_index():
     Fetches all notes from database and converts ObjectIds to strings.
     Passes username, user list, and notes to template for rendering.
     """
-    db = get_db()
     # Retrieve all notes from the notes collection
-    notes = list(db.notes.find({}))
+    notes = list(notes_col.find({}))
     # Convert MongoDB ObjectIds to strings for JSON/template compatibility
     for n in notes:
         n["_id"] = str(n["_id"])
+        interactions = interactions_col.find_one({'entity_type': 'note', 'entity_id': n['_id']}) or {}
+        n['likes'] = len(interactions.get('likes') or [])
+        n['comments'] = interactions.get('comments') or []
     # Render template with community data
     return render_template(
         "community.html",
@@ -90,19 +96,21 @@ def view_note_endpoint(note_id):
         
     Side effect: Increments the 'views' counter each time note is accessed.
     """
-    db = get_db()
     try:
         # Convert string ID to MongoDB ObjectId for database query
-        note = db.notes.find_one({"_id": ObjectId(note_id)})
+        note = notes_col.find_one({"_id": ObjectId(note_id)})
         if not note:
             return jsonify({"error": "Note not found"}), 404
 
         # Increment view counter using MongoDB $inc operator
         # This is atomic and thread-safe
-        db.notes.update_one({"_id": ObjectId(note_id)}, {"$inc": {"views": 1}})
+        notes_col.update_one({"_id": ObjectId(note_id)}, {"$inc": {"views": 1}})
 
         # Convert ObjectId to string before returning JSON
         note["_id"] = str(note["_id"])
+        interactions = interactions_col.find_one({'entity_type': 'note', 'entity_id': note_id}) or {}
+        note['likes'] = len(interactions.get('likes') or [])
+        note['comments'] = interactions.get('comments') or []
         return jsonify(note)
 
     except:
@@ -156,7 +164,6 @@ def update_note(note_id):
         200 OK with success message
         404 if note not found
     """
-    db = get_db()
     data = request.get_json()
     # Prepare update fields
     update_fields = {
@@ -165,7 +172,7 @@ def update_note(note_id):
         "timestamp": datetime.utcnow()  # Update modified timestamp
     }
     # Use MongoDB $set operator to update specified fields
-    result = db.notes.update_one({"_id": ObjectId(note_id)}, {"$set": update_fields})
+    result = notes_col.update_one({"_id": ObjectId(note_id)}, {"$set": update_fields})
     if result.matched_count == 0:
         return jsonify({"error": "Note not found"}), 404
     return jsonify({"message": "Note updated"}), 200
@@ -182,9 +189,9 @@ def delete_note(note_id):
         200 OK with success message
         404 if note not found
     """
-    db = get_db()
     # Remove note document from collection
-    result = db.notes.delete_one({"_id": ObjectId(note_id)})
+    result = notes_col.delete_one({"_id": ObjectId(note_id)})
+    interactions_col.delete_many({'entity_type': 'note', 'entity_id': note_id})
     if result.deleted_count == 0:
         return jsonify({"error": "Note not found"}), 404
     return jsonify({"message": "Note deleted"}), 200
@@ -205,7 +212,6 @@ def upload_note_with_file():
     Returns:
         201 Created with success message
     """
-    db = get_db()
     # Get form data (not JSON, since file upload uses form data)
     title = request.form.get("title")
     content = request.form.get("content")
@@ -228,7 +234,13 @@ def upload_note_with_file():
         "timestamp": datetime.utcnow()
     }
 
-    db.notes.insert_one(new_note)
+    result = notes_col.insert_one(new_note)
+    interactions_col.insert_one({
+        'entity_type': 'note',
+        'entity_id': str(result.inserted_id),
+        'likes': [],
+        'comments': [],
+    })
     return jsonify({"message": "Note with file uploaded"}), 201
 
 
@@ -250,7 +262,6 @@ def upload_file():
         201 Created with success message
         400 if no file provided or file empty
     """
-    db = get_db()
     # Check if file was included in request
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
@@ -285,7 +296,6 @@ def get_files():
     Returns:
         JSON array of file objects with metadata
     """
-    db = get_db()
     # Retrieve all file records
     files = list(db.files.find({}))
     # Convert ObjectIds to strings for JSON
@@ -308,7 +318,6 @@ def delete_file(file_id):
     Note: This only removes the database record. The actual file on disk
     is not deleted (would need additional permission checks).
     """
-    db = get_db()
     try:
         result = db.files.delete_one({"_id": ObjectId(file_id)})
         if result.deleted_count == 0:
@@ -316,11 +325,6 @@ def delete_file(file_id):
         return jsonify({"message": "File deleted"}), 200
     except:
         return jsonify({"error": "Invalid file id"}), 400
-    db = get_db()
-    result = db.files.delete_one({"_id": ObjectId(file_id)})
-    if result.deleted_count == 0:
-        return jsonify({"error": "File not found"}), 404
-    return jsonify({"message": "File deleted"}), 200
 
 """
 notes = [

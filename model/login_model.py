@@ -1,36 +1,51 @@
 """
 Login model backed by MongoDB
 
-Functions here will attempt to read from the `users` collection in the
-`mydatabase` MongoDB instance on localhost.
+Functions here now read from split collections (profiles, authentication,
+relationships, user_permissions) instead of a single users collection.
 """
 from .mongo import get_db
 from typing import Optional, Dict, List
-import os
 from datetime import datetime as dt
-from utils.auth import get_current_pepper_version, get_pepper_by_version, combine_password_and_pepper, ph
+from utils.auth import (
+    get_current_pepper_version,
+    get_pepper_by_version,
+    combine_password_and_pepper,
+    ph,
+)
 from argon2.exceptions import VerifyMismatchError
+
 _db = get_db()
-_users_col = _db.users
+_profiles_col = _db.profiles
+_auth_col = _db.authentication
+_relationships_col = _db.relationships
+_permissions_col = _db.user_permissions
 
 # ensure a unique index on username where possible (best-effort)
+for col in (_profiles_col, _auth_col):
+    try:
+        col.create_index('username', unique=True)
+    except Exception:
+        pass
+
 try:
-    _users_col.create_index('username', unique=True)
+    _relationships_col.create_index([('follower', 1), ('following', 1)], unique=True)
+except Exception:
+    pass
+
+try:
+    _permissions_col.create_index([('username', 1), ('deck_id', 1)], unique=True)
 except Exception:
     pass
 
 
-def create_user(username: str, email: str, password_hash: str, pepper_version:str, name: str) -> bool:
-    """Create a new user in the users collection.
-
-    Returns True on success, False on failure (duplicate username, DB error, or invalid input).
-    Note: password is stored as provided (no hashing yet).
-    """
+def create_user(username: str, email: str, password_hash: str, pepper_version: str, name: str) -> bool:
+    """Create a new user across Profiles + Authentication collections."""
     if not username:
         return False
 
     try:
-        existing = _users_col.find_one({'username': username})
+        existing = _profiles_col.find_one({'username': username})
     except Exception as e:
         print(f"create_user (login_model): error checking existing user: {e}")
         return False
@@ -39,44 +54,58 @@ def create_user(username: str, email: str, password_hash: str, pepper_version:st
         return False
 
     try:
-        nid = str(_users_col.estimated_document_count() + 1)
-        user_doc = {
+        nid = str(_profiles_col.estimated_document_count() + 1)
+        profile_doc = {
             'id': nid,
+            'username': username,
+            'name': name,
+            'email': email,
+            'profile_pic': None,
+            # store ISO string for timestamps to avoid datetime/tz handling issues
+            'studyData': {'streak': 0, 'lastLogin': dt.utcnow().isoformat()},
+        }
+        auth_doc = {
             'username': username,
             'password_hash': password_hash,
             'pepper_version': pepper_version,
-            'name': name,
-            'email': email,
-            # store ISO string for timestamps to avoid datetime/tz handling issues
-            'studyData': {'streak': 0, 'lastLogin': dt.utcnow().isoformat(), 'decks': []}
+            'created_at': dt.utcnow().isoformat(),
         }
-        res = _users_col.insert_one(user_doc)
+        _profiles_col.insert_one(profile_doc)
+        _auth_col.insert_one(auth_doc)
         print(f"create_user (login_model): inserted user with id {nid}")
-        return bool(getattr(res, 'inserted_id', None))
+        return True
     except Exception as e:
         print(f"create_user (login_model): error inserting user: {e}")
         return False
 
 
-def _doc_to_user(doc: Dict) -> Dict:
-    if not doc:
+def _compose_user(username: str) -> Optional[Dict]:
+    profile = _profiles_col.find_one({'username': username})
+    if not profile:
+        return None
+    auth = _auth_col.find_one({'username': username}) or {}
+    return _doc_to_user(profile, auth)
+
+
+def _doc_to_user(profile_doc: Dict, auth_doc: Dict | None = None) -> Dict:
+    if not profile_doc:
         return None
     # normalize document to expected user dict shape
-    # provide safe defaults so templates don't break when DB was reinitialized
-    username = doc.get('username')
-    name = doc.get('name') or username
-    email = doc.get('email')
-    profile_pic = doc.get('profile_pic') if doc.get('profile_pic') else None
-    studyData = doc.get('studyData') or {'streak': 0, 'lastLogin': None, 'decks': []}
+    username = profile_doc.get('username')
+    name = profile_doc.get('name') or username
+    email = profile_doc.get('email')
+    profile_pic = profile_doc.get('profile_pic') if profile_doc.get('profile_pic') else None
+    studyData = profile_doc.get('studyData') or {'streak': 0, 'lastLogin': None}
 
     return {
-        'id': doc.get('id') or str(doc.get('_id')),
+        'id': profile_doc.get('id') or str(profile_doc.get('_id')),
         'username': username,
         'name': name,
         'email': email,
         'profile_pic': profile_pic,
         # include password only for internal checks; callers should trim it
-        'password_hash': doc.get('password_hash'),
+        'password_hash': (auth_doc or {}).get('password_hash'),
+        'pepper_version': (auth_doc or {}).get('pepper_version'),
         'studyData': studyData,
     }
 
@@ -85,9 +114,9 @@ def get_user_by_username(username: str) -> Optional[Dict]:
     """Return a user document by username, or None if not found."""
     if not username:
         return None
-    doc = _users_col.find_one({'username': username})
+    doc = _compose_user(username)
     if doc:
-        return _doc_to_user(doc)
+        return doc
 
     # fallback: if an in-memory USERS exists, try it
     try:
@@ -125,10 +154,11 @@ def get_all_users() -> List[Dict]:
 
     Note: callers should avoid exposing passwords in production.
     """
-    docs = list(_users_col.find({}, {'_id': 0}))
+    docs = list(_profiles_col.find({}, {'_id': 0}))
     out = []
     for d in docs:
-        out.append(_doc_to_user(d))
+        auth = _auth_col.find_one({'username': d.get('username')}) or {}
+        out.append(_doc_to_user(d, auth))
 
     # fallback to in-memory list if DB empty
     if not out:
@@ -147,7 +177,11 @@ def delete_user_by_username(username: str) -> bool:
     if not username:
         return False
     try:
-        res = _users_col.delete_one({'username': username})
+        _auth_col.delete_many({'username': username})
+        _relationships_col.delete_many({'follower': username})
+        _relationships_col.delete_many({'following': username})
+        _permissions_col.delete_many({'username': username})
+        res = _profiles_col.delete_one({'username': username})
         return res.deleted_count > 0
     except Exception as e:
         print(f"delete_user_by_username (login_model): error deleting user: {e}")
@@ -175,7 +209,7 @@ def update_login_streak(username: str) -> bool:
     
     try:
         # Get current user data
-        user_doc = _users_col.find_one({'username': username})
+        user_doc = _profiles_col.find_one({'username': username})
         if not user_doc:
             print(f"update_login_streak: user '{username}' not found in MongoDB")
             return False
@@ -241,7 +275,7 @@ def update_login_streak(username: str) -> bool:
         study_data['lastLogin'] = now.isoformat()
         
         # Update MongoDB
-        res = _users_col.update_one(
+        res = _profiles_col.update_one(
             {'username': username},
             {'$set': {'studyData': study_data}}
         )
@@ -280,7 +314,7 @@ def update_user_password(username: str, new_password: str) -> bool:
     
     try:
         # First verify the user exists
-        user_exists = _users_col.find_one({'username': username})
+        user_exists = _auth_col.find_one({'username': username})
         if not user_exists:
             print(f"update_user_password: user '{username}' not found in MongoDB")
             return False
@@ -297,7 +331,7 @@ def update_user_password(username: str, new_password: str) -> bool:
         
         # Update the password
         print(f"update_user_password: Updating password for user '{username}'")
-        res = _users_col.update_one(
+        res = _auth_col.update_one(
             {'username': username},
             {'$set': {'password_hash': password_hash, 'pepper_version': current_version}}
         )
@@ -308,7 +342,7 @@ def update_user_password(username: str, new_password: str) -> bool:
         # Success if we matched the user
         if res.matched_count > 0:
             # Verify the update by reading back
-            updated_user = _users_col.find_one({'username': username})
+            updated_user = _auth_col.find_one({'username': username})
             if updated_user and updated_user.get('password_hash') == password_hash:
                 print(f"update_user_password: ✓ Successfully updated password for '{username}'")
                 return True
@@ -342,7 +376,7 @@ def update_user_profile_pic(username: str, profile_pic_url: Optional[str]) -> bo
     
     try:
         # First verify the user exists
-        user_exists = _users_col.find_one({'username': username})
+        user_exists = _profiles_col.find_one({'username': username})
         if not user_exists:
             print(f"update_user_profile_pic: user '{username}' not found in MongoDB")
             return False
@@ -350,14 +384,14 @@ def update_user_profile_pic(username: str, profile_pic_url: Optional[str]) -> bo
         if profile_pic_url is None:
             # Remove the profile_pic field
             print(f"update_user_profile_pic: Removing profile_pic for user '{username}'")
-            res = _users_col.update_one(
+            res = _profiles_col.update_one(
                 {'username': username},
                 {'$unset': {'profile_pic': ''}}
             )
         else:
             # Set or update the profile_pic field
             print(f"update_user_profile_pic: Setting profile_pic='{profile_pic_url}' for user '{username}'")
-            res = _users_col.update_one(
+            res = _profiles_col.update_one(
                 {'username': username},
                 {'$set': {'profile_pic': profile_pic_url}}
             )
@@ -368,7 +402,7 @@ def update_user_profile_pic(username: str, profile_pic_url: Optional[str]) -> bo
         # Success if we matched the user (modified_count can be 0 if value was already the same)
         if res.matched_count > 0:
             # Verify the update by reading back
-            updated_user = _users_col.find_one({'username': username})
+            updated_user = _profiles_col.find_one({'username': username})
             if updated_user:
                 stored_pic = updated_user.get('profile_pic')
                 print(f"update_user_profile_pic: Verified - stored value is now: {stored_pic}")

@@ -16,6 +16,10 @@ from flask import Blueprint, render_template, g
 from utils.auth import get_current_user_from_token  # JWT authentication
 from model.mongo import get_db  # Direct database access to get all users
 
+db = get_db()
+profiles_col = db.profiles
+relationships_col = db.relationships
+
 friends_bp = Blueprint('friends', __name__)
 
 
@@ -59,14 +63,17 @@ def friends_index():
     Returns:
         HTML template with list of all community members
     """
-    db = get_db()
     # Get all users with their full profile data from MongoDB
-    all_users = list(db.users.find({}))
+    all_users = list(profiles_col.find({}))
     
     # Convert MongoDB ObjectIds to strings for JSON/template compatibility
     # ObjectId is a binary type that can't be serialized to JSON
     for user in all_users:
         user['_id'] = str(user['_id'])
+        followers = relationships_col.count_documents({'following': user.get('username')})
+        following = relationships_col.count_documents({'follower': user.get('username')})
+        user['followers_count'] = followers
+        user['following_count'] = following
     
     # Render template with current user and all community members
     return render_template(

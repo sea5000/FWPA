@@ -171,7 +171,7 @@ def like_post_endpoint(post_id):
         200 OK with success message
         404 if post not found
     """
-    success = like_post(post_id)  # Call model to increment likes
+    success = like_post(post_id, g.current_user)  # Call model to increment likes
     if not success:
         return jsonify({"error": "Post not found"}), 404
     return jsonify({"message": "Liked"}), 200

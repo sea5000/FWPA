@@ -38,7 +38,7 @@ def log_session(user: str, duration: int, subject: str | None = None, mode: str 
         'timestamp': (timestamp or datetime.utcnow())  # Use provided or current time
     }
     # Insert into sessions collection and get the generated ID
-    res = db.sessions.insert_one(doc)
+    res = db.study_sessions.insert_one(doc)
     return str(res.inserted_id)
 
 
@@ -54,7 +54,7 @@ def list_sessions(user: str) -> list[dict]:
     """
     db = get_db()
     # Query sessions for this user and sort by timestamp descending (newest first)
-    sessions = list(db.sessions.find({'user': user}).sort('timestamp', -1))
+    sessions = list(db.study_sessions.find({'user': user}).sort('timestamp', -1))
     # Convert MongoDB ObjectIds to strings for JSON serialization
     for s in sessions:
         s['_id'] = str(s['_id'])
@@ -80,7 +80,7 @@ def total_study_time(user: str) -> int:
         {'$match': {'user': user}},  # Filter documents: only this user
         {'$group': {'_id': None, 'total': {'$sum': '$duration'}}}  # Sum all durations
     ]
-    result = list(db.sessions.aggregate(pipeline))
+    result = list(db.study_sessions.aggregate(pipeline))
     # Return the sum, or 0 if no sessions exist
     return int(result[0]['total']) if result else 0
 
@@ -100,7 +100,7 @@ def time_since(user: str, since: datetime) -> int:
     db = get_db()
     # Query for sessions after the given timestamp and sum their durations
     # $gte: Greater than or equal (includes the start time)
-    docs = db.sessions.find({'user': user, 'timestamp': {'$gte': since}})
+    docs = db.study_sessions.find({'user': user, 'timestamp': {'$gte': since}})
     # Sum durations manually (could use aggregation for very large datasets)
     return int(sum(d.get('duration', 0) for d in docs))
 

@@ -457,7 +457,10 @@
             });
           }
 
-          new bootstrap.Modal(document.getElementById("commentModal")).show();
+          const modalEl = document.getElementById("commentModal");
+          let modalInstance = bootstrap.Modal.getInstance(modalEl);
+          if (!modalInstance) modalInstance = new bootstrap.Modal(modalEl);
+          if (!modalEl.classList.contains("show")) modalInstance.show();
         } catch (e) {
           alert("Failed to load comments.");
         }

@@ -123,10 +123,10 @@
                                             <a class="text-primary d-inline-block"
                                                 href="{{ url_for('flashcards.study',deck_id = deck.id) }}">{{deck.name}}</a>
                                         </div>
-                                        <div class="col-4">{{deck.len}}</div>
+                                        <div class="col-md-4">{{deck.len}}</div>
                                         <div
-                                            class="col-4 d-flex flex-row gap-md-5 gap-sm-6 gap-lg-5 justify-content-center">
-                                            <div class="col-2 btn-group">
+                                            class="col-md-4 d-flex gap-md-1 justify-content-center">
+                                            <div class="col-md-2 btn-group">
                                                 <button type="button"
                                                     class="btn btn-sm btn-info text-white me-2 dropdown-toggle"
                                                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
@@ -144,6 +144,7 @@
                                                     <!-- <a class="dropdown-item"></a> -->
                                                 </div>
                                             </div>
+                                            <br>
                                             {% if deck.id in permissions.editor %}
                                             <div class="col-2">
                                                 

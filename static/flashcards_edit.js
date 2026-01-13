@@ -377,3 +377,135 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+    // Share modal logic
+    document.addEventListener('DOMContentLoaded', function () {
+        const shareBtn = document.getElementById('shareBtn');
+        const shareModalEl = document.getElementById('shareModal');
+        const shareList = document.getElementById('share-list');
+        const shareSearch = document.getElementById('share-search');
+        const shareSave = document.getElementById('share-save');
+        const shareEmpty = document.getElementById('share-empty');
+        const bsModal = shareModalEl ? new bootstrap.Modal(shareModalEl) : null;
+
+        function renderList(users, perms) {
+            // users: array of profile objects or username strings
+            console.debug('renderList users=', users, 'perms=', perms);
+            shareList.innerHTML = '';
+            if (!users || users.length === 0) {
+                shareEmpty.classList.remove('d-none');
+                return;
+            }
+            shareEmpty.classList.add('d-none');
+            users.forEach(u => {
+                const tr = document.createElement('tr');
+                const uname = (u && u.username) ? u.username : u;
+                const display = (u && (u.display_name || u.name)) ? (u.display_name || u.name) : uname;
+                const isOwner = perms && perms.owner && perms.owner === uname;
+                // determine checked state from perms (perms may contain arrays of usernames)
+                const isEditor = perms && Array.isArray(perms.editors) && perms.editors.includes(uname);
+                const isReviewer = perms && Array.isArray(perms.reviewers) && perms.reviewers.includes(uname);
+
+                tr.dataset.username = uname;
+                tr.innerHTML = `
+                    <td>${display} <div class="small text-muted">${uname}</div></td>
+                    <td class="text-center"><input data-username="${uname}" class="form-check-input share-editor" type="checkbox" ${isEditor ? 'checked' : ''}></td>
+                    <td class="text-center"><input data-username="${uname}" class="form-check-input share-reviewer" type="checkbox" ${isReviewer ? 'checked' : ''}></td>
+                `;
+                shareList.appendChild(tr);
+            });
+        }
+
+        async function openShare() {
+            const friends = window.SHARE_FRIENDS || [];
+            let perms = null;
+            try {
+                const res = await fetch(`/flashcards/${window.CURRENT_DECK_ID}/permissions`);
+                const body = await res.json();
+                if (body.ok) perms = body.permissions;
+            } catch (e) { /* ignore */ }
+
+            // Fetch authoritative user list from server
+            let allUsers = [];
+            try {
+                const res2 = await fetch('/flashcards/userlist');
+                const data2 = await res2.json();
+                if (data2 && Array.isArray(data2.users)) allUsers = data2.users;
+            } catch (e) { /* ignore */ }
+
+            // Build an ordered list: owner, editors, reviewers, then remaining users from allUsers
+            const users = [];
+            const seen = new Set();
+
+            function pushUserByName(uname) {
+                if (!uname || seen.has(uname)) return;
+                // attempt to find full profile in friends
+                const prof = friends.find(f => (f && f.username) === uname);
+                users.push(prof || { username: uname });
+                seen.add(uname);
+            }
+
+            if (perms) {
+                if (perms.owner) pushUserByName(perms.owner);
+                if (Array.isArray(perms.editors)) perms.editors.forEach(pushUserByName);
+                if (Array.isArray(perms.reviewers)) perms.reviewers.forEach(pushUserByName);
+            }
+
+            // then append all users from server list
+            allUsers.forEach(u => {
+                const uname = (typeof u === 'string') ? u : (u.username || u);
+                if (!seen.has(uname)) {
+                    // prefer friend profile for richer display
+                    const prof = friends.find(f => (f && f.username) === uname);
+                    users.push(prof || { username: uname });
+                    seen.add(uname);
+                }
+            });
+
+            renderList(users, perms);
+            if (bsModal) bsModal.show();
+        }
+
+        function filterList(q) {
+            q = (q || '').toLowerCase();
+            Array.from(shareList.querySelectorAll('tr')).forEach(tr => {
+                const display = tr.children[0].textContent.toLowerCase();
+                tr.style.display = display.indexOf(q) === -1 ? 'none' : '';
+            });
+        }
+
+        if (shareBtn) shareBtn.addEventListener('click', openShare);
+        if (shareSearch) shareSearch.addEventListener('input', (e) => filterList(e.target.value));
+
+        if (shareSave) {
+            shareSave.addEventListener('click', async function () {
+                const rows = Array.from(shareList.querySelectorAll('tr'));
+                const shares = rows.map(tr => {
+                    const editorEl = tr.querySelector('.share-editor');
+                    const reviewerEl = tr.querySelector('.share-reviewer');
+                    const uname = (editorEl && editorEl.dataset && editorEl.dataset.username) || (reviewerEl && reviewerEl.dataset && reviewerEl.dataset.username) || '';
+                    const editor = !!(editorEl && editorEl.checked);
+                    const reviewer = !!(reviewerEl && reviewerEl.checked);
+                    return { username: uname, editor: editor, reviewer: reviewer };
+                });
+
+                try {
+                    const res = await fetch(`/flashcards/${window.CURRENT_DECK_ID}/share`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ shares })
+                    });
+                    const body = await res.json();
+                    if (body.ok) {
+                        if (bsModal) bsModal.hide();
+                        // optional: show a brief toast/alert
+                        alert('Permissions updated');
+                    } else {
+                        alert('Failed to update permissions');
+                    }
+                } catch (e) {
+                    alert('Network error');
+                }
+            });
+        }
+    });

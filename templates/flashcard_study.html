@@ -88,6 +88,7 @@
                                     style="font-size:18px;">Arrow_back</span>
                                 <span class="fw-semibold">Back to Decks</span>
                             </a>
+                            {% if deck.id in permissions.editor %}
                             <a href="{{ url_for('flashcards.edit', deck_id = deck_id) }}"
                                 class="btn btn-success btn-sm rounded-pill d-inline-flex align-items-center gap-2">
                                 <span class="material-symbols-outlined" aria-hidden="true"
@@ -100,6 +101,7 @@
                                     style="font-size:18px;">delete</span>
                                 <span>Delete</span>
                             </a>
+                            {% endif %}
                         </div>
                     </div>
 

@@ -147,17 +147,22 @@ def get_user_decks(username):
         return []
     
     # Code to give admin access to all decks, should probably be removed for production.
-    if username == "admin":
-        # admin gets all decks
-        deck_ids = [d.get('id') for d in _decks_col.find({}) if d.get('id')]
-        decks = []
-        for deck_id in deck_ids:
-            deck = get_deck_by_id(deck_id)
-            if deck:
-                decks.append(deck)
-        return decks
+    # if username == "admin":
+    #     # admin gets all decks
+    #     deck_ids = [d.get('id') for d in _decks_col.find({}) if d.get('id')]
+    #     decks = []
+    #     for deck_id in deck_ids:
+    #         deck = get_deck_by_id(deck_id)
+    #         if deck:
+    #             decks.append(deck)
+    #     return decks
     ### END admin special case ###
-    deck_ids = [p.get('deck_id') for p in _permissions_col.find({'username': username}) if p.get('deck_id')]
+    
+    # Creates a set of deck id's based of the permissions collection, it finds all decks that the username is in (Not very scalable at the moment), and adds the id to the list of decks.
+    deck_ids = {p.get('deck_id') for p in _permissions_col.find()
+                if "all" in (p.get('reviewers') or []) or username in (p.get('reviewers') or [])
+                or "all" in (p.get('editors') or []) or username in (p.get('editors') or [])}
+    #deck_ids = [p.get('deck_id') for p in _permissions_col.find({'username': username}) if p.get('deck_id')]
     decks = []
     for deck_id in deck_ids:
         deck = get_deck_by_id(deck_id)
@@ -326,7 +331,25 @@ def record_review(deck_id, card_id, correct: bool):
 
     return card
 
-def create_deck(name, summary, subject: Optional[str] = None, category: Optional[str] = None, tags: Optional[list] = None):
+def create_deck_permissions(deck_id, owner, reviewrs: Optional[list[str]] = None, editors: Optional[list[str]] = None):
+    """Create a permission entry for a user on a deck."""
+    sid = str(deck_id)
+    _permissions_col.insert_one({'deck_id': sid, 'reviewers': reviewrs or [], 'editors': editors or [], 'owner': owner})
+
+def rem_deck_permissions(deck_id, field, value):
+    """Remove `value` from an array field on the deck permission doc."""
+    sid = str(deck_id)
+    if value != "admin":
+        _permissions_col.update_one({'deck_id': sid}, {'$pull': {field: value}})
+    
+def add_deck_permissions(deck_id, field, value):
+    """Add `value` to an array field (e.g. 'editors' or 'reviewers') on the deck permission doc.
+
+    Uses `$addToSet` so duplicates are not created and creates the document if missing.
+    """
+    sid = str(deck_id)
+    _permissions_col.update_one({'deck_id': sid}, {'$addToSet': {field: value}}, upsert=True)
+def create_deck(name, summary, owner, subject: Optional[str] = None, category: Optional[str] = None, tags: Optional[list] = None):
     """Create a new deck with the given name and summary."""
     existing_ids = []
     for deck in _decks_col.find({}):
@@ -338,13 +361,17 @@ def create_deck(name, summary, subject: Optional[str] = None, category: Optional
         next_id = max(existing_ids) + 1
     else:
         next_id = 1
-
+    
     deck_id = str(next_id)
     new_deck = _make_deck_dict(deck_id, name, summary, cards_map={}, subject=subject, category=category, tags=tags)
-
+    
+    ##### FIX THIS \/
+    create_deck_permissions(deck_id, owner, [owner,"admin"],[owner,"admin"])
+    
     cdoc = {
         'id': deck_id,
         'name': name,
+        'owner': owner,
         'summary': summary,
         'subject': subject,
         'category': category,
@@ -356,8 +383,27 @@ def create_deck(name, summary, subject: Optional[str] = None, category: Optional
 
     return new_deck
 
-def add_deck_to_user(username, deck_id):
-    """Add a deck to the user's study data.
+def makePublic():
+    ...
+
+def get_user_permissions(username):
+    """    """
+    user_doc = _profiles_col.find_one({'username': username})
+    if not user_doc:
+        return False
+    # Return only deck IDs where the username appears in each role
+    rev_docs = list(_permissions_col.find({'reviewers': username}))
+    rev_docs.extend(list(_permissions_col.find({'reviewers': "all"})))
+    edit_docs = list(_permissions_col.find({'editors': username}))
+    edit_docs.extend(list(_permissions_col.find({'editors': "all"})))
+    own_docs = list(_permissions_col.find({'owner': username}))
+
+    rev = [d.get('deck_id') for d in rev_docs if d.get('deck_id')]
+    edit = [d.get('deck_id') for d in edit_docs if d.get('deck_id')]
+    own = [d.get('deck_id') for d in own_docs if d.get('deck_id')]
+    return {'reviewer': list(set(rev)), 'editor': list(set(edit)), 'owner': list(set(own))}
+def add_deck_to_user(username, deck_id, role:str='owner'):
+    """Add a user to the flashcard deck's permissions.
 
     Returns True on success, False on failure.
     """
@@ -368,10 +414,66 @@ def add_deck_to_user(username, deck_id):
     user_doc = _profiles_col.find_one({'username': username})
     if not user_doc:
         return False
+    sid = str(deck_id)
 
-    existing = _permissions_col.find_one({'username': username, 'deck_id': sid})
-    if existing:
-        return True
+    # Ensure a permission document exists for this deck
+    perm = _permissions_col.find_one({'deck_id': sid})
+    if not perm:
+        create_deck_permissions(sid, username,[username],[username])
+        #_permissions_col.insert_one({'deck_id': sid, 'reviewers': [], 'editors': [], 'owner': None})
 
-    _permissions_col.insert_one({'username': username, 'deck_id': sid, 'role': 'owner'})
-    return True
+    # normalize role names and perform the appropriate update
+    r = role.lower()
+    if r in ('owner',):
+        _permissions_col.update_one({'deck_id': sid}, {'$set': {'owner': username}})
+        perm = _permissions_col.find_one({'deck_id': sid})
+        return perm.get('owner') == username
+
+    if r in ('editor', 'editors'):
+        _permissions_col.update_one({'deck_id': sid}, {'$addToSet': {'editors': username}})
+        perm = _permissions_col.find_one({'deck_id': sid})
+        return username in perm.get('editors', [])
+
+    if r in ('reviewer', 'reviewers'):
+        _permissions_col.update_one({'deck_id': sid}, {'$addToSet': {'reviewers': username}})
+        perm = _permissions_col.find_one({'deck_id': sid})
+        return username in perm.get('reviewers', [])
+
+    return False
+
+
+def get_friends(username):
+    """Return an ordered list of friend profile objects for `username`.
+
+    A friend is defined as a relationship document where `follower` == username
+    and the `following` field is the friend's username. Returns a list of
+    profile dicts (at least `username` and `display_name` when available).
+    """
+    if not username:
+        return []
+    db = get_db()
+    relationships = db.relationships
+    profiles = db.profiles
+
+    rels = list(relationships.find({'follower': username}))
+    friend_usernames = [r.get('following') for r in rels if r.get('following')]
+    if not friend_usernames:
+        return []
+
+    profs = list(profiles.find({'username': {'$in': friend_usernames}}, {'_id': 0, 'username': 1, 'display_name': 1, 'name': 1}))
+    prof_map = {p.get('username'): p for p in profs}
+    # preserve original ordering from relationships
+    friends = [prof_map.get(u, {'username': u}) for u in friend_usernames]
+    return friends
+
+
+def get_deck_permissions(deck_id):
+    """Return the permission document for a deck or None if missing."""
+    if deck_id is None:
+        return None
+    db = get_db()
+    perm = db.user_permissions.find_one({'deck_id': str(deck_id)})
+    if not perm:
+        return None
+    perm['_id'] = str(perm.get('_id'))
+    return perm

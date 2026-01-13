@@ -75,18 +75,11 @@
         </header>
         <main>
             <div class="container p-4">
-                <form method="POST">
+                <div class="col">
                     <div class="row">
-                        <div class="col">
-                            <!-- col-12 col-lg-8 -->
-                            <h2 class="h2 fw-bold"><input class="form-control" name="deck_name"
-                                    placeholder="{% if deck.name%}{{deck.name}}{% else %}Deck name{%endif%}" /></h2>
-                            <t class="text-muted mt-1"><input class="form-control" name="deck_summary"
-                                    placeholder="{% if deck.summary%}{{deck.summary}}{% else %}Deck summary{%endif%}" />
-                            </t>
-                        </div>
-                        <div class="col text-center align-content-center">
-                            <div class="d-flex justify-content-center justify-content-md-end gap-2">
+                        <div class="col-12 d-flex gap-2 mt-3 mt-md-0 mb-3 flex-column flex-md-row align-items-center">
+                            <h2 class="col-12 col-md-6 mb-2 mb-md-0">Edit Flashcard Deck:</h2>
+                            <div class="d-flex gap-2 flex-row flex-wrap ms-md-auto justify-content-center pb-md-3">
                                 <a href="{{ url_for('flashcards.index', deck_id = deck_id) }}"
                                     class="btn btn-outline-warning btn-sm rounded-pill d-inline-flex align-items-center gap-2">
                                     <span class="material-symbols-outlined" aria-hidden="true"
@@ -105,107 +98,140 @@
                                         style="font-size:18px;">delete</span>
                                     <span>Delete</span>
                                 </a>
+                                <button type="button" id="shareBtn"
+                                    class="btn btn-sm btn-outline-primary rounded-pill d-inline-flex align-items-center gap-2">
+                                    <span class="material-symbols-outlined" aria-hidden="true"
+                                        style="font-size:18px;">share</span>
+                                    <span>Share</span>
+                                </button>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="d-flex flex-column ">
-                            <!-- col-12 col-lg-8 -->
-                            <hr class="">
-                            <!-- Header row for list/table labels (visible on medium+ screens) -->
-                            <div class="row fw-bold border-bottom py-2 d-none d-md-flex text-center">
-                                <div class="col">Card</div>
-                                <div class="col">Front</div>
-                                <div class="col">Back</div>
+                        <form method="POST" class="pb-sm-5">
+                            <div class="col-12 col-md-8">
+                                <!-- col-12 col-lg-8 -->
+                                <h2 class="h2 fw-bold"><input class="form-control" name="deck_name"
+                                        placeholder="{% if deck.name%}{{deck.name}}{% else %}Deck name{%endif%}" /></h2>
+                                <t class="text-muted mt-1"><input class="form-control" name="deck_summary"
+                                        placeholder="{% if deck.summary%}{{deck.summary}}{% else %}Deck summary{%endif%}" />
+                                </t>
+                                <!-- visual break on small screens -->
+                                <hr class="d-md-none my-3" />
                             </div>
 
-                            <input type="hidden" name="deck_id" value="{{deck.id}}" />
-                            <div class="list-group list-group-flush">
-                                {% for cardn, card in deck.cards.items() %}
-                                <div class="list-group-item py-3">
-                                    <div class="row g-2 align-items-center">
-                                        <div class="col-1 text-center">
-                                            <strong>{{cardn}}</strong>
-                                            <div class="form-check mt-1">
-                                                <input class="form-check-input" type="checkbox" name="delete_{{cardn}}"
-                                                    id="delete_{{cardn}}">
-                                                <label class="form-check-label small text-danger"
-                                                    for="delete_{{cardn}}">Delete</label>
-                                            </div>
-                                        </div>
-                                        <div class="col">
-                                            <input class="form-control" name="front_{{cardn}}" value="{{card.front}}" />
-                                        </div>
-                                        <div class="col">
-                                            <input class="form-control" name="back_{{cardn}}" value="{{card.back}}" />
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-
-                                <div class="list-group-item py-3 bg-light">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <strong>New cards</strong>
-                                        <div>
-                                            <button type="button" id="add-new-card"
-                                                class="btn btn-sm btn-outline-primary">Add card</button>
-                                        </div>
+                            <div class="row">
+                                <div class="d-flex flex-column ">
+                                    <!-- col-12 col-lg-8 -->
+                                    <hr class="">
+                                    <!-- Header row for list/table labels (visible on medium+ screens) -->
+                                    <div class="row fw-bold border-bottom py-2 d-none d-md-flex text-center">
+                                        <div class="col">Card</div>
+                                        <div class="col">Front</div>
+                                        <div class="col">Back</div>
                                     </div>
 
-                                    <div id="new-cards-container">
-                                        <!-- new card rows will be inserted here -->
-                                        <div class="new-card-row d-none" id="new-card-template">
+                                    <input type="hidden" name="deck_id" value="{{deck.id}}" />
+                                    <div class="list-group list-group-flush">
+                                        {% for cardn, card in deck.cards.items() %}
+                                        <div class="list-group-item py-3">
                                             <div class="row g-2 align-items-center">
                                                 <div class="col-1 text-center">
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-outline-danger remove-new-card"
-                                                        title="Remove">×</button>
+                                                    <div class="d-md-none small text-muted mb-1">Card</div>
+                                                    <strong>{{cardn}}</strong>
+                                                    <div class="form-check mt-1 d-flex gap-3 justify-content-center">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            name="delete_{{cardn}}" id="delete_{{cardn}}">
+                                                        <label class="form-check-label small text-danger"
+                                                            for="delete_{{cardn}}">Delete</label>
+                                                    </div>
                                                 </div>
                                                 <div class="col">
-                                                    <input class="form-control" placeholder="Front"
-                                                        name="new_front[]" />
+                                                    <div class="d-md-none small text-muted mb-1">Front</div>
+                                                    <input class="form-control" name="front_{{cardn}}"
+                                                        value="{{card.front}}" />
                                                 </div>
                                                 <div class="col">
-                                                    <input class="form-control" placeholder="Back" name="new_back[]" />
+                                                    <div class="d-md-none small text-muted mb-1">Back</div>
+                                                    <input class="form-control" name="back_{{cardn}}"
+                                                        value="{{card.back}}" />
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <small class="text-muted">Click "Add card" to create multiple new cards. You can
-                                        remove them before
-                                        saving.</small>
-                                </div>
+                                        {% endfor %}
 
-                                <div class="list-group-item py-3 text-end">
-                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                        <div class="list-group-item py-3 bg-light">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <strong>New cards</strong>
+                                                <div>
+                                                    <button type="button" id="add-new-card"
+                                                        class="btn btn-sm btn-outline-primary">Add card</button>
+                                                </div>
+                                            </div>
+
+                                            <div id="new-cards-container">
+                                                <!-- new card rows will be inserted here -->
+                                                <div class="new-card-row d-none" id="new-card-template">
+                                                    <div class="row g-2 align-items-center">
+                                                        <div class="col-1 text-center">
+                                                            <div class="d-md-none small text-muted mb-1">Card</div>
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-outline-danger remove-new-card"
+                                                                title="Remove">×</button>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="d-md-none small text-muted mb-1">Front</div>
+                                                            <input class="form-control" placeholder="Front"
+                                                                name="new_front[]" />
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="d-md-none small text-muted mb-1">Back</div>
+                                                            <input class="form-control" placeholder="Back"
+                                                                name="new_back[]" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <small class="text-muted">Click "Add card" to create multiple new cards. You
+                                                can
+                                                remove them before
+                                                saving.</small>
+                                        </div>
+
+                                        <div class="list-group-item py-3 text-end">
+                                            <button type="submit" class="btn btn-primary">Save changes</button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                </form>
-                <!-- Confirm Delete Modal (simple custom modal so no extra bootstrap JS required) -->
-                <div id="confirmDeleteModal" class="position-fixed top-0 start-0 w-100 h-100 d-none"
-                    style="z-index:1050;background:rgba(0,0,0,0.45);">
-                    <div class="d-flex align-items-center justify-content-center h-100 p-3">
-                        <div class="bg-white rounded shadow-sm p-4" style="max-width:480px; width:100%;">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="m-0">Can you confirm deletion?</h5>
-                                <button type="button" class="btn-close" id="closeDeleteModal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <p class="mb-3">Are you sure you want to delete this deck?
-                                This action cannot be undone.</p>
-                            <div class="d-flex justify-content-end gap-2">
-                                <button type="button" class="btn btn-light btn-sm" id="cancelDelete">Cancel</button>
-                                <form method="POST" action="{{ url_for('flashcards.delete', deck_id = deck_id) }}"
-                                    class="m-0">
-                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                </form>
+                        </form>
+                    </div>
+                    <!-- Confirm Delete Modal (simple custom modal so no extra bootstrap JS required) -->
+                    <div id="confirmDeleteModal" class="position-fixed top-0 start-0 w-100 h-100 d-none"
+                        style="z-index:1050;background:rgba(0,0,0,0.45);">
+                        <div class="d-flex align-items-center justify-content-center h-100 p-3">
+                            <div class="bg-white rounded shadow-sm p-4" style="max-width:480px; width:100%;">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="m-0">Can you confirm deletion?</h5>
+                                    <button type="button" class="btn-close" id="closeDeleteModal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <p class="mb-3">Are you sure you want to delete this deck?
+                                    This action cannot be undone.</p>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button type="button" class="btn btn-light btn-sm" id="cancelDelete">Cancel</button>
+                                    <form method="POST" action="{{ url_for('flashcards.delete', deck_id = deck_id) }}"
+                                        class="m-0">
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
+                    </div>
                 </div>
             </div>
     </div>
+    <div class="d-md-none d-lg-none" id="filler" style="height: 10vh;"></div>
     </main>
     <!-- Floating chat button + UI (place here) -->
 
@@ -232,7 +258,9 @@
 
         <div id="floating-chat-body">
             <!-- Message area (placeholder) -->
-            <div class="text-muted small">Type flashcard dreams request here... You can also provide a reference doc.</div>
+            <div class="text-muted small">Type flashcard dreams request here... You can also provide a reference
+                doc.
+            </div>
         </div>
 
         <div id="floating-chat-footer">
@@ -337,6 +365,48 @@
         </nav>
     </footer>
     </div>
+
+    <!-- Share modal -->
+    <div class="modal fade" id="shareModal" tabindex="-1" aria-hidden="true" aria-labelledby="shareModalLabel">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shareModalLabel">Share deck with friends</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <input id="share-search" class="form-control" placeholder="Search friends..." />
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Friend</th>
+                                    <th class="text-center">Edit</th>
+                                    <th class="text-center">Review</th>
+                                </tr>
+                            </thead>
+                            <tbody id="share-list">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="share-empty" class="text-center text-muted d-none">Follow friends first to share study
+                        decks</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="share-save" class="btn btn-primary">Share / Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.SHARE_FRIENDS = {{ friends | tojson }};
+        window.CURRENT_DECK_ID = "{{ deck_id }}";
+    </script>
+
     <script src="{{ url_for('static', filename='flashcards.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='flashcards_edit.js') }}"></script>

@@ -87,7 +87,7 @@
                         <h2 class="h2 fw-bold">Flashcard Decks</h2>
                         <t class="text-muted mt-1">Browse, create, and explore your flashcard decks.</t>
                     </div>
-                    <div class="col text-center align-content-center">
+                    <div class="col-12 col-md-4 text-center text-md-end align-content-center mt-3 mt-md-0">
                         <div class="d-flex justify-content-center justify-content-md-end gap-2">
                             <a href="{{ url_for('flashcards.new_deck')}}"
                                 class="btn btn-primary btn-sm rounded-pill d-inline-flex align-items-center gap-2">
@@ -144,10 +144,13 @@
                                                     <!-- <a class="dropdown-item"></a> -->
                                                 </div>
                                             </div>
+                                            {% if deck.id in permissions.editor %}
                                             <div class="col-2">
+                                                
                                                 <a href="{{ url_for('flashcards.edit',deck_id = deck.id) }}"
                                                     class="btn btn-sm btn-secondary text-white">Edit</a>
                                             </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>

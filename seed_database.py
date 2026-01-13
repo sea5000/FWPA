@@ -162,8 +162,7 @@ def seed_decks_cards_tags_permissions():
                 {"id": "1", "front": "Hola", "back": "Hello", "tags": ["greeting"]},
                 {"id": "2", "front": "Adiós", "back": "Goodbye", "tags": ["farewell"]},
                 {"id": "3", "front": "Gracias", "back": "Thank you", "tags": ["politeness"]},
-            ],
-            "owners": ["alice"],
+            ]
         },
         {
             "id": "2",
@@ -176,15 +175,15 @@ def seed_decks_cards_tags_permissions():
                 {"id": "1", "front": "Bonjour", "back": "Hello", "tags": ["greeting"]},
                 {"id": "2", "front": "Au revoir", "back": "Goodbye", "tags": ["farewell"]},
                 {"id": "3", "front": "Merci", "back": "Thank you", "tags": ["politeness"]},
-            ],
-            "owners": ["james", "emma"],
+            ]
         },
     ]
 
     deck_docs = []
     card_docs = []
     tag_docs = []
-    perm_docs = []
+    perm_docs = [{'deck_id': '1', 'reviewers': ['admin', 'all'], 'editors': ['admin', 'alice'], 'owner': 'alice'},
+                 {'deck_id': '2', 'reviewers': ['admin', 'all'], 'editors': ['admin', 'james'], 'owner': 'james'}]
 
     for deck in decks:
         deck_docs.append({

@@ -67,7 +67,9 @@ def community_index():
     # Convert MongoDB ObjectIds to strings for JSON/template compatibility
     for n in notes:
         n["_id"] = str(n["_id"])
+        print("[note]", n)
         interactions = interactions_col.find_one({'entity_type': 'note', 'entity_id': n['_id']}) or {}
+        print("[interactions]", interactions)
         n['likes'] = len(interactions.get('likes') or [])
         n['comments'] = interactions.get('comments') or []
     # Render template with community data

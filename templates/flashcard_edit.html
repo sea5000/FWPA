@@ -116,7 +116,9 @@
                         <form method="POST" class="pb-sm-5">
                             <div class="col-12 col-md-8">
                                 <!-- col-12 col-lg-8 -->
+                                 <div class="medium text-muted mb-1">Title:</div>
                                 <h2 class="h2 fw-bold"><textarea class="form-control auto-expand" name="deck_name" rows="1" placeholder="Deck name">{% if deck.name %}{{ deck.name }}{% endif %}</textarea></h2>
+                                <div class="medium text-muted mb-1">Summary:</div>
                                 <p class="text-muted mt-1"><textarea class="form-control auto-expand" name="deck_summary" rows="1" placeholder="Deck summary">{% if deck.summary %}{{ deck.summary }}{% endif %}</textarea></p>
                                 <!-- visual break on small screens -->
                                 <hr class="d-md-none my-3" />
@@ -138,7 +140,7 @@
                                         {% for cardn, card in deck.cards.items() %}
                                         <div class="list-group-item py-3">
                                             <div class="row g-2">
-                                                <div class="col-1 text-center">
+                                                <div class="col-md-1 text-center">
                                                     <div class="d-md-none small text-muted mb-1">Card</div>
                                                     <strong>{{cardn}}</strong>
                                                     <div class="form-check mt-1 d-flex gap-3 justify-content-center">
@@ -148,11 +150,11 @@
                                                             for="delete_{{cardn}}">Delete</label>
                                                     </div>
                                                 </div>
-                                                <div class="col">
+                                                <div class="col-md">
                                                     <div class="d-md-none small text-muted mb-1">Front</div>
                                                     <textarea class="form-control auto-expand" name="front_{{cardn}}" rows="1">{{card.front}}</textarea>
                                                 </div>
-                                                <div class="col">
+                                                <div class="col-md">
                                                     <div class="d-md-none small text-muted mb-1">Back</div>
                                                     <textarea class="form-control auto-expand" name="back_{{cardn}}" rows="1">{{card.back}}</textarea>
                                                 </div>

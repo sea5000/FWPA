@@ -6,9 +6,15 @@
         const clone = tmpl.cloneNode(true);
         clone.id = '';
         clone.classList.remove('d-none');
-        // set values if provided
-        if (front !== undefined) clone.querySelector('input[name="new_front[]"]').value = front;
-        if (back !== undefined) clone.querySelector('input[name="new_back[]"]').value = back;
+        // set values if provided (support input or textarea)
+        if (front !== undefined) {
+            const f = clone.querySelector('textarea[name="new_front[]"], input[name="new_front[]"]');
+            if (f) f.value = front;
+        }
+        if (back !== undefined) {
+            const b = clone.querySelector('textarea[name="new_back[]"], input[name="new_back[]"]');
+            if (b) b.value = back;
+        }
         // wire remove button
         const btn = clone.querySelector('.remove-new-card');
         if (btn) {
@@ -184,177 +190,152 @@ document.addEventListener('DOMContentLoaded', function () {
             sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
         }
 
-        try {
-            const response = await fetch('/api/chat-proxy', {
-                method: 'POST',
-                body: formData
-            });
+            try {
+                const response = await fetch('/api/chat-proxy', {
+                    method: 'POST',
+                    body: formData
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            // Remove loading indicator from chat body
-            chatBody.removeChild(loadingDiv);
+                // Remove loading indicator from chat body
+                chatBody.removeChild(loadingDiv);
 
-            if (data.status === 'success') {
-                // Prefer structured JSON response from the AI proxy
-                const jsonResp = data.json || data.jsonResp || null;
-                const feedback = data.feedback || null;
+                if (data.status === 'success') {
+                    // Prefer structured JSON response from the AI proxy
+                    const jsonResp = data.json || data.jsonResp || null;
+                    const feedback = data.feedback || null;
 
-                if (feedback) {
-                    appendMessage(feedback, 'ai');
-                }
+                    if (feedback) {
+                        appendMessage(feedback, 'ai');
+                    }
 
-                if (jsonResp) {
-                    // jsonResp may already be an object or a JSON string
-                    let parsed = jsonResp;
-                    console.log(parsed)
-                    if (typeof parsed === 'string') {
-                        // First try native parse, then fallbacks that extract code fences
+                    if (jsonResp) {
                         try {
-                            parsed = JSON.parse(parsed);
-                        } catch (e) {
-                            const tried = tryParseAIJSON(parsed);
-                            if (tried) {
-                                parsed = tried;
-                            } else {
-                                console.error('Failed to parse AI JSON response (client fallback)', e);
-                                // show raw text in chat UI but continue (no DOM insertion)
-                                appendMessage(jsonResp, 'ai');
-                                parsed = null;
-                            }
-                        }
-                    }
-
-                    // Normalize common alternative keys from different LLMs
-                    if (parsed && typeof parsed === 'object') {
-                        if (!parsed.name && parsed.deck_name) parsed.name = parsed.deck_name;
-                        if (!parsed.summary && parsed.deck_summary) parsed.summary = parsed.deck_summary;
-                        if (!parsed.flashcards && parsed.flaşcards) parsed.flashcards = parsed.flaşcards;
-                        // sometimes feedback may be embedded in the JSON
-                        if (!feedback && parsed.user_feedback) {
-                            appendMessage(parsed.user_feedback, 'ai');
-                        }
-                    }
-
-                    // Try a few alternative places for flashcards array
-                    // Accept common misspellings/variants from different LLMs (e.g. "flaashcards")
-                    let flashcardsArray = null;
-                    if (parsed && typeof parsed === 'object') {
-                        const candidateKeys = ['flashcards', 'cards', 'items', 'flaashcards', 'flaash_cards', 'flaashcard', 'flaşcards'];
-                        for (let i = 0; i < candidateKeys.length; i++) {
-                            const k = candidateKeys[i];
-                            if (parsed[k] && Array.isArray(parsed[k])) {
-                                flashcardsArray = parsed[k];
-                                break;
-                            }
-                        }
-                        // If we found a misspelled key, normalize it for downstream code
-                        if (!flashcardsArray && parsed.flaashcards && Array.isArray(parsed.flaashcards)) {
-                            flashcardsArray = parsed.flaashcards;
-                            parsed.flashcards = parsed.flaashcards;
-                        }
-                    }
-
-                    if (flashcardsArray && Array.isArray(flashcardsArray)) {
-                        // For each returned flashcard, add a new row to the edit form
-                        flashcardsArray.forEach(fc => {
-                            const front = fc.front || fc.question || fc.prompt || '';
-                            const back = fc.back || fc.answer || fc.response || '';
-                            if (window.addNewCardRow) {
-                                window.addNewCardRow(front, back);
-                            } else {
-                                // fallback: clone template manually
-                                const tmpl = document.getElementById('new-card-template');
-                                if (tmpl) {
-                                    const clone = tmpl.cloneNode(true);
-                                    clone.id = '';
-                                    clone.classList.remove('d-none');
-                                    const f = clone.querySelector('input[name="new_front[]"]');
-                                    const b = clone.querySelector('input[name="new_back[]"]');
-                                    if (f) f.value = front;
-                                    if (b) b.value = back;
-                                    const btn = clone.querySelector('.remove-new-card');
-                                    if (btn) btn.addEventListener('click', () => clone.remove());
-                                    document.getElementById('new-cards-container').appendChild(clone);
+                            // jsonResp may already be an object or a JSON string
+                            let parsed = jsonResp;
+                            console.log(parsed)
+                            if (typeof parsed === 'string') {
+                                // First try native parse, then fallbacks that extract code fences
+                                try {
+                                    parsed = JSON.parse(parsed);
+                                } catch (e) {
+                                    const tried = tryParseAIJSON(parsed);
+                                    if (tried) {
+                                        parsed = tried;
+                                    } else {
+                                        console.error('Failed to parse AI JSON response (client fallback)', e);
+                                        appendMessage('Parsing error: ' + e.message, 'ai');
+                                        parsed = null;
+                                    }
                                 }
                             }
-                        });
 
-                        // Optionally update deck name/summary on the page if provided
-                        //document.getElementsByName('deck_name')[0].value = 
-                        if (parsed && parsed.name) {
-                            const nameField = document.getElementsByName('deck_name')[0];
-                            if (nameField) nameField.value = parsed.name;
-                        }
-                        if (parsed && parsed.summary) {
-                            const summaryField = document.getElementsByName('deck_summary')[0];
-                            if (summaryField) summaryField.value = parsed.summary;
-                        }
-
-                        // Do NOT auto-submit. Let user review the AI-added rows and click
-                        // the existing "Save changes" button to persist them.
-                        // Add a non-intrusive notice with an optional "Save now" button.
-                        const form = document.querySelector('form');
-                        const noticeId = 'ai-save-notice-container';
-                        let notice = document.getElementById(noticeId);
-                        if (!notice) {
-                            notice = document.createElement('div');
-                            notice.id = noticeId;
-                            notice.className = 'mb-3';
-                            // insert the notice just above the Save changes area
-                            const saveArea = document.querySelector('.list-group-item.py-3.text-end');
-                            if (saveArea && saveArea.parentNode) {
-                                saveArea.parentNode.insertBefore(notice, saveArea);
-                            } else if (form) {
-                                form.insertBefore(notice, form.firstChild);
+                            // Normalize common alternative keys from different LLMs
+                            if (parsed && typeof parsed === 'object') {
+                                if (!parsed.name && parsed.deck_name) parsed.name = parsed.deck_name;
+                                if (!parsed.summary && parsed.deck_summary) parsed.summary = parsed.deck_summary;
+                                if (!parsed.flashcards && parsed.flaşcards) parsed.flashcards = parsed.flaşcards;
+                                if (!feedback && parsed.user_feedback) {
+                                    appendMessage(parsed.user_feedback, 'ai');
+                                }
                             }
+
+                            // Find flashcards array
+                            let flashcardsArray = null;
+                            if (parsed && typeof parsed === 'object') {
+                                const candidateKeys = ['flashcards', 'cards', 'items', 'flaashcards', 'flaash_cards', 'flaashcard', 'flaşcards'];
+                                for (let i = 0; i < candidateKeys.length; i++) {
+                                    const k = candidateKeys[i];
+                                    if (parsed[k] && Array.isArray(parsed[k])) {
+                                        flashcardsArray = parsed[k];
+                                        break;
+                                    }
+                                }
+                                if (!flashcardsArray && parsed.flaashcards && Array.isArray(parsed.flaashcards)) {
+                                    flashcardsArray = parsed.flaashcards;
+                                    parsed.flashcards = parsed.flaashcards;
+                                }
+                            }
+
+                            if (flashcardsArray && Array.isArray(flashcardsArray)) {
+                                flashcardsArray.forEach(fc => {
+                                    const front = fc.front || fc.question || fc.prompt || '';
+                                    const back = fc.back || fc.answer || fc.response || '';
+                                    if (window.addNewCardRow) {
+                                        window.addNewCardRow(front, back);
+                                    } else {
+                                        const tmpl = document.getElementById('new-card-template');
+                                        if (tmpl) {
+                                            const clone = tmpl.cloneNode(true);
+                                            clone.id = '';
+                                            clone.classList.remove('d-none');
+                                            const f = clone.querySelector('textarea[name="new_front[]"], input[name="new_front[]"]');
+                                            const b = clone.querySelector('textarea[name="new_back[]"], input[name="new_back[]"]');
+                                            if (f) f.value = front;
+                                            if (b) b.value = back;
+                                            const btn = clone.querySelector('.remove-new-card');
+                                            if (btn) btn.addEventListener('click', () => clone.remove());
+                                            document.getElementById('new-cards-container').appendChild(clone);
+                                        }
+                                    }
+                                });
+
+                                if (parsed && parsed.name) {
+                                    const nameField = document.getElementsByName('deck_name')[0];
+                                    if (nameField) nameField.value = parsed.name;
+                                }
+                                if (parsed && parsed.summary) {
+                                    const summaryField = document.getElementsByName('deck_summary')[0];
+                                    if (summaryField) summaryField.value = parsed.summary;
+                                }
+
+                                const form = document.querySelector('form');
+                                const noticeId = 'ai-save-notice-container';
+                                let notice = document.getElementById(noticeId);
+                                if (!notice) {
+                                    notice = document.createElement('div');
+                                    notice.id = noticeId;
+                                    notice.className = 'mb-3';
+                                    const saveArea = document.querySelector('.list-group-item.py-3.text-end');
+                                    if (saveArea && saveArea.parentNode) {
+                                        saveArea.parentNode.insertBefore(notice, saveArea);
+                                    } else if (form) {
+                                        form.insertBefore(notice, form.firstChild);
+                                    }
+                                }
+                                notice.innerHTML = `\n        <div class="alert alert-info d-flex justify-content-between align-items-center mb-0">\n            <div>AI added <strong>${flashcardsArray.length}</strong> card(s) to this form. Review them and click <strong>Save changes</strong> to persist.</div>\n            <div><button type="submit" class="btn btn-sm btn-primary" id="ai-save-now">Save now</button></div>\n        </div>`;
+                                appendMessage('Added ' + flashcardsArray.length + ' card(s) to the edit form. Click Save changes to persist.', 'ai');
+                            } else {
+                                appendMessage(data.reply || JSON.stringify(parsed), 'ai');
+                            }
+                        } catch (procErr) {
+                            console.error('Error processing AI response', procErr);
+                            appendMessage('Processing error: ' + (procErr && procErr.message ? procErr.message : String(procErr)), 'ai');
                         }
-                        notice.innerHTML = `
-        <div class="alert alert-info d-flex justify-content-between align-items-center mb-0">
-            <div>AI added <strong>${flashcardsArray.length}</strong> card(s) to this form. Review them and click <strong>Save changes</strong> to persist.</div>
-            <div><button type="submit" class="btn btn-sm btn-primary" id="ai-save-now">Save now</button></div>
-        </div>`;
-                        // wire the save-now button to submit the form
-                        // const saveNowBtn = notice.querySelector('#ai-save-now');
-                        // if (saveNowBtn) {
-                        //     saveNowBtn.addEventListener('click', function () {
-                        //         const form = document.querySelector('form');
-                        //         if (form) form.submit();
-                        //     });
-                        // }
-                        // const saveNowBtn = document.getElementById('ai-save-now');
-                        // if (saveNowBtn && form) {
-                        //     saveNowBtn.addEventListener('click', function () { form.submit(); });
-                        // }
-                        // Also append a short confirmation in the chat UI
-                        appendMessage('Added ' + flashcardsArray.length + ' card(s) to the edit form. Click Save changes to persist.', 'ai');
                     } else {
-                        // No flashcards array found — show raw reply
-                        appendMessage(data.reply || JSON.stringify(parsed), 'ai');
+                        appendMessage(data.reply || 'No structured content returned', 'ai');
                     }
                 } else {
-                    // Structured JSON not present — fall back to reply text if available
-                    appendMessage(data.reply || 'No structured content returned', 'ai');
+                    appendMessage("Error: " + data.message, 'ai');
                 }
-            } else {
-                appendMessage("Error: " + data.message, 'ai');
-            }
 
-            // Reset file input
-            fileInput.value = "";
+                // Reset file input
+                fileInput.value = "";
 
-        } catch (error) {
-            // Remove loading indicator from chat body if present
-            try { chatBody.removeChild(loadingDiv); } catch (e) { }
-            appendMessage("Network Error", 'ai');
-        } finally {
-            // Restore send button state
-            if (sendBtn) {
-                sendBtn.disabled = false;
-                sendBtn.removeAttribute('aria-busy');
-                sendBtn.innerHTML = sendBtnOriginalHTML;
+            } catch (error) {
+                // Remove loading indicator from chat body if present
+                try { chatBody.removeChild(loadingDiv); } catch (e) { }
+                console.error('Network/sendMessage error', error);
+                appendMessage("Network Error: " + (error && error.message ? error.message : String(error)), 'ai');
+            } finally {
+                // Restore send button state
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.removeAttribute('aria-busy');
+                    sendBtn.innerHTML = sendBtnOriginalHTML;
+                }
             }
-        }
     }
 
     // Event Listeners

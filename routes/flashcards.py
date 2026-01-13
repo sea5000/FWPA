@@ -277,7 +277,7 @@ def flashcards_review():
 def flashcards_new_deck():
     """Render the new deck creation page (form)."""
     # create_deck(name, summary) -> create a new deck record and persist it
-    deck = create_deck("New Deck", g.current_user, "")
+    deck = create_deck("New Deck", "Summary goes here", g.current_user)
     # attach the newly-created deck to the current user's studyData
     add_deck_to_user(g.current_user, deck['id'])
     return redirect(url_for('flashcards.edit', deck_id = deck['id']))

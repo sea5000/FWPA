@@ -8,6 +8,7 @@ import json
 import ast
 from google import genai
 from google.genai import types
+from model.logs_model import insert_ai_log
 
 load_dotenv()
 # blueprint should have a simple import name; the URL is provided by app.register_blueprint
@@ -222,6 +223,11 @@ def chat_proxy():
             feedback = parsed.pop('feedback', '')  # Remove feedback from JSON, use separately
         
         if parsed is not None:
+            # record a successful AI generation log (best-effort)
+            try:
+                insert_ai_log(g.current_user, None, fullPrompt, ai_text, parsed=parsed, feedback=feedback, success=True)
+            except Exception:
+                pass
             return jsonify({
                 "status": "success", 
                 "json": parsed, 
@@ -229,6 +235,10 @@ def chat_proxy():
             })
         else:
             # Return error with raw response for debugging
+            try:
+                insert_ai_log(g.current_user, None, fullPrompt, ai_text, parsed=None, feedback=parse_error or "Failed to parse AI response", success=False)
+            except Exception:
+                pass
             return jsonify({
                 "status": "error",
                 "message": parse_error or "Failed to parse AI response",
@@ -236,4 +246,33 @@ def chat_proxy():
             }), 500
     except Exception as e:
         print(f"Gemini API Error: {e}")
+        try:
+            insert_ai_log(g.current_user, None, fullPrompt if 'fullPrompt' in locals() else '', '', parsed=None, feedback=str(e), success=False)
+        except Exception:
+            pass
         return jsonify({"status": "error", "message": str(e)}), 500
+
+
+
+@chatProxy_bp.route('/log', methods=['POST'])
+def ai_log_endpoint():
+    """Accept JSON payload and write an AI log entry to MongoDB.
+
+    Expected JSON: { user, deck_id, prompt, raw_response, parsed?, feedback?, success? }
+    """
+    payload = request.get_json(silent=True)
+    if not payload:
+        return jsonify({'ok': False, 'error': 'missing json payload'}), 400
+    user = payload.get('user') or g.current_user
+    deck_id = payload.get('deck_id')
+    prompt = payload.get('prompt', '')
+    raw_response = payload.get('raw_response', '')
+    parsed = payload.get('parsed')
+    feedback = payload.get('feedback')
+    success = payload.get('success', True)
+    extra = payload.get('extra')
+    try:
+        _id = insert_ai_log(user, deck_id, prompt, raw_response, parsed=parsed, feedback=feedback, success=success, extra=extra)
+        return jsonify({'ok': True, 'id': _id})
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 500

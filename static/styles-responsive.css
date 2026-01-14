@@ -14,6 +14,10 @@
 }
 
 /* Prevent horizontal scroll */
+html {
+    overflow-y: scroll;
+}
+
 body {
     overflow-x: hidden;
 }
@@ -56,10 +60,28 @@ h3, .h3 {
 }
 
 /* Logo sizing - responsive */
+/* Logo sizing - responsive */
 .site-header img[alt*="Logo"],
 .site-header img[src*="logo"] {
-    height: clamp(60px, 15vw, 145px) !important;
+    /* DEFAULT OVERRIDDEN FOR HEADER LOGO TO BE STATIC */
+    height: clamp(60px, 15vw, 145px); /* Keep for login/other pages if needed */
+    width: auto;
+}
+
+/* Fixed static header logo */
+/* Fixed static header logo */
+.site-header .header-logo-static {
+    height: 50px !important;
     width: auto !important;
+    max-width: none !important;
+}
+
+/* Allow logo container to expand beyond col-1 width on desktop */
+@media (min-width: 768px) {
+    .site-header .col-1 {
+        width: auto !important;
+        flex: 0 0 auto !important;
+    }
 }
 
 /* Header brand text */
@@ -442,11 +464,26 @@ body.has-mobile-footer {
    ACCESSIBILITY - Reduced Motion
    ======================================== */
 @media (prefers-reduced-motion: reduce) {
-    *,
     *::before,
     *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
+}
+
+/* ========================================
+   HEADER ICON ALIGNMENT FIX
+   ======================================== */
+.site-header .btn,
+.site-header .btn-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+}
+
+.site-header .material-symbols-outlined {
+    vertical-align: middle;
+    line-height: 1 !important;
 }

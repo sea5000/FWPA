@@ -22,14 +22,11 @@
 <body>
 
     <!-- Header -->
-    <header class="w-100 bg-white border-bottom">
+    <header class="w-100 bg-white border-bottom site-header">
       <div class="container d-flex align-items-center justify-content-between py-3">
-        <div class="col-1 d-flex align-items-center justify-content-center py-3">
-          <div class="col-1" style="width:40px;height:40px;color:var(--bs-primary);">
-            <span class="material-symbols-outlined fs-3 text-primary">book</span>
-          </div>
-          <a class="col-1 h3 text-decoration-none text-reset fw-bold" href="{{ url_for('home.index') }}">Bookme</a>
-        </div>
+        <a class="col-1 d-flex align-items-center justify-content-center py-3 text-decoration-none" href="{{ url_for('home.index') }}">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Bookme Logo" class="header-logo-static">
+        </a>
         <nav class="d-none d-md-flex align-items-center gap-2">
           <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('home.index') }}">Home</a>
           <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>

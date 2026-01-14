@@ -13,6 +13,10 @@
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
       rel="stylesheet"
     />
+    <link
+      href="{{ url_for('static', filename='styles-responsive.css') }}"
+      rel="stylesheet"
+    />
     <title>Community - Notes | BookMe</title>
   </head>
 
@@ -85,7 +89,7 @@
             </div>
             <div class="dropdown">
               <a
-                class="btn btn-link text-muted p-0 dropdown-toggle"
+                class="btn btn-link text-muted p-0"
                 href="{{ url_for('profile.index') }}"
                 id="profileDropdown"
                 data-bs-toggle="dropdown"

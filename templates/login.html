@@ -24,6 +24,10 @@
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
       rel="stylesheet"
     />
+    <link
+      href="{{ url_for('static', filename='styles-responsive.css') }}"
+      rel="stylesheet"
+    />
 
     <style>
       :root {
@@ -97,7 +101,7 @@
       /* Main Headings */
       h2.display-6 {
         font-weight: 800 !important;
-        font-size: 4rem;
+        font-size: clamp(2rem, 6vw, 4rem);
         letter-spacing: -1.5px;
         color: var(--color-text-main);
         margin-bottom: 0.5rem;
@@ -302,7 +306,7 @@
             <img
               src="/static/logo.png"
               alt="BookMe Logo"
-              style="height: 145px; width: auto"
+              style="height: clamp(80px, 20vw, 145px); width: auto"
             />
           </a>
         </div>
@@ -332,7 +336,7 @@
           </div>
 
           <div
-            class="mt-5 d-flex flex-row justify-content-center gap-3 animate-up"
+            class="mt-5 d-flex flex-row flex-wrap justify-content-center gap-3 animate-up"
             style="animation-delay: 0.2s"
           >
             <a

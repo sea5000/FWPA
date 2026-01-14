@@ -1,0 +1,403 @@
+/* ========================================
+   RESPONSIVE STYLES - Mobile First Approach
+   ======================================== */
+
+/* ========================================
+   BASE STYLES (Mobile First - 320px+)
+   ======================================== */
+
+/* Ensure proper box-sizing */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* Prevent horizontal scroll */
+body {
+    overflow-x: hidden;
+}
+
+/* Responsive Typography - Fluid scaling */
+h1, .h1 {
+    font-size: clamp(1.75rem, 5vw, 3rem);
+}
+
+h2, .h2 {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+h3, .h3 {
+    font-size: clamp(1.25rem, 3vw, 2rem);
+}
+
+.display-6 {
+    font-size: clamp(2rem, 6vw, 4rem) !important;
+}
+
+.lead {
+    font-size: clamp(1rem, 2.5vw, 1.25rem) !important;
+}
+
+/* Responsive containers */
+.container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* ========================================
+   HEADER RESPONSIVE STYLES
+   ======================================== */
+
+/* Mobile header adjustments */
+.site-header .container {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+/* Logo sizing - responsive */
+.site-header img[alt*="Logo"],
+.site-header img[src*="logo"] {
+    height: clamp(60px, 15vw, 145px) !important;
+    width: auto !important;
+}
+
+/* Header brand text */
+.site-header .h3 {
+    font-size: clamp(1.25rem, 4vw, 1.75rem) !important;
+}
+
+/* Note: .nav-centered visibility is handled by Bootstrap's d-none d-md-flex classes in HTML */
+/* Note: .header-actions positioning is handled by styles-theme.css */
+
+/* ========================================
+   BUTTON RESPONSIVE STYLES
+   ======================================== */
+
+/* Ensure touch-friendly buttons (minimum 44x44px) */
+.btn {
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+}
+
+.btn-lg {
+    min-height: 48px;
+    padding: 0.75rem 1.5rem;
+    font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+}
+
+.btn-sm {
+    min-height: 38px;
+    padding: 0.35rem 0.75rem;
+}
+
+/* Stack buttons on mobile */
+.btn-group-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.btn-group-mobile .btn {
+    width: 100%;
+}
+
+/* ========================================
+   CARD RESPONSIVE STYLES
+   ======================================== */
+
+/* Mobile card spacing */
+.card {
+    margin-bottom: 1rem;
+}
+
+.card-body {
+    padding: 1rem;
+}
+
+/* Card images - maintain aspect ratio */
+.card-img-top {
+    min-height: 150px;
+    max-height: 200px;
+}
+
+/* ========================================
+   FORM RESPONSIVE STYLES
+   ======================================== */
+
+/* Touch-friendly form inputs */
+.form-control,
+.form-select {
+    min-height: 44px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 0.75rem;
+}
+
+.form-label {
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+/* ========================================
+   LOGIN PAGE RESPONSIVE STYLES
+   ======================================== */
+
+/* Login overlay adjustments */
+.login-overlay {
+    padding: 1rem;
+}
+
+.login-card {
+    max-width: 100% !important;
+    margin: 0 auto;
+}
+
+.login-card .card-body {
+    padding: 1.5rem !important;
+}
+
+/* Top badge responsive */
+.top-badge {
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    padding: 6px 16px;
+}
+
+/* Feature pills responsive */
+.feature-pills-container {
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.feature-pill {
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    padding: 8px 16px;
+}
+
+/* ========================================
+   TABLE/LIST RESPONSIVE STYLES
+   ======================================== */
+
+/* Make tables scrollable on mobile */
+.table-responsive-mobile {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* List group mobile adjustments */
+.list-group-item {
+    padding: 0.75rem;
+}
+
+/* ========================================
+   MODAL RESPONSIVE STYLES
+   ======================================== */
+
+.modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem);
+}
+
+.modal-content {
+    border-radius: 1rem;
+}
+
+.modal-body {
+    padding: 1rem;
+}
+
+/* ========================================
+   FOOTER RESPONSIVE STYLES
+   ======================================== */
+
+/* Mobile footer - ensure it doesn't overlap content */
+.fixed-bottom {
+    z-index: 1030;
+}
+
+/* Add padding to body when mobile footer is present */
+body.has-mobile-footer {
+    padding-bottom: 70px;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+/* Responsive spacing */
+.py-mobile-sm {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.px-mobile-sm {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* Hide on mobile */
+.hide-mobile {
+    display: none !important;
+}
+
+/* ========================================
+   SMALL DEVICES (576px and up)
+   ======================================== */
+@media (min-width: 576px) {
+    .container {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    .login-card .card-body {
+        padding: 2rem !important;
+    }
+
+    .modal-dialog {
+        margin: 1.75rem auto;
+        max-width: 500px;
+    }
+
+    .feature-pills-container {
+        gap: 0.75rem;
+        margin-top: 2.5rem;
+    }
+}
+
+/* ========================================
+   MEDIUM DEVICES (768px and up) - Tablet
+   ======================================== */
+@media (min-width: 768px) {
+    /* Show desktop navigation */
+    .nav-centered {
+        display: flex !important;
+    }
+
+    /* Show hide-mobile elements */
+    .hide-mobile {
+        display: block !important;
+    }
+
+    /* Header adjustments */
+    .site-header .container {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    /* Note: .nav-centered and .header-actions positioning is handled by styles-theme.css */
+
+    /* Button groups can be horizontal */
+    .btn-group-mobile {
+        flex-direction: row;
+        width: auto;
+    }
+
+    .btn-group-mobile .btn {
+        width: auto;
+    }
+
+    /* Card spacing */
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .card-img-top {
+        min-height: 180px;
+        max-height: 250px;
+    }
+
+    /* Login page */
+    .login-card {
+        max-width: 440px !important;
+    }
+
+    .login-card .card-body {
+        padding: 2.5rem !important;
+    }
+
+    /* Feature pills */
+    .feature-pills-container {
+        gap: 1rem;
+        margin-top: 3rem;
+    }
+
+    /* Remove mobile footer padding */
+    body.has-mobile-footer {
+        padding-bottom: 0;
+    }
+}
+
+/* ========================================
+   LARGE DEVICES (992px and up)
+   ======================================== */
+@media (min-width: 992px) {
+    .container {
+        max-width: 960px;
+    }
+
+    /* Larger cards */
+    .card-img-top {
+        min-height: 192px;
+        max-height: 280px;
+    }
+
+    .feature-pills-container {
+        gap: 1rem;
+        margin-top: 3.5rem;
+    }
+}
+
+/* ========================================
+   EXTRA LARGE DEVICES (1200px and up)
+   ======================================== */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+}
+
+/* ========================================
+   LANDSCAPE ORIENTATION ADJUSTMENTS
+   ======================================== */
+@media (max-height: 600px) and (orientation: landscape) {
+    /* Reduce vertical spacing in landscape */
+    .py-4 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+
+    .py-5 {
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+    }
+
+    .display-6 {
+        font-size: clamp(1.5rem, 4vw, 2.5rem) !important;
+    }
+
+    .site-header img[alt*="Logo"],
+    .site-header img[src*="logo"] {
+        height: clamp(50px, 12vw, 100px) !important;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY - Reduced Motion
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

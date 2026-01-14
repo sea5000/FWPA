@@ -13,6 +13,7 @@
     <!-- <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap"
         rel="stylesheet"> -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link href="{{ url_for('static', filename='styles-responsive.css') }}" rel="stylesheet">
     <style>
         /* body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -58,7 +59,7 @@
                         </ul>
                     </div>
                     <div class="dropdown">
-                        <a class="btn btn-link text-muted p-0 dropdown-toggle" href="{{ url_for('profile.index') }}"
+                        <a class="btn btn-link text-muted p-0" href="{{ url_for('profile.index') }}"
                             id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile"
                             title="Profile">
                             <span class="material-symbols-outlined fs-3">account_circle</span>

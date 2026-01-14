@@ -19,8 +19,6 @@
     width: 360px;
     max-width: calc(100% - 40px);
     max-height: 70vh;
-    display: none;
-    /* toggled by JS */
     flex-direction: column;
     background: #fff;
     border: 1px solid rgba(0, 0, 0, 0.08);
@@ -29,7 +27,7 @@
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.20);
 }
 
-#floating-chat-panel.show {
+#floating-chat-panel[open] {
     display: flex;
 }
 

@@ -214,8 +214,9 @@ body {
     flex-wrap: wrap;
 }
 
-/* Buttons */
-.btn {
+/* Buttons - scoped to settings to avoid affecting header */
+.settings-container .btn,
+.modal .btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -225,28 +226,33 @@ body {
     transition: all 0.2s ease-in-out;
 }
 
-.btn-sm {
+.settings-container .btn-sm,
+.modal .btn-sm {
     padding: 0.25rem 0.75rem;
     font-size: 0.875rem;
 }
 
-.btn-outline-danger {
+.settings-container .btn-outline-danger,
+.modal .btn-outline-danger {
     color: var(--danger);
     border-color: var(--danger);
     background-color: #fff;
 }
 
-.btn-outline-danger:hover {
+.settings-container .btn-outline-danger:hover,
+.modal .btn-outline-danger:hover {
     background-color: var(--danger);
     color: white;
 }
 
-.btn-danger {
+.settings-container .btn-danger,
+.modal .btn-danger {
     background-color: var(--danger);
     border-color: var(--danger);
 }
 
-.btn-danger:hover {
+.settings-container .btn-danger:hover,
+.modal .btn-danger:hover {
     background-color: #c82333;
     border-color: #bd2130;
 }
@@ -305,3 +311,52 @@ body {
         background-color: #666;
         color: #fff;
     }
+
+/* ============================================
+   HEADER CONSISTENCY FIX - Force profile page header to match other pages
+   ============================================ */
+
+/* Prevent btn-link underline on header icons */
+.site-header .btn-link {
+    text-decoration: none !important;
+}
+
+.site-header .btn-link:hover,
+.site-header .btn-link:focus {
+    text-decoration: none !important;
+}
+
+/* Ensure header buttons don't get profile-settings button styling */
+
+
+/* Material icons in header should remain consistent size */
+.site-header .material-symbols-outlined {
+    font-size: 24px !important;
+}
+
+.site-header .fs-3 {
+    font-size: 1.75rem !important;
+}
+
+/* Desktop: Force header dimensions and spacing to match other pages */
+@media (min-width: 768px) {
+    /* Container must use xl breakpoint width, not xxl */
+    .site-header .container {
+        max-width: 1140px !important;
+        padding: 1rem 1.5rem !important;
+        min-height: 70px;
+    }
+    
+    /* CRITICAL: Force py-3 padding on logo div (Bootstrap class not applying) */
+    .site-header .col-1.d-flex.align-items-center.justify-content-center.py-3 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+    
+    /* Ensure header has proper height */
+    .site-header {
+        min-height: 105px;
+    }
+}
+
+

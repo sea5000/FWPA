@@ -1,58 +1,84 @@
-/* Small theme tweaks to unify spacing and active states */
-:root{
-  --primary: #0d6efd; /* bootstrap primary */
+/* =============================================
+   THEME STYLES - OVERRIDES AND CUSTOMIZATIONS
+   ============================================= */
+
+
+
+/* Login/Signup page logo centering */
+.login-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 400px;
+  margin: 0 auto;
 }
-body{ font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; }
-header .container { max-width: 1120px; }
-header h1 { font-weight: 700; }
-/* header nav link spacing */
-header .nav-link, header .btn{ margin-left: 0.5rem; margin-right:0.5rem; }
-/* active states */
-.nav-link.active, .nav-link.text-primary, .nav-link.fw-bold{ color: var(--primary) !important; font-weight:700; }
-.navbar-btn-active{ background-color: var(--primary) !important; color:#fff !important; }
-/* footer */
-footer .nav-link{ color:#6c757d; }
-footer .nav-link.active, footer .nav-link.text-primary{ color:var(--primary); font-weight:700; }
-/* cards */
-.card{ border-radius: .75rem; }
-.card-img-top{ background-size:cover; background-position:center; }
-/* small helpers */
-.text-muted { color: #6c757d !important; }
 
-/* Footer layout tweaks */
-footer .nav { max-width: 1120px; margin: 0 auto; }
-footer .nav-link { padding-top: .35rem; padding-bottom: .35rem; }
+/* Enhanced focus states for accessibility */
+.form-control:focus, .btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.25);
+}
 
-/* Center and size material icons uniformly */
-.material-symbols-outlined { vertical-align: middle; display: inline-block; line-height: 1; }
-.material-symbols-outlined.fs-4 { font-size: 1.25rem !important; }
+/* Soft shadows for UI elements */
+.dropdown-menu {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
 /* Slightly reduce header button density on small screens */
 @media (max-width: 767px) {
   header .btn-sm { padding:.35rem .6rem; }
 }
 
-/* Header centering and right-side actions (nav centered, icons on the right) */
-.site-header .container { position: relative; }
-.site-header .nav-centered { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
-.site-header .nav-centered .btn { margin-left: .4rem; margin-right: .4rem; }
-.site-header .header-actions { position: absolute; right: 0; top: 50%; transform: translateY(-50%); gap: .5rem; }
-.site-header .header-actions .btn { padding: .25rem .35rem; }
-.site-header .header-actions .material-symbols-outlined { font-size: 1.25rem; }
-
-/* Responsive header improvements for tablet and up */
+/* =============================================
+   DESKTOP HEADER ALIGNMENT (>= 768px)
+   ============================================= */
 @media (min-width: 768px) {
-  .site-header .col-1 {
-    width: auto;
-    flex-direction: row;
+  /* Ensure header container uses flexbox with vertical centering */
+  .site-header .container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    min-height: 70px;
   }
   
-  .site-header .header-actions {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    margin-top: 0;
+  /* Logo section - remove extra padding that causes misalignment */
+  .site-header .col-1 {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem;
+  }
+  
+  /* Navigation - centered, use static positioning */
+  .site-header .nav-centered {
+    position: static !important;
+    display: flex !important;
+    align-items: center !important;
+    transform: none !important;
+    margin: 0 auto;
+  }
+  
+  /* Header actions - remove absolute positioning, use flexbox alignment */
+  .site-header .header-actions,
+  .site-header .d-flex.align-items-center.gap-3 {
+    position: static !important;
+    transform: none !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+  }
+  
+  /* Ensure all button icons are perfectly aligned */
+  .site-header .btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  /* Profile icon - ensure it's the same height as notification icon */
+  .site-header .material-symbols-outlined {
+    vertical-align: middle;
   }
 }
-

@@ -67,8 +67,56 @@ h3, .h3 {
     font-size: clamp(1.25rem, 4vw, 1.75rem) !important;
 }
 
-/* Note: .nav-centered visibility is handled by Bootstrap's d-none d-md-flex classes in HTML */
-/* Note: .header-actions positioning is handled by styles-theme.css */
+/* Mobile: Optimize header for mobile (< 768px) */
+@media (max-width: 767px) {
+    /* Keep header as simple flex row */
+    .site-header .container {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        position: relative;
+    }
+    
+    /* Logo section - keep compact on left */
+    .site-header .col-1 {
+        flex: 0 0 auto !important;
+        width: auto !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        padding: 0 !important;
+        gap: 0.5rem;
+    }
+    
+    /* Hide the navigation links on mobile (they're in footer) */
+    .site-header nav.nav-centered,
+    .site-header .nav-centered {
+        display: none !important;
+    }
+    
+    /* Header actions - always visible on right side, same line as logo */
+    /* Target specifically: direct children divs with the gap-3 class (not nav elements) */
+    .site-header .container > div.d-flex.align-items-center.gap-3,
+    .site-header .container > div:last-child {
+        display: flex !important;
+        position: static !important;
+        flex: 0 0 auto !important;
+        margin-left: auto !important;
+        gap: 0.75rem !important;
+    }
+    
+    /* Ensure proper scrolling on mobile */
+    body {
+        overflow-y: auto !important;
+        height: auto;
+    }
+    
+    /* Add proper padding for mobile footer */
+    .d-flex.flex-column.min-vh-100 {
+        padding-bottom: 70px;
+    }
+}
 
 /* ========================================
    BUTTON RESPONSIVE STYLES
@@ -326,7 +374,8 @@ body.has-mobile-footer {
     }
 
     /* Remove mobile footer padding */
-    body.has-mobile-footer {
+    body.has-mobile-footer,
+    .d-flex.flex-column.min-vh-100 {
         padding-bottom: 0;
     }
 }

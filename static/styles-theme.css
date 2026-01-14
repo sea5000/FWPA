@@ -30,26 +30,6 @@ footer .nav-link { padding-top: .35rem; padding-bottom: .35rem; }
 /* Slightly reduce header button density on small screens */
 @media (max-width: 767px) {
   header .btn-sm { padding:.35rem .6rem; }
-  
-  /* Mobile header adjustments */
-  .site-header .container {
-    flex-wrap: wrap;
-    position: relative;
-  }
-  
-  /* Stack logo and brand on mobile */
-  .site-header .col-1 {
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  }
-  
-  /* Ensure header actions are accessible on mobile */
-  .site-header .header-actions {
-    position: static;
-    transform: none;
-    margin-top: 0.5rem;
-  }
 }
 
 /* Header centering and right-side actions (nav centered, icons on the right) */

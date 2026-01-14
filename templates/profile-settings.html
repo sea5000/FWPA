@@ -27,7 +27,7 @@
 
 <body class="bg-light text-dark">
     <div class="d-flex flex-column min-vh-100">
-        <header class="w-100 site-header bg-white shadow-sm">
+        <header class="w-100 site-header">
             <div class="container d-flex align-items-center justify-content-between py-3">
                 <div class="col-1 d-flex align-items-center justify-content-center py-3">
                     <div class="col-1" style="width:40px;height:40px;color:var(--bs-primary);">
@@ -39,16 +39,25 @@
                 <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
                     <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('home.index') }}">Home</a>
                     <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
-                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('feed.index') }}">Community</a>
-                    <a class="btn btn-sm btn-primary rounded-pill text-white"
+                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('community.index') }}">Community</a>
+                    <a class="btn btn-sm btn-light rounded-pill"
                         href="{{ url_for('challenges.index') }}">Challenge</a>
                 </nav>
-                <div class="d-none d-md-flex align-items-center header-actions">
-                    <a href="#" class="btn btn-link text-muted p-0" aria-label="Notifications" title="Notifications">
-                        <span class="material-symbols-outlined">notifications</span>
-                    </a>
-                    <div class="dropdown ms-3">
-                        <a class="btn btn-link text-primary p-0" href="{{ url_for('profile.index') }}"
+                <div class="d-flex align-items-center gap-3">
+                    <div class="dropdown">
+                        <button type="button" class="btn btn-link text-muted p-0" data-bs-toggle="dropdown"
+                            aria-expanded="false" aria-label="Notifications">
+                            <span class="material-symbols-outlined">notifications</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 300px;">
+                            <li class="text-center text-muted small py-3">
+                                No new notifications. <br>Can't start procrastinating now!
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Profile dropdown -->
+                    <div class="dropdown">
+                        <a class="btn btn-link text-muted p-0" href="{{ url_for('profile.index') }}"
                             id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile"
                             title="Profile">
                             <span class="material-symbols-outlined fs-3">account_circle</span>

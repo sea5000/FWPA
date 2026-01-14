@@ -55,76 +55,122 @@
     <!-- ============================================================================
            HEADER SECTION - Navigation and User Menu
            ============================================================================ -->
-    <header class="w-100 bg-white border-bottom">
-      <div class="container d-flex align-items-center justify-content-between py-3">
-        <!-- Logo Section -->
-        <div class="col-1 d-flex align-items-center justify-content-center py-3">
-          <div class="col-1" style="width: 40px; height: 40px; color: var(--bs-primary)">
-            <!-- Book icon from Material Symbols -->
-            <span class="material-symbols-outlined fs-3 text-primary">book</span>
+      <header class="w-100 bg-white border-bottom">
+        <div
+          class="container d-flex align-items-center justify-content-between py-3"
+        >
+          <!-- Logo Section -->
+          <div
+            class="col-1 d-flex align-items-center justify-content-center py-3"
+          >
+            <div
+              class="col-1"
+              style="width: 40px; height: 40px; color: var(--bs-primary)"
+            >
+              <!-- Book icon from Material Symbols -->
+              <span class="material-symbols-outlined fs-3 text-primary"
+                >book</span
+              >
+            </div>
+            <!-- App title/logo - links to home -->
+            <a
+              class="col-1 h3 text-decoration-none text-reset fw-bold"
+              id="logoButton"
+              href="{{ url_for('home.index') }}"
+              >Bookme</a
+            >
           </div>
-          <!-- App title/logo - links to home -->
-          <a class="col-1 h3 text-decoration-none text-reset fw-bold" id="logoButton"
-            href="{{ url_for('home.index') }}">Bookme</a>
+          
+          <!-- Navigation Links (hidden on mobile, visible on medium+ screens) -->
+          <nav class="d-none d-md-flex align-items-center gap-2">
+            <!-- Home link -->
+            <a
+              class="btn btn-sm btn-light rounded-pill"
+              href="{{ url_for('home.index') }}"
+              >Home</a
+            >
+            <!-- Study link -->
+            <a
+              class="btn btn-sm btn-light rounded-pill"
+              href="{{ url_for('study.index') }}"
+              >Study</a
+            >
+            <!-- Community link - highlighted as current page -->
+            <a
+              class="btn btn-sm btn-primary rounded-pill text-white"
+              href="{{ url_for('community.index') }}"
+              >Community</a
+            >
+            <!-- Challenges link -->
+            <a
+              class="btn btn-sm btn-light rounded-pill"
+              href="{{ url_for('challenges.index') }}"
+              >Challenge</a
+            >
+          </nav>
+          
+          <!-- User Controls (Notifications and Profile) -->
+          <div class="d-none d-md-flex align-items-center gap-3">
+            <!-- Notifications Dropdown -->
+            <div class="dropdown">
+              <button
+                type="button"
+                class="btn btn-link text-muted p-0"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                aria-label="Notifications"
+              >
+                <span class="material-symbols-outlined">notifications</span>
+              </button>
+              <ul
+                class="dropdown-menu dropdown-menu-end p-3"
+                style="width: 300px"
+              >
+                <li class="text-center text-muted small py-3">
+                  No new notifications. <br />Can't start procrastinating now!
+                </li>
+              </ul>
+            </div>
+            
+            <!-- Profile Dropdown Menu -->
+            <div class="dropdown">
+              <a
+                class="btn btn-link text-muted p-0"
+                href="{{ url_for('profile.index') }}"
+                id="profileDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                aria-label="Profile"
+              >
+                <!-- Account circle icon -->
+                <span class="material-symbols-outlined fs-3"
+                  >account_circle</span
+                >
+              </a>
+              <!-- Profile menu items -->
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><h6 class="dropdown-header">Account</h6></li>
+                <li>
+                  <a class="dropdown-item" href="{{ url_for('profile.index') }}"
+                    >Profile & Settings</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <!-- Logout form -->
+                <li>
+                  <form
+                    method="POST"
+                    action="{{ url_for('auth.logout') }}"
+                    class="m-0"
+                  >
+                    <button type="submit" class="dropdown-item">Log out</button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-
-        <!-- Navigation Links (hidden on mobile, visible on medium+ screens) -->
-        <nav class="d-none d-md-flex align-items-center gap-2">
-          <!-- Home link -->
-          <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('home.index') }}">Home</a>
-          <!-- Study link -->
-          <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
-          <!-- Community link - highlighted as current page -->
-          <a class="btn btn-sm btn-primary rounded-pill text-white"
-            href="{{ url_for('community.index') }}">Community</a>
-          <!-- Challenges link -->
-          <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('challenges.index') }}">Challenge</a>
-        </nav>
-
-        <!-- User Controls (Notifications and Profile) -->
-        <div class="d-none d-md-flex align-items-center gap-3">
-          <!-- Notifications Dropdown -->
-          <div class="dropdown">
-            <button type="button" class="btn btn-link text-muted p-0" data-bs-toggle="dropdown" aria-expanded="false"
-              aria-label="Notifications">
-              <span class="material-symbols-outlined">notifications</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 300px">
-              <li class="text-center text-muted small py-3">
-                No new notifications. <br />Can't start procrastinating now!
-              </li>
-            </ul>
-          </div>
-
-          <!-- Profile Dropdown Menu -->
-          <div class="dropdown">
-            <a class="btn btn-link text-muted p-0 dropdown-toggle" href="{{ url_for('profile.index') }}"
-              id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile">
-              <!-- Account circle icon -->
-              <span class="material-symbols-outlined fs-3">account_circle</span>
-            </a>
-            <!-- Profile menu items -->
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li>
-                <h6 class="dropdown-header">Account</h6>
-              </li>
-              <li>
-                <a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a>
-              </li>
-              <li>
-                <hr class="dropdown-divider" />
-              </li>
-              <!-- Logout form -->
-              <li>
-                <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
-                  <button type="submit" class="dropdown-item">Log out</button>
-                </form>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </header>
+      </header>
 
     <!-- ============================================================================
            MAIN CONTENT AREA

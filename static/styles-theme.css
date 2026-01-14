@@ -40,3 +40,19 @@ footer .nav-link { padding-top: .35rem; padding-bottom: .35rem; }
 .site-header .header-actions .btn { padding: .25rem .35rem; }
 .site-header .header-actions .material-symbols-outlined { font-size: 1.25rem; }
 
+/* Responsive header improvements for tablet and up */
+@media (min-width: 768px) {
+  .site-header .col-1 {
+    width: auto;
+    flex-direction: row;
+  }
+  
+  .site-header .header-actions {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-top: 0;
+  }
+}
+

@@ -117,41 +117,49 @@
                             <div class="list-group list-group-flush">
                                 {% for deck in decks%}
                                 <div class="list-group-item py-3">
-                                    <div class="row align-items-center text-center">
+                                    <div class="list-group-item py-3">
+                                        <div class="row text-center align-items-center">
 
-                                        <div class="col">
-                                            <a class="text-primary d-inline-block"
-                                                href="{{ url_for('flashcards.study',deck_id = deck.id) }}">{{deck.name}}</a>
-                                        </div>
-                                        <div class="col-md-4">{{deck.len}}</div>
-                                        <div
-                                            class="col-md-4 d-flex gap-md-1 justify-content-center">
-                                            <div class="col-md-2 btn-group">
-                                                <button type="button"
-                                                    class="btn btn-sm btn-info text-white me-2 dropdown-toggle"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                                    id="statsButton-{{ deck.id }}">Stats</button>
-                                                <div class="dropdown-menu" aria-labelledby="statsButton-{{ deck.id }}">
-                                                    <a class="dropdown-item">Total cards: <strong
-                                                            id="tc-{{deck.id}}"></strong></a>
-                                                    <!-- <a class="dropdown-item" id="tc-{{deck.id}}"></a> -->
-                                                    <a class="dropdown-item">Total correct answers: <strong
-                                                            id="ca-{{deck.id}}"
-                                                            style="color:green"></strong></strong></a>
-                                                    <!-- <a class="dropdown-item"></a> -->
-                                                    <a class="dropdown-item">Total incorrect answers: <strong
-                                                            id="ia-{{deck.id}}" style="color:red"></strong></strong></a>
-                                                    <!-- <a class="dropdown-item"></a> -->
+                                            <!-- Deck Name -->
+                                            <div class="col-12 col-md-4 mb-2 mb-md-0">
+                                                <a class="text-primary d-inline-block"
+                                                    href="{{ url_for('flashcards.study', deck_id=deck.id) }}">
+                                                    {{ deck.name }}
+                                                </a>
+                                            </div>
+
+                                            <!-- Deck Length -->
+                                            <div class="col-12 col-md-4 mb-2 mb-md-0">
+                                                {{ deck.len }}
+                                            </div>
+
+                                            <!-- Buttons Column -->
+                                            <div
+                                                class="col-12 col-md d-flex flex-column flex-md-row gap-2 justify-content-center">
+                                                <!-- Stats Button -->
+                                                <div class="btn-group mb-2 mb-md-0">
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-info text-white dropdown-toggle"
+                                                        data-bs-toggle="dropdown" aria-haspopup="true"
+                                                        aria-expanded="false"
+                                                        id="statsButton-{{ deck.id }}">Stats</button>
+                                                    <div class="dropdown-menu"
+                                                        aria-labelledby="statsButton-{{ deck.id }}">
+                                                        <a class="dropdown-item">Total cards: <strong
+                                                                id="tc-{{deck.id}}"></strong></a>
+                                                        <a class="dropdown-item">Total correct answers: <strong
+                                                                id="ca-{{deck.id}}" style="color:green"></strong></a>
+                                                        <a class="dropdown-item">Total incorrect answers: <strong
+                                                                id="ia-{{deck.id}}" style="color:red"></strong></a>
+                                                    </div>
                                                 </div>
+
+                                                <!-- Edit Button -->
+                                                {% if deck.id in permissions.editor %}
+                                                <a href="{{ url_for('flashcards.edit', deck_id=deck.id) }}"
+                                                    class="btn btn-sm btn-secondary text-white mb-2 mb-md-0">Edit</a>
+                                                {% endif %}
                                             </div>
-                                            <br>
-                                            {% if deck.id in permissions.editor %}
-                                            <div class="col-2">
-                                                
-                                                <a href="{{ url_for('flashcards.edit',deck_id = deck.id) }}"
-                                                    class="btn btn-sm btn-secondary text-white">Edit</a>
-                                            </div>
-                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -172,6 +180,7 @@
                             </div>
                         </div>
                     </div>
+                    <div class="d-md-none d-sm-12" style="height:10vh"></div>
         </main>
         <footer class="d-md-none fixed-bottom bg-white border-top">
             <nav class="nav justify-content-around py-2">

@@ -21,6 +21,7 @@
                 'GRAD' 0,
                 'opsz' 24
         }
+
         .auto-expand {
             overflow: hidden;
             resize: none;
@@ -116,47 +117,57 @@
                         <form method="POST" class="pb-sm-5">
                             <div class="col-12 col-md-8">
                                 <!-- col-12 col-lg-8 -->
-                                 <div class="medium text-muted mb-1">Title:</div>
-                                <h2 class="h2 fw-bold"><textarea class="form-control auto-expand" name="deck_name" rows="1" placeholder="Deck name">{% if deck.name %}{{ deck.name }}{% endif %}</textarea></h2>
+                                <div class="medium text-muted mb-1">Title:</div>
+                                <h2 class="h2 fw-bold"><textarea class="form-control auto-expand" name="deck_name"
+                                        rows="1"
+                                        placeholder="Deck name">{% if deck.name %}{{ deck.name }}{% endif %}</textarea>
+                                </h2>
                                 <div class="medium text-muted mb-1">Summary:</div>
-                                <p class="text-muted mt-1"><textarea class="form-control auto-expand" name="deck_summary" rows="1" placeholder="Deck summary">{% if deck.summary %}{{ deck.summary }}{% endif %}</textarea></p>
-                                <!-- visual break on small screens -->
-                                <hr class="d-md-none my-3" />
+                                <p class="text-muted mt-1"><textarea class="form-control auto-expand"
+                                        name="deck_summary" rows="1"
+                                        placeholder="Deck summary">{% if deck.summary %}{{ deck.summary }}{% endif %}</textarea>
+                                </p>
                             </div>
 
                             <div class="row">
-                                <div class="d-flex flex-column ">
+                                <div class="d-flex flex-column">
                                     <!-- col-12 col-lg-8 -->
                                     <hr class="">
                                     <!-- Header row for list/table labels (visible on medium+ screens) -->
-                                    <div class="row fw-bold border-bottom py-2 d-none d-md-flex text-center">
-                                        <div class="col">Card</div>
-                                        <div class="col">Front</div>
-                                        <div class="col">Back</div>
+                                    <div class="row fw-bold border-bottom py-2 d-none d-md-flex text-center col-12">
+                                        <div class="col-2">Card</div>
+                                        <div class="col col-5">Front</div>
+                                        <div class="col col-5">Back</div>
                                     </div>
 
                                     <input type="hidden" name="deck_id" value="{{deck.id}}" />
-                                    <div class="list-group list-group-flush">
+                                    <div class="list-group list-group-flush col-12">
                                         {% for cardn, card in deck.cards.items() %}
-                                        <div class="list-group-item py-3">
-                                            <div class="row g-2">
-                                                <div class="col-md-1 text-center">
-                                                    <div class="d-md-none small text-muted mb-1">Card</div>
+                                        <div class="list-group-item py-3 ">
+                                            <div
+                                                class="row g-2 align-items-center d-flex flex-row w-100">
+                                                <div class="col-2 text-center">
+                                                    <div class="d-sm-block d-none small text-muted mb-1">Card</div>
                                                     <strong>{{cardn}}</strong>
-                                                    <div class="form-check mt-1 d-flex gap-3 justify-content-center">
+                                                    <div class="form-check mt-1 d-flex gap-md-3 justify-content-center"
+                                                        style="background-color: rgb(255, 205, 205);">
                                                         <input class="form-check-input" type="checkbox"
                                                             name="delete_{{cardn}}" id="delete_{{cardn}}">
                                                         <label class="form-check-label small text-danger"
                                                             for="delete_{{cardn}}">Delete</label>
                                                     </div>
                                                 </div>
-                                                <div class="col-md">
-                                                    <div class="d-md-none small text-muted mb-1">Front</div>
-                                                    <textarea class="form-control auto-expand" name="front_{{cardn}}" rows="1">{{card.front}}</textarea>
-                                                </div>
-                                                <div class="col-md">
-                                                    <div class="d-md-none small text-muted mb-1">Back</div>
-                                                    <textarea class="form-control auto-expand" name="back_{{cardn}}" rows="1">{{card.back}}</textarea>
+                                                <div class="col container d-flex flex-column flex-md-row  w-100 gap-2">
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="d-md-none small text-muted mb-1">Front</div>
+                                                        <textarea class="form-control auto-expand"
+                                                            name="front_{{cardn}}" rows="1">{{card.front}}</textarea>
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="d-md-none small text-muted mb-1">Back</div>
+                                                        <textarea class="form-control auto-expand" name="back_{{cardn}}"
+                                                            rows="1">{{card.back}}</textarea>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -183,11 +194,15 @@
                                                         </div>
                                                         <div class="col">
                                                             <div class="d-md-none small text-muted mb-1">Front</div>
-                                                            <textarea class="form-control auto-expand" placeholder="Front" name="new_front[]" rows="1"></textarea>
+                                                            <textarea class="form-control auto-expand"
+                                                                placeholder="Front" name="new_front[]"
+                                                                rows="1"></textarea>
                                                         </div>
                                                         <div class="col">
                                                             <div class="d-md-none small text-muted mb-1">Back</div>
-                                                            <textarea class="form-control auto-expand" placeholder="Back" name="new_back[]" rows="1"></textarea>
+                                                            <textarea class="form-control auto-expand"
+                                                                placeholder="Back" name="new_back[]"
+                                                                rows="1"></textarea>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -382,7 +397,7 @@
                         <table class="table table-sm">
                             <thead>
                                 <tr>
-                                    <th>Friend</th>
+                                    <th>User</th>
                                     <th class="text-center">Edit</th>
                                     <th class="text-center">Review</th>
                                 </tr>
@@ -411,18 +426,18 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='flashcards_edit.js') }}"></script>
     <script>
-        (function(){
-            function autoExpand(el){
-                if(!el) return;
+        (function () {
+            function autoExpand(el) {
+                if (!el) return;
                 el.style.height = 'auto';
                 el.style.height = (el.scrollHeight) + 'px';
             }
-            document.addEventListener('input', function(e){
+            document.addEventListener('input', function (e) {
                 const t = e.target;
                 if (t && t.classList && t.classList.contains('auto-expand')) autoExpand(t);
             }, true);
-            document.addEventListener('DOMContentLoaded', function(){
-                document.querySelectorAll('.auto-expand').forEach(function(el){ autoExpand(el); });
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.auto-expand').forEach(function (el) { autoExpand(el); });
             });
         })();
     </script>

@@ -66,7 +66,7 @@ def require_auth():
         return user
     g.current_user = user
 
-@chatProxy_bp.route('/', methods=['POST'], endpoint='chatProxy')
+@chatProxy_bp.route('/', methods=['POST', 'OPTIONS'], endpoint='chatProxy')
 def chat_proxy():
     if not client:
         return jsonify({"error": "AI service not available. GEMINI_API_KEY is not configured."}), 503
@@ -276,3 +276,12 @@ def ai_log_endpoint():
         return jsonify({'ok': True, 'id': _id})
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)}), 500
+
+
+@chatProxy_bp.after_request
+def add_cors_headers(response):
+    # Allow requests from any origin for development; restrict in production
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    return response

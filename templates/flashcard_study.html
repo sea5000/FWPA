@@ -77,20 +77,22 @@
                 <div class="row">
                     <div class="col">
                         <!-- col-12 col-lg-8 -->
+                        <div class=" medium text-muted mb-1">Title:</div>
                         <h2 class="h2 fw-bold">{{deck.name}}</h2>
+                        <div class="medium text-muted mb-1">Summary:</div>
                         <t class="text-muted mt-1">{{deck.summary}}</t>
                     </div>
-                    <div class="col text-center align-content-center">
+                    <div class="col-sm text-center align-content-center">
                         <div class="d-flex justify-content-center justify-content-md-end gap-2">
                             <a href="{{ url_for('flashcards.index', deck_id = deck_id) }}"
-                                class="btn btn-outline-warning btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                                class="btn btn-outline-warning btn-md d-md-flex d-sm-inline-grid rounded-pill d-inline-flex align-items-center gap-2">
                                 <span class="material-symbols-outlined" aria-hidden="true"
                                     style="font-size:18px;">Arrow_back</span>
                                 <span class="fw-semibold">Back to Decks</span>
                             </a>
                             {% if deck.id in permissions.editor %}
                             <a href="{{ url_for('flashcards.edit', deck_id = deck_id) }}"
-                                class="btn btn-success btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                                class="btn btn-success btn-md d-md-flex  d-sm-inline-grid rounded-pill d-inline-flex align-items-center gap-2">
                                 <span class="material-symbols-outlined" aria-hidden="true"
                                     style="font-size:18px;">edit</span>
                                 <span class="fw-semibold">Edit</span>
@@ -231,6 +233,7 @@
                     </div>
 
                 </div>
+            <div class="d-md-none d-sm-12" style="height:10vh"></div>
         </main>
         <footer class="d-md-none fixed-bottom bg-white border-top">
             <nav class="nav justify-content-around py-2">

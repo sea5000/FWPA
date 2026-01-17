@@ -1,32 +1,103 @@
 // Dynamic new-card rows for flashcard edit page
 (function () {
+    function renumberAllCards() {
+        const list = document.querySelector('.list-group.list-group-flush');
+        if (!list) return;
+        let idx = 1;
+
+        // Renumber existing server-rendered card items (immediate children that are card rows)
+        Array.from(list.children).forEach(child => {
+            if (!child.classList.contains('list-group-item')) return;
+            // skip the "new cards" container and the final save area
+            if (child.classList.contains('bg-light') || child.classList.contains('text-end')) return;
+
+            // update visible number
+            const strong = child.querySelector('strong');
+            if (strong) strong.textContent = String(idx);
+
+            // update input names for server-side fields
+            const frontEl = child.querySelector('textarea[name^="front_"], input[name^="front_"]');
+            if (frontEl) frontEl.name = 'front_' + idx;
+            const backEl = child.querySelector('textarea[name^="back_"], input[name^="back_"]');
+            if (backEl) backEl.name = 'back_' + idx;
+
+            const delEl = child.querySelector('input[type="checkbox"][name^="delete_"]');
+            if (delEl) {
+                const newName = 'delete_' + idx;
+                const newId = 'delete_' + idx;
+                delEl.name = newName;
+                delEl.id = newId;
+                const lab = child.querySelector('label[for^="delete_"]');
+                if (lab) lab.setAttribute('for', newId);
+            }
+
+            idx++;
+        });
+
+        // Now assign numbers to any new-card rows (they use new_front[] names but should display continuous numbering)
+        const newContainer = document.getElementById('new-cards-container');
+        if (newContainer) {
+            const newRows = Array.from(newContainer.querySelectorAll('.new-card-row')).filter(r => !r.classList.contains('d-none'));
+            newRows.forEach(nr => {
+                const numEl = nr.querySelector('.card-number');
+                if (numEl) numEl.textContent = String(idx);
+                idx++;
+            });
+        }
+    }
+
     function addNewCardRow(front, back) {
         const tmpl = document.getElementById('new-card-template');
         if (!tmpl) return;
+        // Clone the full template so structure/classes are preserved exactly
         const clone = tmpl.cloneNode(true);
-        clone.id = '';
+        // Ensure it doesn't keep the template id and is visible
+        clone.removeAttribute('id');
         clone.classList.remove('d-none');
-        // set values if provided (support input or textarea)
-        if (front !== undefined) {
+        // Ensure expected wrapper class exists
+        if (!clone.classList.contains('new-card-row')) clone.classList.add('new-card-row');
+
+        // set values if provided (support textarea or input)
+        if (front !== undefined && front !== null) {
             const f = clone.querySelector('textarea[name="new_front[]"], input[name="new_front[]"]');
-            if (f) f.value = front;
+            if (f) {
+                f.value = front;
+            }
         }
-        if (back !== undefined) {
+        if (back !== undefined && back !== null) {
             const b = clone.querySelector('textarea[name="new_back[]"], input[name="new_back[]"]');
-            if (b) b.value = back;
+            if (b) {
+                b.value = back;
+            }
         }
+
         // wire remove button
         const btn = clone.querySelector('.remove-new-card');
         if (btn) {
             btn.addEventListener('click', function () {
                 clone.remove();
+                try { window.renumberAllCards && window.renumberAllCards(); } catch (e) { }
             });
         }
-        document.getElementById('new-cards-container').appendChild(clone);
+
+        // Append in the same container as the template so markup matches
+        const container = document.getElementById('new-cards-container');
+        if (container) container.appendChild(clone);
+        else document.getElementById('new-cards-container').appendChild(clone);
+        // Trigger auto-expand on appended textareas now that they're in the DOM
+        try {
+            const autos = clone.querySelectorAll('.auto-expand');
+            autos.forEach(el => {
+                try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) { }
+            });
+        } catch (e) { }
+        // Update numbering after insert
+        try { window.renumberAllCards && window.renumberAllCards(); } catch (e) { }
     }
 
-    // expose for other scripts to programmatically add new card rows
+    // expose for other scripts to programmatically add new card rows and renumbering
     window.addNewCardRow = addNewCardRow;
+    window.renumberAllCards = renumberAllCards;
 
     document.addEventListener('DOMContentLoaded', function () {
         const addBtn = document.getElementById('add-new-card');
@@ -35,6 +106,9 @@
                 addNewCardRow('', '');
             });
         }
+
+        // initialize numbering for any server-rendered cards or pre-existing new rows
+        try { window.renumberAllCards && window.renumberAllCards(); } catch (e) { }
 
         // No prefill-handling necessary; new rows will be added by the user.
     });
@@ -280,6 +354,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                         }
                                     }
                                 });
+                                // Ensure numbering is consistent after AI-inserted cards
+                                try { window.renumberAllCards && window.renumberAllCards(); } catch (e) { }
 
                                 if (parsed && parsed.name) {
                                     const nameField = document.getElementsByName('deck_name')[0];
@@ -367,7 +443,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const shareSearch = document.getElementById('share-search');
         const shareSave = document.getElementById('share-save');
         const shareEmpty = document.getElementById('share-empty');
-        const bsModal = shareModalEl ? new bootstrap.Modal(shareModalEl) : null;
+        // Use a static backdrop + disable ESC to prevent accidental closes
+        const bsModal = shareModalEl ? new bootstrap.Modal(shareModalEl, { backdrop: 'static', keyboard: false }) : null;
 
         function renderList(users, perms) {
             // users: array of profile objects or username strings

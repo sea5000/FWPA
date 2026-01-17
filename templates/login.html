@@ -452,9 +452,9 @@
               <span class="small text-muted">Demo Credentials</span>
               <div class="mt-2 d-flex flex-wrap justify-content-center gap-2">
                 {% for user in users %}
-                <span
-                  class="badge bg-light text-dark border fw-normal py-2 px-3"
-                  >{{ user.username }}</span
+                <button
+                  class="badge bg-light text-dark border fw-normal py-2 px-3" onclick="getElementById('username').value = '{{ user.username }}'"
+                  >{{ user.username }}</button
                 >
                 {% endfor %}
               </div>

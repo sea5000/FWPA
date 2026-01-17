@@ -13,7 +13,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles-flashcards.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-    <link href="{{ url_for('static', filename='styles-responsive.css') }}" rel="stylesheet">
     <style>
         .material-symbols-outlined {
             font-variation-settings:
@@ -35,9 +34,13 @@
     <div class="d-flex flex-column min-vh-100">
         <header class="w-100 site-header">
             <div class="container d-flex align-items-center justify-content-between py-3">
-                <a class="col-1 d-flex align-items-center justify-content-center py-3 text-decoration-none" href="{{ url_for('home.index') }}">
-                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Bookme Logo" class="header-logo-static">
-                </a>
+                <div class="col-1 d-flex align-items-center justify-content-center py-3">
+                    <div class="col-1" style="width:40px;height:40px;color:var(--bs-primary);">
+                        <span class="material-symbols-outlined fs-3 text-primary">book</span>
+                    </div>
+                    <a class="col-1 h3 text-decoration-none text-reset fw-bold" id="logoButton"
+                        href="{{ url_for('home.index') }}">Bookme</a>
+                </div>
                 <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
                     <a class="btn btn-sm btn-primary rounded-pill text-white"
                         href="{{ url_for('home.index') }}">Home</a>
@@ -88,12 +91,6 @@
                                     <span class="material-symbols-outlined" aria-hidden="true"
                                         style="font-size:18px;">Arrow_back</span>
                                     <span class="fw-semibold">Back to Decks</span>
-                                </a>
-                                <a href="{{ url_for('flashcards.deck',deck_id = deck_id) }}"
-                                    class="btn btn-warning btn-sm rounded-pill d-inline-flex align-items-center gap-2">
-                                    <span class="material-symbols-outlined" aria-hidden="true"
-                                        style="font-size:18px;">arrow_back</span>
-                                    <span class="fw-semibold">Exit</span>
                                 </a>
                                 <a role="button" id="deleteBtn"
                                     class="btn btn-outline-danger btn-sm rounded-pill d-inline-flex align-items-center gap-2">
@@ -185,6 +182,7 @@
                                                     <div class="row g-2 align-items-center">
                                                         <div class="col-1 text-center">
                                                             <div class="d-md-none small text-muted mb-1">Card</div>
+                                                            <strong class="card-number d-none d-sm-block"></strong>
                                                             <button type="button"
                                                                 class="btn btn-sm btn-outline-danger remove-new-card"
                                                                 title="Remove">×</button>
@@ -255,7 +253,7 @@
     </button>
 
     <!-- Chat panel -->
-    <div id="floating-chat-panel" role="dialog" aria-hidden="true" aria-label="Chat window">
+    <div id="floating-chat-panel" role="dialog" aria-hidden="true" aria-label="Chat window" style="display:none;">
         <div id="floating-chat-header">
             <div>
                 <div class="chat-title">AI Assistant</div>
@@ -270,8 +268,7 @@
 
         <div id="floating-chat-body">
             <!-- Message area (placeholder) -->
-            <div class="text-muted small">Type flashcard dreams request here... You can also provide a reference
-                doc.
+            <div class="text-muted small">Type flashcard dreams request here... You can also provide a reference doc.
             </div>
         </div>
 
@@ -295,68 +292,83 @@
 
     <script>
         (function () {
-            const openBtn = document.getElementById('floating-chat-button');
-            const panel = document.getElementById('floating-chat-panel');
-            const closeBtn = document.getElementById('floating-chat-close');
-            const minimizeBtn = document.getElementById('floating-chat-minimize');
-            const fileDrop = document.getElementById('file-drop');
-            const fileInput = document.getElementById('file-drop-input');
-            const sendBtn = document.getElementById('chat-send-btn');
-            const msgInput = document.getElementById('chat-message-input');
+            try {
+                const openBtn = document.getElementById('floating-chat-button');
+                const panel = document.getElementById('floating-chat-panel');
+                const closeBtn = document.getElementById('floating-chat-close');
+                const fileDrop = document.getElementById('file-drop');
+                const fileInput = document.getElementById('file-drop-input');
+                const msgInput = document.getElementById('chat-message-input');
 
-            function showPanel() {
-                panel.classList.add('show');
-                panel.setAttribute('aria-hidden', 'false');
-                msgInput.focus();
-            }
-            function hidePanel() {
+                if (!panel) return;
+
+                // Ensure panel hidden by default on load
                 panel.classList.remove('show');
                 panel.setAttribute('aria-hidden', 'true');
-            }
-            function togglePanel() {
-                panel.classList.contains('show') ? hidePanel() : showPanel();
-            }
 
-            openBtn.addEventListener('click', function () { togglePanel(); });
-
-            closeBtn.addEventListener('click', function () { hidePanel(); });
-
-            // File drop UI (no functional upload)
-            fileDrop.addEventListener('click', () => fileInput.click());
-            ['dragenter', 'dragover'].forEach(ev => {
-                fileDrop.addEventListener(ev, function (e) {
-                    e.preventDefault(); e.stopPropagation();
-                    fileDrop.classList.add('dragover');
-                });
-            });
-            ['dragleave', 'drop'].forEach(ev => {
-                fileDrop.addEventListener(ev, function (e) {
-                    e.preventDefault(); e.stopPropagation();
-                    fileDrop.classList.remove('dragover');
-                });
-            });
-            fileDrop.addEventListener('drop', function (e) {
-                // e.dataTransfer.files is available here; left for implementation
-                // const files = e.dataTransfer.files;
-            });
-            fileInput.addEventListener('change', function (e) {
-                // selected files are available via fileInput.files; left for implementation
-            });
-
-
-            // Close on ESC
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') hidePanel();
-            });
-
-            // Close when clicking outside panel (except the floating button)
-            document.addEventListener('click', function (e) {
-                const target = e.target;
-                if (!panel.contains(target) && !openBtn.contains(target)) {
-                    // do not auto-close if panel is not shown
-                    if (panel.classList.contains('show')) hidePanel();
+                function showPanel() {
+                    panel.classList.add('show');
+                    panel.setAttribute('aria-hidden', 'false');
+                    panel.style.display = 'flex';
+                    if (msgInput && typeof msgInput.focus === 'function') msgInput.focus();
                 }
-            });
+                function hidePanel() {
+                    panel.classList.remove('show');
+                    panel.setAttribute('aria-hidden', 'true');
+                    panel.style.display = 'none';
+                }
+                function togglePanel() {
+                    panel.classList.contains('show') ? hidePanel() : showPanel();
+                }
+
+                // Use stopPropagation on button/panel clicks so document-level listener
+                // doesn't immediately close the panel after opening.
+                if (openBtn && openBtn.addEventListener) openBtn.addEventListener('click', function (e) { e.stopPropagation(); togglePanel(); });
+                if (closeBtn && closeBtn.addEventListener) closeBtn.addEventListener('click', function (e) { e.stopPropagation(); hidePanel(); });
+
+                // Prevent clicks inside the panel from bubbling to document (which closes it)
+                panel.addEventListener('click', function (e) { e.stopPropagation(); });
+
+                // File drop UI (no functional upload)
+                if (fileDrop && fileInput) {
+                    fileDrop.addEventListener('click', () => fileInput.click());
+                    ['dragenter', 'dragover'].forEach(ev => {
+                        fileDrop.addEventListener(ev, function (e) {
+                            e.preventDefault(); e.stopPropagation();
+                            fileDrop.classList.add('dragover');
+                        });
+                    });
+                    ['dragleave', 'drop'].forEach(ev => {
+                        fileDrop.addEventListener(ev, function (e) {
+                            e.preventDefault(); e.stopPropagation();
+                            fileDrop.classList.remove('dragover');
+                        });
+                    });
+                    fileDrop.addEventListener('drop', function (e) {
+                        // e.dataTransfer.files is available here; left for implementation
+                    });
+                    fileInput.addEventListener('change', function (e) {
+                        // selected files are available via fileInput.files; left for implementation
+                    });
+                }
+
+                // Close on ESC when panel is open
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && panel.classList.contains('show')) hidePanel();
+                });
+
+                // Close when clicking outside panel (except the floating button)
+                document.addEventListener('click', function (e) {
+                    const target = e.target;
+                    const clickedInsidePanel = target.closest && target.closest('#floating-chat-panel');
+                    const clickedOnButton = target.closest && target.closest('#floating-chat-button');
+                    if (!clickedInsidePanel && !clickedOnButton) {
+                        if (panel.classList.contains('show')) hidePanel();
+                    }
+                });
+            } catch (err) {
+                console.error('Chat panel init error', err);
+            }
         })();
     </script>
     <footer class="d-md-none fixed-bottom bg-white border-top">

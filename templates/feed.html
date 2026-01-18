@@ -1,219 +1,276 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-  <!-- Meta tags for charset and responsive design -->
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+{% block title %}Community - Feed | BookMe{% endblock %}
 
-  <!-- Bootstrap CSS Framework for responsive layout and components -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-  <!-- Material Symbols Icons library -->
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-  <link href="{{ url_for('static', filename='styles-responsive.css') }}" rel="stylesheet" />
-
-  <title>Community - Feed | BookMe</title>
-
-  <!-- Custom styles for feed elements -->
-  <style>
-    /* Post avatar - circular user profile pictures */
-    .post-avatar {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      /* Make circular */
-      object-fit: cover;
-      /* Crop image to fill circle */
-    }
-
-    /* Images posted in posts */
-    .post-image {
-      max-width: 100%;
-      border-radius: 8px;
-      margin-top: 12px;
-    }
-
-    /* Like/comment/share action buttons */
-    .post-actions button {
-      background: none;
-      border: none;
-      color: #666;
-      padding: 8px 16px;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-
-    /* Button hover effect - change to primary color */
-    .post-actions button:hover {
-      color: #2badee;
-    }
-  </style>
-  <link href="{{ url_for('static', filename='styles-responsive.css') }}" rel="stylesheet" />
-  <style>
-    /* Streak button styling */
-    .streak-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background-color: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      color: #64748b;
-      text-decoration: none;
-      font-size: 0.875rem;
-      font-weight: 600;
-      transition: all 0.2s ease;
-    }
-
-    .streak-btn:hover {
-      background-color: #e2e8f0;
-      color: #475569;
-    }
-
-    .streak-btn .material-symbols-outlined {
-      font-size: 1.25rem;
-      color: #f59e0b;
-    }
-
-    /* Fine-tune navigation centering */
-    @media (min-width: 768px) {
-      .site-header .nav-centered {
-        margin-left: 14px;
-      }
-    }
-  </style>
-</head>
-
-<body class="bg-light">
-  <div class="d-flex flex-column min-vh-100">
-    <!-- ============================================================================
-           HEADER SECTION - Navigation and User Menu
-           ============================================================================ -->
-          <header class="w-100 site-header">
-      <div class="container position-relative d-flex align-items-center justify-content-between py-3">
-        <!-- Logo -->
-        <a class="col-1 d-flex align-items-center justify-content-center py-3 text-decoration-none"
-          href="{{ url_for('home.index') }}">
-          <img src="{{ url_for('static', filename='logo.png') }}" alt="Bookme Logo" class="header-logo-static">
-        </a>
+{% block head %}
+    <style>
+        /* ===================================
+           PAGE-SPECIFIC: FEED
+           =================================== */
         
-        <!-- Centered Navigation -->
-        <nav class="nav-centered d-none d-md-flex align-items-center gap-2 position-absolute top-50 start-50 translate-middle">
-          <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('home.index') }}">Home</a>
-          <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
-          <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('community.index') }}">Community</a>
-        </nav>
-        
-        <!-- Right side: Streak, Notification, Profile -->
-        <div class="d-none d-md-flex align-items-center gap-3">
-          <!-- Streak button -->
-          <a href="{{ url_for('streak.index') }}" class="streak-btn">
-            <span class="material-symbols-outlined">local_fire_department</span>
-            <span>{{ studyData.streak if studyData is defined else 0 }} DAY STREAK</span>
-          </a>
-          
-          <!-- Notification dropdown -->
-          <div class="dropdown">
-            <button type="button" class="btn btn-link text-muted p-0" data-bs-toggle="dropdown"
-              aria-expanded="false" aria-label="Notifications">
-              <span class="material-symbols-outlined">notifications</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 300px;">
-              <li class="text-center text-muted small py-3">
-                No new notifications. <br>Can't start procrastinating now!
-              </li>
-            </ul>
-          </div>
-          
-          <!-- Profile dropdown -->
-          <div class="dropdown">
-            <a class="btn btn-link text-muted p-0" href="{{ url_for('profile.index') }}"
-              id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile"
-              title="Profile">
-              <span class="material-symbols-outlined fs-3">account_circle</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-              <li>
-                <h6 class="dropdown-header">Account</h6>
-              </li>
-              <li>
-                <a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a>
-              </li>
-              <li>
-                <hr class="dropdown-divider" />
-              </li>
-              <li>
-                <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
-                  <button type="submit" class="dropdown-item">Log out</button>
-                </form>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </header>
+        .community-page-content {
+            background-color: #fff;
+        }
 
-    <!-- ============================================================================
-           MAIN CONTENT AREA
-           ============================================================================ -->
+        .community-title {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 4.5rem;
+            color: #1c1c1c;
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+        }
+
+        .community-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-bottom: 4rem;
+        }
+
+        /* Custom Tabs */
+        .nav-tabs-custom {
+            border-bottom: 1px solid #eee;
+            margin-bottom: 3rem;
+            display: flex;
+            gap: 2rem;
+            padding-bottom: 0;
+        }
+
+        .nav-link-custom {
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #999;
+            text-decoration: none;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-link-custom:hover {
+            color: #1a1a1a;
+        }
+
+        .nav-link-custom.active {
+            color: #1a1a1a;
+            border-bottom-color: #1a1a1a;
+        }
+
+        /* Feed Specific Styles */
+        .feed-card {
+            background-color: #fff;
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #f0f0f0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        }
+
+        .feed-card:hover {
+            box-shadow: 0 4px 25px rgba(0,0,0,0.04);
+        }
+
+        .post-input {
+            border: none;
+            resize: none;
+            font-size: 1rem;
+            color: #1c1c1c;
+            background: transparent;
+            padding: 0.5rem 0;
+        }
+        
+        .post-input:focus {
+            box-shadow: none;
+            outline: none;
+            background: transparent;
+        }
+
+        .post-input::placeholder {
+            color: #999;
+            font-weight: 300;
+        }
+
+        .add-image-btn {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #666;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .add-image-btn:hover {
+            color: #1a1a1a;
+        }
+
+        /* Feed Post Typography */
+        .post-author-name {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 1.1rem;
+            color: #1c1c1c;
+            font-weight: 400;
+        }
+
+        .post-time {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .post-text {
+            color: #444;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+
+        .post-footer-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #666;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: none;
+            border: none;
+            padding: 0;
+            text-decoration: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .post-footer-btn:hover {
+            color: #1a1a1a;
+        }
+        
+        .post-footer-btn .material-symbols-outlined {
+            font-size: 18px;
+        }
+
+        /* Post avatar */
+        .post-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Images posted in posts */
+        .post-image {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        /* Like/comment/share action buttons */
+        .post-actions button {
+            background: none;
+            border: none;
+            color: #666;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .post-actions button:hover {
+            color: #2badee;
+        }
+
+        /* Black pill button for post */
+        .btn-black-pill {
+            background-color: #1a1a1a;
+            color: #fff;
+            border-radius: 100px;
+            padding: 12px 24px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .btn-black-pill:hover {
+            background-color: #333;
+            color: #fff;
+        }
+    </style>
+{% endblock %}
+
+{% block body_attrs %}class="community-page-content text-dark"{% endblock %}
+
+{% block content %}
+    <!-- Main Content -->
     <main class="flex-grow-1">
       <div class="container my-5">
-        <!-- Page Title -->
-        <div class="d-flex align-items-center justify-content-between mb-4">
-          <div>
-            <h2 class="h3 mb-0">Community</h2>
-            <small class="text-muted">Connect and share knowledge</small>
-          </div>
+        <!-- Page Header -->
+        <div class="mb-5">
+            <h1 class="community-title">Community Hub</h1>
+            <p class="community-subtitle">Connect and share knowledge with fellow learners.</p>
+            
+            <!-- Custom Tabs -->
+            <div class="nav-tabs-custom">
+                <a href="{{ url_for('community.index') }}" class="nav-link-custom">Notes</a>
+                <a href="{{ url_for('friends.index') }}" class="nav-link-custom">Friends</a>
+                <a href="{{ url_for('feed.index') }}" class="nav-link-custom active">Feed</a>
+            </div>
         </div>
 
-        <!-- Navigation Tabs: Notes | Friends | Feed -->
-        <ul class="nav nav-tabs mb-4">
-          <li class="nav-item">
-            <!-- Link to Notes section -->
-            <a class="nav-link" href="{{ url_for('community.index') }}">📝 Notes</a>
-          </li>
-          <li class="nav-item">
-            <!-- Link to Friends section -->
-            <a class="nav-link" href="{{ url_for('friends.index') }}">👥 Friends</a>
-          </li>
-          <li class="nav-item">
-            <!-- Feed tab - active (current page) -->
-            <a class="nav-link active" href="{{ url_for('feed.index') }}">📰 Feed</a>
-          </li>
-        </ul>
+        <!-- Create Post Section -->
+        <div class="feed-card">
+          <div class="d-flex gap-4">
+             <!-- User Avatar -->
+             <div class="flex-shrink-0">
+                {% if profileData and profileData.profile_pic %}
+                <img src="{{ profileData.profile_pic }}" class="post-avatar" alt="Your avatar" />
+                {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ profileData.name or username }}&background=E0C9A6&color=fff&size=60"
+                  class="post-avatar" alt="Your avatar" />
+                {% endif %}
+             </div>
+             
+             <!-- Content Area -->
+             <div class="flex-grow-1">
+                 <textarea id="postText" class="post-input form-control p-0" rows="2"
+                   placeholder="Share your study progress, notes, or thoughts..."></textarea>
+                 
+                 <!-- Image Preview Container -->
+                 <div id="imagePreview" class="mt-3 d-none">
+                     <img src="" class="img-fluid rounded-3" style="max-height: 200px; object-fit: cover;">
+                     <button type="button" class="btn-close position-absolute" style="margin-left: -25px; margin-top: 5px;" onclick="clearImage()"></button>
+                 </div>
 
-        <!-- ============================================================================
-               CREATE POST SECTION
-               ============================================================================ -->
-        <div class="card p-4 mb-4">
-          <!-- User avatar + text input -->
-          <div class="d-flex align-items-start gap-3 mb-3">
-            {% if profileData and profileData.profile_pic %}
-            <!-- Show user's uploaded profile picture -->
-            <img src="{{ profileData.profile_pic }}" class="post-avatar" alt="Your avatar" />
-            {% else %}
-            <!-- Generate default avatar from initials if no picture -->
-            <img
-              src="https://ui-avatars.com/api/?name={{ profileData.name or username }}&background=0D6EFD&color=fff&size=60"
-              class="post-avatar" alt="Your avatar" />
-            {% endif %}
-            <!-- Text input for post content -->
-            <textarea id="postText" class="form-control" rows="3"
-              placeholder="Share your study progress, notes, or thoughts..."></textarea>
-          </div>
-
-          <!-- Image upload input -->
-          <div class="mb-3">
-            <input type="file" id="postImage" class="form-control" accept="image/*" />
-            <small class="text-muted">Optional: Add an image to your post</small>
-          </div>
-          <div class="d-flex justify-content-end">
-            <button class="btn btn-primary" onclick="createPost()">
-              <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle">send</span>
-              Post
-            </button>
+                 <div class="d-flex justify-content-between align-items-center mt-4 border-top pt-3">
+                     <div>
+                         <input type="file" id="postImage" class="d-none" accept="image/*" onchange="previewImage(this)">
+                         <button class="add-image-btn" onclick="document.getElementById('postImage').click()">
+                             <span class="material-symbols-outlined fs-5">image</span>
+                             Add Image
+                         </button>
+                     </div>
+                     <button class="btn-black-pill" onclick="createPost()">
+                         POST
+                     </button>
+                 </div>
+             </div>
           </div>
         </div>
 
@@ -243,7 +300,6 @@
           <small class="d-block">Community</small></a>
       </nav>
     </footer>
-  </div>
 
   <!-- Comment Modal -->
   <div class="modal fade" id="commentModal" tabindex="-1">
@@ -265,8 +321,9 @@
       </div>
     </div>
   </div>
+{% endblock %}
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}
   <script>
     let activePostId = null;
 
@@ -298,6 +355,28 @@
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
+    }
+
+    // Image Preview Helper
+    function previewImage(input) {
+        const previewDiv = document.getElementById('imagePreview');
+        const img = previewDiv.querySelector('img');
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                previewDiv.classList.remove('d-none');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    function clearImage() {
+        const input = document.getElementById('postImage');
+        const previewDiv = document.getElementById('imagePreview');
+        input.value = '';
+        previewDiv.classList.add('d-none');
     }
 
     // Create Post
@@ -333,7 +412,7 @@
         if (response.ok) {
           textInput.value = "";
           imageInput.value = "";
-          loadFeed();
+          renderFeed();
         } else {
           alert("Failed to create post. Please try again.");
         }
@@ -510,9 +589,90 @@
       }
     }
 
-    // Load feed on page load
-    document.addEventListener("DOMContentLoaded", loadFeed);
-  </script>
-</body>
+    // New Render Feed Logic (Community Hub Design)
+    async function renderFeed() {
+      const container = document.getElementById("feedContainer");
 
-</html>
+      try {
+        const res = await fetch("/feed/api/feed/posts");
+        const posts = await res.json();
+
+        if (!posts || posts.length === 0) {
+          container.innerHTML = `
+                        <div class="card p-5 text-center">
+                            <span class="material-symbols-outlined" style="font-size: 64px; color: #ccc;">feed</span>
+                            <h5 class="mt-3">No posts yet</h5>
+                            <p class="text-muted">Be the first to share something!</p>
+                        </div>
+                    `;
+          return;
+        }
+
+        container.innerHTML = "";
+        posts.forEach((post) => {
+          const card = document.createElement("div");
+          card.className = "feed-card";
+
+          const authorName = post.author || "Unknown";
+          const avatarUrl = post.author_profile_pic 
+              ? post.author_profile_pic 
+              : `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random&color=fff&size=60`;
+
+          card.innerHTML = `
+              <!-- Post Header -->
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div class="d-flex align-items-center gap-3">
+                      <img src="${avatarUrl}" class="post-avatar" alt="${authorName}">
+                      <div>
+                          <div class="post-author-name">${authorName}</div>
+                          <div class="post-time">${formatPostTime(post.timestamp)}</div>
+                      </div>
+                  </div>
+                  <button class="btn btn-link text-muted p-0">
+                      <span class="material-symbols-outlined">more_horiz</span>
+                  </button>
+              </div>
+
+              <!-- Post Content -->
+              <div class="mb-4">
+                  <p class="post-text">${post.text}</p>
+                  ${post.image ? `<img src="${post.image}" class="img-fluid rounded-4 w-100 mt-2" alt="Post custom image">` : ''}
+              </div>
+
+              <!-- Post Footer -->
+              <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                  <div class="d-flex gap-4">
+                      <span class="d-flex align-items-center gap-2" style="cursor: pointer" onclick="likePost('${post._id}')">
+                           <span class="material-symbols-outlined ${post.is_liked ? 'text-danger' : ''}">favorite</span>
+                           ${post.likes || 0}
+                      </span>
+                      
+                      <span class="d-flex align-items-center gap-2" style="cursor: pointer" onclick="openComments('${post._id}')">
+                           <span class="material-symbols-outlined">chat_bubble</span>
+                           ${post.comments ? post.comments.length : 0}
+                      </span>
+                  </div>
+                  
+                  <button class="post-footer-btn">
+                      <span class="material-symbols-outlined">share</span>
+                      SHARE
+                  </button>
+              </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (e) {
+        console.error(e);
+        container.innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>Error loading feed</strong><br>
+                        Please refresh the page or try again later.
+                    </div>
+                `;
+      }
+    }
+
+    // Load feed on page load
+    document.addEventListener("DOMContentLoaded", renderFeed);
+  </script>
+{% endblock %}

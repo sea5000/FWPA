@@ -2,6 +2,64 @@
    THEME STYLES - OVERRIDES AND CUSTOMIZATIONS
    ============================================= */
 
+/* =============================================
+   CSS VARIABLES
+   ============================================= */
+:root {
+    --font-serif: 'Playfair Display', serif;
+    --font-sans: 'Inter', sans-serif;
+    --color-dark: #1a1a1a;
+    --color-muted: #64748b;
+    --color-amber: #f59e0b;
+    --bg-light: #f1f5f9;
+    --border-light: #e2e8f0;
+}
+
+/* =============================================
+   BASE TYPOGRAPHY
+   ============================================= */
+body {
+    font-family: var(--font-sans);
+}
+
+h1, h2, h3 {
+    font-family: var(--font-serif);
+}
+
+/* =============================================
+   STREAK BUTTON (Header)
+   ============================================= */
+.streak-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    color: var(--color-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.streak-btn:hover {
+    background-color: var(--border-light);
+    color: #475569;
+}
+
+.streak-btn .material-symbols-outlined {
+    font-size: 1.25rem;
+    color: var(--color-amber);
+}
+
+/* Navigation centering offset */
+@media (min-width: 768px) {
+    .site-header .nav-centered {
+        margin-left: 14px;
+    }
+}
 
 
 /* Login/Signup page logo centering */

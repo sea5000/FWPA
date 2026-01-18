@@ -1,27 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0">
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Bookme - Study Mode</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block title %}Bookme - Study Mode{% endblock %}
 
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-    <link href="{{ url_for('static', filename='styles-responsive.css') }}" rel="stylesheet">
+{% block head %}
     <style>
-        :root {
-            --font-serif: 'Playfair Display', serif;
-            --font-sans: 'Inter', sans-serif;
-        }
-
-        /* Scope specific page styles */
+        /* ===================================
+           PAGE-SPECIFIC: STUDY DASHBOARD
+           =================================== */
         .study-page-content {
-            font-family: var(--font-sans);
             background-color: #FAFAF9;
         }
 
@@ -143,107 +129,14 @@
             background-color: #1a1a1a;
             color: #fff;
         }
-        
-        /* HEADER FIXES MATCHING HOME.HTML */
-        .streak-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background-color: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            color: #64748b;
-            text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-
-        .streak-btn:hover {
-            background-color: #e2e8f0;
-            color: #475569;
-        }
-
-        .streak-btn .material-symbols-outlined {
-            font-size: 1.25rem;
-            color: #f59e0b;
-        }
-
-        /* Force proper nav offset like home.html */
-        @media (min-width: 768px) {
-            .site-header .nav-centered {
-                margin-left: 14px;
-            }
-        }
     </style>
-</head>
+{% endblock %}
 
-<body class="study-page-content">
-    <div class="d-flex flex-column min-vh-100">
-        <header class="w-100 site-header">
-            <div class="container position-relative d-flex align-items-center justify-content-between py-3">
-                <!-- Logo -->
                 <a class="col-1 d-flex align-items-center justify-content-center py-3 text-decoration-none"
                     href="{{ url_for('home.index') }}">
-                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Bookme Logo"
-                        class="header-logo-static">
-                </a>
-                
-                <!-- Centered Navigation -->
-                <nav class="nav-centered d-none d-md-flex align-items-center gap-2 position-absolute top-50 start-50 translate-middle">
-                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('home.index') }}">Home</a>
-                    <a class="btn btn-sm btn-primary rounded-pill text-white" href="{{ url_for('study.index') }}">Study</a>
-                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('community.index') }}">Community</a>
-                </nav>
-                
-                <!-- Right side: Streak, Notification, Profile -->
-                <div class="d-none d-md-flex align-items-center gap-3">
-                    <!-- Streak button -->
-                    <a href="{{ url_for('streak.index') }}" class="streak-btn">
-                        <span class="material-symbols-outlined">local_fire_department</span>
-                        <span>{{ studyData.streak if studyData is defined else 0 }} DAY STREAK</span>
-                    </a>
-                    
-                    <!-- Notification dropdown -->
-                    <div class="dropdown">
-                        <button type="button" class="btn btn-link text-muted p-0" data-bs-toggle="dropdown"
-                            aria-expanded="false" aria-label="Notifications">
-                            <span class="material-symbols-outlined">notifications</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 300px;">
-                            <li class="text-center text-muted small py-3">
-                                No new notifications. <br>Can't start procrastinating now!
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Profile dropdown -->
-                    <div class="dropdown">
-                        <a class="btn btn-link text-muted p-0" href="{{ url_for('profile.index') }}"
-                            id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile"
-                            title="Profile">
-                            <span class="material-symbols-outlined fs-3">account_circle</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                            <li>
-                                <h6 class="dropdown-header">Account</h6>
-                            </li>
-                            <li><a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
-                                    <button type="submit" class="dropdown-item">Log out</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </header>
+{% block body_attrs %}class="study-page-content"{% endblock %}
+
+{% block content %}
         <main class="flex-grow-1 py-5">
             <!-- Title Section -->
             <div class="container text-center mb-5 mt-4">
@@ -320,8 +213,9 @@
                     <small class="d-block">Community</small></a>
             </nav>
         </footer>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+
+{% block scripts %}
     <script>
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -368,6 +262,4 @@
             } catch (e) { }
         });
     </script>
-</body>
-
-</html>
+{% endblock %}

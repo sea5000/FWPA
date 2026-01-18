@@ -1,20 +1,9 @@
 {% extends "base.html" %}
 
-<<<<<<< HEAD
 {% block title %}Bookme Dashboard{% endblock %}
 
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='styles-flashcards.css') }}">
-=======
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Bookme Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles-flashcards.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-    <link href="{{ url_for('static', filename='styles-responsive.css') }}" rel="stylesheet" />
->>>>>>> de2ccf86e707ed60fa630363a55a176c70087fc7
     <style>
         .material-symbols-outlined {
             font-variation-settings:
@@ -24,142 +13,20 @@
                 'opsz' 24
         }
 
-        /* class used for autoexpanded textboxes */
         .auto-expand {
             overflow: hidden;
             resize: none;
             text-align: left;
         }
-
-        /* Streak button styling */
-        .streak-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background-color: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            color: #64748b;
-            text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-
-        .streak-btn:hover {
-            background-color: #e2e8f0;
-            color: #475569;
-        }
-
-        .streak-btn .material-symbols-outlined {
-            font-size: 1.25rem;
-            color: #f59e0b;
-        }
-
-        /* Fine-tune navigation centering */
-        @media (min-width: 768px) {
-            .site-header .nav-centered {
-                margin-left: 14px;
-            }
-        }
-
-        .flashcards-page .btn-primary,
-        .flashcards-page .btn-info {
-            background-color: #000 !important;
-            border-color: #000 !important;
-            color: #fff !important;
-        }
-
-        .flashcards-page .btn:hover,
-        .flashcards-page .btn:focus {
-            background-color: #333 !important;
-            border-color: #333 !important;
-            color: #fff !important;
-            transform: translateY(-1px) !important;
-        }
     </style>
-<<<<<<< HEAD
 {% endblock %}
 
 {% block body_attrs %}class="bg-light text-dark"{% endblock %}
 
 {% block content %}
-=======
-</head>
-
-<body class="bg-light text-dark">
-    <div class="d-flex flex-column min-vh-100">
-        <header class="w-100 site-header">
-            <div class="container position-relative d-flex align-items-center justify-content-between py-3">
-                <!-- Logo -->
-                <a class="col-1 d-flex align-items-center justify-content-center py-3 text-decoration-none"
-                    href="{{ url_for('home.index') }}">
-                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Bookme Logo"
-                        class="header-logo-static">
-                </a>
-
-                <!-- Centered Navigation -->
-                <nav
-                    class="nav-centered d-none d-md-flex align-items-center gap-2 position-absolute top-50 start-50 translate-middle">
-                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('home.index') }}">Home</a>
-                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
-                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('community.index') }}">Community</a>
-                </nav>
-
-                <!-- Right side: Streak, Notification, Profile -->
-                <div class="d-none d-md-flex align-items-center gap-3">
-                    <!-- Streak button -->
-                    <a href="{{ url_for('streak.index') }}" class="streak-btn">
-                        <span class="material-symbols-outlined">local_fire_department</span>
-                        <span>{{ studyData.streak if studyData is defined else 0 }} DAY STREAK</span>
-                    </a>
-
-                    <!-- Notification dropdown -->
-                    <div class="dropdown">
-                        <button type="button" class="btn btn-link text-muted p-0" data-bs-toggle="dropdown"
-                            aria-expanded="false" aria-label="Notifications">
-                            <span class="material-symbols-outlined">notifications</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 300px;">
-                            <li class="text-center text-muted small py-3">
-                                No new notifications. <br>Can't start procrastinating now!
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Profile dropdown -->
-                    <div class="dropdown">
-                        <a class="btn btn-link text-muted p-0" href="{{ url_for('profile.index') }}"
-                            id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile"
-                            title="Profile">
-                            <span class="material-symbols-outlined fs-3">account_circle</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                            <li>
-                                <h6 class="dropdown-header">Account</h6>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider" />
-                            </li>
-                            <li>
-                                <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
-                                    <button type="submit" class="dropdown-item">Log out</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </header>
->>>>>>> de2ccf86e707ed60fa630363a55a176c70087fc7
         <main>
-            <div class="container p-4 flashcards-page">
+            <div class="container p-4">
                 <div class="col">
-                    <!-- Navigation buttons -->
                     <div class="row">
                         <div class="col-12 d-flex gap-2 mt-3 mt-md-0 mb-3 flex-column flex-md-row align-items-center">
                             <h2 class="col-12 col-md-6 mb-2 mb-md-0">Edit Flashcard Deck:</h2>
@@ -185,10 +52,8 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Deck -->
                     <div class="row">
                         <form method="POST" class="pb-sm-5">
-                            <!-- Deck information -->
                             <div class="col-12 col-md-8">
                                 <div class="medium text-muted mb-1">Title:</div>
                                 <h2 class="h2 fw-bold"><textarea class="form-control auto-expand" name="deck_name"
@@ -200,13 +65,12 @@
                                         name="deck_summary" rows="1"
                                         placeholder="Deck summary">{% if deck.summary %}{{ deck.summary }}{% endif %}</textarea>
                                 </p>
-                                <input type="text" value="Amsterdam,Washington,Sydney,Beijing,Cairo" data-role="tagsinput">
                             </div>
 
                             <div class="row">
                                 <div class="d-flex flex-column">
                                     <hr class="">
-                                    <!-- Table Headers -->
+                                    <!-- Header row for list/table labels (visible on medium+ screens) -->
                                     <div class="row fw-bold border-bottom py-2 d-none d-md-flex text-center col-12">
                                         <div class="col-2">Card</div>
                                         <div class="col col-5">Front</div>
@@ -215,9 +79,7 @@
 
                                     <input type="hidden" name="deck_id" value="{{deck.id}}" />
                                     <div class="list-group list-group-flush col-12">
-                                        <!-- Card Table -->
                                         {% for cardn, card in deck.cards.items() %}
-                                        <!-- Induvidual card -->
                                         <div class="list-group-item py-3">
                                             <div class="row g-2 align-items-center d-flex flex-row w-100">
                                                 <div class="col-2 text-center">
@@ -246,7 +108,7 @@
                                             </div>
                                         </div>
                                         {% endfor %}
-                                        <!-- New Card section -->
+
                                         <div class="list-group-item py-3 bg-light">
                                             <div class="d-flex justify-content-between align-items-center mb-2">
                                                 <strong>New cards</strong>
@@ -295,8 +157,7 @@
                                 </div>
                         </form>
                     </div>
-
-                    <!-- Confirm Delete Modal -->
+                    <!-- Confirm Delete Modal (simple custom modal so no extra bootstrap JS required) -->
                     <div id="confirmDeleteModal" class="position-fixed top-0 start-0 w-100 h-100 d-none"
                         style="z-index:1050;background:rgba(0,0,0,0.45);">
                         <div class="d-flex align-items-center justify-content-center h-100 p-3">
@@ -322,9 +183,10 @@
                 </div>
             </div>
     </div>
-    <!-- Bottom padding for mobile screen size -->
     <div class="d-md-none d-lg-none" id="filler" style="height: 10vh;"></div>
     </main>
+    <!-- Floating chat button + UI (place here) -->
+
 
     <!-- Floating button -->
     <button id="floating-chat-button" class="btn btn-primary d-inline-flex align-items-center justify-content-center"
@@ -348,7 +210,7 @@
 
         <div id="floating-chat-body">
             <!-- Message area (placeholder) -->
-            <div class="text-muted small">Type your flashcard dreams here... You can also provide a reference doc.
+            <div class="text-muted small">Type flashcard dreams request here... You can also provide a reference doc.
             </div>
         </div>
 
@@ -461,7 +323,7 @@
                 // Prevent clicks inside the panel from bubbling to document (which closes it)
                 panel.addEventListener('click', function (e) { e.stopPropagation(); });
 
-                // File drop UI
+                // File drop UI (no functional upload)
                 if (fileDrop && fileInput) {
                     fileDrop.addEventListener('click', () => fileInput.click());
                     ['dragenter', 'dragover'].forEach(ev => {
@@ -527,9 +389,4 @@
             });
         })();
     </script>
-<<<<<<< HEAD
 {% endblock %}
-=======
-</body>
-</html>
->>>>>>> de2ccf86e707ed60fa630363a55a176c70087fc7

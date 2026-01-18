@@ -1,268 +1,266 @@
-/* Base Styles */
-:root {
-    --primary: #0d6efd;
-    --primary-light: #e9f0ff;
-    --danger: #dc3545;
-    --danger-light: #f8d7da;
-    --success: #198754;
-    --warning: #ffc107;
-    --border-color: #dee2e6;
-    --text-muted: #6c757d;
-    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    --border-radius: 0.5rem;
-    --card-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.03);
+/* ===========================================
+   PROFILE & SETTINGS PAGE STYLES
+   Redesigned to match reference design
+   =========================================== */
+
+/* Page background */
+.profile-settings-page {
+    background-color: #f9f9f9;
+    min-height: 100vh;
 }
-
-/* Body styling is inherited from styles-theme.css for consistency */
-
 
 /* Settings Container */
 .settings-container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 1rem;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
 }
 
-@media (min-width: 768px) {
-    .settings-container {
-        padding: 2rem;
-    }
+/* Page Title */
+.page-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 3rem;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
 }
 
-/* Header */
-.settings-header {
-    text-align: center;
+.page-subtitle {
+    font-size: 0.95rem;
+    color: #9ca3af;
+    margin-bottom: 3rem;
+}
+
+/* Section Labels */
+.section-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 1rem;
+}
+
+.section-label.danger {
+    color: #ef4444;
+}
+
+/* Settings Cards */
+.settings-card {
+    background: #ffffff;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    padding: 1.5rem;
     margin-bottom: 2.5rem;
 }
 
-.settings-header h1 {
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-}
-
-/* Sections */
-.settings-section {
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    background: none;
-    box-shadow: none;
-}
-
-.settings-section h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: -0.5rem -1.5rem 1.5rem;
-    padding: 0 1.5rem 1rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.settings-section.danger-zone {
-    border-left: 3px solid var(--danger);
-}
-
-.settings-section.danger-zone h2 {
-    color: var(--danger);
-    border-color: rgba(220, 53, 69, 0.2);
-}
-
-/* Profile Section */
-.profile-info {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 1rem 0;
-    background: none;
-    border-radius: var(--border-radius);
-}
-
-.profile-picture-container {
-    position: relative;
-    width: 120px;
-    height: 120px;
-}
-
-.profile-picture {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid var(--primary-light);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.status-indicator {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    border: 3px solid white;
-}
-
-.status-indicator.online {
-    background-color: #ffffff;
-}
-
-.status-indicator.away {
-    background-color: var(--warning);
-}
-
-.status-indicator.offline {
-    background-color: var(--danger);
-}
-
-.profile-details h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 0.25rem;
-    color: var(--bs-heading-color);
-}
-
-.profile-details .username {
-    color: var(--primary);
-    font-weight: 500;
-}
-
-.profile-details .email {
-    color: var(--text-muted);
-    margin-bottom: 1rem;
-    display: block;
-}
-
-.username {
-    font-weight: 400;
-    color: var(--text-muted);
-    font-size: 0.9em;
-    margin-left: 0.5rem;
-}
-
-/* Preference & Security Items */
-.preference-item,
-.security-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 0;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.preference-item:last-child,
-.security-item:last-child {
-    border-bottom: none;
-}
-
-.preference-info,
-.security-info {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    flex: 1;
-}
-
-.preference-info .material-symbols-outlined,
-.security-info .material-symbols-outlined {
-    color: var(--primary);
-    font-size: 1.5rem;
-    margin-top: 0.25rem;
-}
-
-.preference-info .content,
-.security-info .content {
-    flex: 1;
-}
-
-.preference-info h4,
-.security-info h4 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 0.125rem;
-}
-
-.preference-info p,
-.security-info p {
-    font-size: 0.875rem;
+.settings-card:last-child {
     margin-bottom: 0;
 }
 
-/* Form Switches */
+/* Profile Card */
+.profile-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.5rem 0;
+}
+
+.profile-avatar-container {
+    flex-shrink: 0;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #f0f0f0;
+}
+
+.profile-info {
+    flex-grow: 1;
+}
+
+.profile-name {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.25rem;
+    color: #1a1a1a;
+    margin-bottom: 0.15rem;
+}
+
+.profile-meta {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+.profile-meta span {
+    margin-right: 0.5rem;
+}
+
+/* Edit Profile Button */
+.btn-edit-profile {
+    background-color: #1a1a1a;
+    color: #fff;
+    border: none;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.25rem;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-edit-profile:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+/* Profile Edit Controls */
+.profile-edit-controls {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* Settings Item (for preferences, security) */
+.settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid #f5f5f5;
+    gap: 1rem;
+}
+
+.settings-item > *:last-child {
+    flex-shrink: 0;
+}
+
+.settings-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.settings-item:first-child {
+    padding-top: 0;
+}
+
+.settings-item-info {
+    flex: 1;
+}
+
+.settings-item-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin-bottom: 0.15rem;
+}
+
+.settings-item-description {
+    font-size: 0.8rem;
+    color: #9ca3af;
+    margin: 0;
+}
+
+/* Toggle Switch */
 .form-switch .form-check-input {
-    width: 2.5em;
-    margin-left: -2.8em;
+    width: 2.75em;
     height: 1.5em;
     cursor: pointer;
-}
-/* Danger Zone */
-.danger-zone {
-    border: 1px solid rgba(220, 53, 69, 0.2);
-}
-
-.danger-zone h2 {
-    color: var(--danger-color);
-    border-bottom-color: rgba(220, 53, 69, 0.2);
+    border-radius: 1em;
+    background-color: #e5e7eb;
+    border: none;
 }
 
-.danger-actions {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
+.form-switch .form-check-input:checked {
+    background-color: #1a1a1a;
 }
 
-/* Buttons - scoped to settings to avoid affecting header */
-.settings-container .btn,
-.modal .btn {
+.form-switch .form-check-input:focus {
+    box-shadow: none;
+}
+
+/* Outline Button */
+.btn-outline-settings {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
+    justify-content: center;
+    background-color: transparent;
+    color: #1a1a1a;
+    border: 1.5px solid #1a1a1a;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
     padding: 0.5rem 1rem;
-    border-radius: 50px;
-    transition: all 0.2s ease-in-out;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
-.settings-container .btn-sm,
-.modal .btn-sm {
-    padding: 0.25rem 0.75rem;
-    font-size: 0.875rem;
+.btn-outline-settings:hover {
+    background-color: #1a1a1a;
+    color: #fff;
+    text-decoration: none;
 }
 
-.settings-container .btn-outline-danger,
-.modal .btn-outline-danger {
-    color: var(--danger);
-    border-color: var(--danger);
-    background-color: #fff;
+/* Danger Zone */
+.danger-zone-container {
+    margin-top: 3rem;
 }
 
-.settings-container .btn-outline-danger:hover,
-.modal .btn-outline-danger:hover {
-    background-color: var(--danger);
-    color: white;
+.danger-zone-description {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    margin-bottom: 1rem;
 }
 
-.settings-container .btn-danger,
-.modal .btn-danger {
-    background-color: var(--danger);
-    border-color: var(--danger);
+.btn-danger-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    color: #ef4444;
+    border: 1.5px solid #ef4444;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.25rem;
+    border-radius: 20px;
+    transition: all 0.2s ease;
 }
 
-.settings-container .btn-danger:hover,
-.modal .btn-danger:hover {
-    background-color: #c82333;
-    border-color: #bd2130;
+.btn-danger-outline:hover {
+    background-color: #ef4444;
+    color: #fff;
 }
 
-/* Modal */
+/* Modal Styles */
 .modal-content {
     border: none;
-    border-radius: var(--border-radius);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
 }
 
 .modal-header {
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid #f0f0f0;
     padding: 1.25rem 1.5rem;
+}
+
+.modal-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.25rem;
 }
 
 .modal-body {
@@ -270,75 +268,40 @@
 }
 
 .modal-footer {
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid #f0f0f0;
     padding: 1rem 1.5rem;
+}
+
+.modal .btn {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 0.6rem 1.25rem;
+    border-radius: 20px;
+}
+
+/* Hidden file input */
+#profileFileInput {
+    display: none;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     .settings-container {
-        margin: 1rem auto;
+        padding: 2rem 1rem;
     }
     
-    .profile-info {
+    .page-title {
+        font-size: 2.25rem;
+    }
+    
+    .profile-card {
         flex-direction: column;
-        align-items: center;
         text-align: center;
     }
     
-    .danger-actions {
-        flex-direction: column;
-    }
-    
-    .danger-actions .btn {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-/* Notification badge removed */
-.position-absolute.top-0.start-100.translate-middle.badge.rounded-pill.bg-danger {
-    display: none;
-        color: #e0e0e0;
-        border-color: #666;
-    }
-    
-    .btn-outline-secondary:hover {
-        background-color: #666;
-        color: #fff;
-    }
-
-/* ============================================
-   HEADER CONSISTENCY FIX - Force profile page header to match other pages
-   ============================================ */
-
-/* Prevent btn-link underline on header icons */
-.site-header .btn-link {
-    text-decoration: none !important;
-}
-
-.site-header .btn-link:hover,
-.site-header .btn-link:focus {
-    text-decoration: none !important;
-}
-
-/* Ensure header buttons don't get profile-settings button styling */
-
-
-/* Material icons in header should remain consistent size */
-.site-header .material-symbols-outlined {
-    font-size: 24px !important;
-}
-
-.site-header .fs-3 {
-    font-size: 1.75rem !important;
-}
-
-/* Desktop: Ensure profile page header matches other pages */
-@media (min-width: 768px) {
-    /* Container uses same max-width as other pages */
-    .site-header .container {
-        max-width: 1140px !important;
+    .profile-info {
+        margin-bottom: 1rem;
     }
 }
 

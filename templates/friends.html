@@ -9,7 +9,7 @@
            =================================== */
         
         .community-page-content {
-            background-color: #fff;
+            background-color: #f9f9f9;
         }
 
         .community-title {
@@ -67,13 +67,153 @@
             margin: 0;
         }
 
-        /* Follow Button Styles */
-        .follow-btn.following {
-            background-color: #198754;
-            border-color: #198754;
-            animation: pop-in 0.3s ease-out;
+        /* Profile Card Styles */
+        .user-card .card {
+            background: #fff;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
         }
 
+        .user-card .card:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .user-card .card-body {
+            padding: 2rem 1.5rem;
+        }
+
+        /* Profile Picture */
+        .user-card .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .user-card .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-card .profile-avatar .material-symbols-outlined {
+            font-size: 48px;
+            color: #cbd5e1;
+        }
+
+        /* User Name */
+        .user-card .user-name {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 1.35rem;
+            color: #1a1a1a;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Username */
+        .user-card .user-handle {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Streak Badge */
+        .user-card .streak-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            background-color: #fef3c7;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #92400e;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 0.75rem;
+        }
+
+        .user-card .streak-badge .flame-icon {
+            color: #f59e0b;
+        }
+
+        /* Bio */
+        .user-card .user-bio {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 1.25rem;
+            line-height: 1.4;
+        }
+
+        /* Follow Button */
+        .user-card .btn-follow {
+            background-color: #1a1a1a;
+            color: #fff;
+            border: 2px solid #1a1a1a;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 0.65rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+
+        .user-card .btn-follow:hover {
+            background-color: #333;
+            border-color: #333;
+            color: #fff;
+        }
+
+        .user-card .btn-follow.following {
+            background-color: #16a34a;
+            border-color: #16a34a;
+        }
+
+        .user-card .btn-follow.following:hover {
+            background-color: #dc2626;
+            border-color: #dc2626;
+        }
+
+        /* View Profile Button */
+        .user-card .btn-view-profile {
+            background-color: transparent;
+            color: #1a1a1a;
+            border: 2px solid #1a1a1a;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 0.65rem 1.25rem;
+            border-radius: 25px;
+            transition: all 0.2s ease;
+        }
+
+        .user-card .btn-view-profile:hover {
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+
+        /* Button Group */
+        .user-card .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        /* Follow Button Animation */
         @keyframes pop-in {
             0% {
                 transform: scale(0.9);
@@ -88,10 +228,16 @@
             }
         }
 
-        .follow-btn.following:hover {
-            background-color: #dc3545;
-            border-color: #dc3545;
-            animation: none;
+        .follow-btn.following {
+            animation: pop-in 0.3s ease-out;
+        }
+
+        /* Following Section Cards */
+        #followingContainer .card {
+            background: #fff;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
     </style>
 {% endblock %}
@@ -141,44 +287,43 @@
           <div class="col-md-6 col-lg-4 user-card">
             <div class="card h-100">
               <div class="card-body text-center">
-                <div class="mb-3">
+                <!-- Profile Avatar -->
+                <div class="profile-avatar">
                   {% if user.profile_pic %}
-                  <img src="{{ user.profile_pic }}" alt="{{ user.name }}" class="rounded-circle" width="80" height="80"
-                    style="object-fit: cover" />
+                  <img src="{{ user.profile_pic }}" alt="{{ user.name }}" />
                   {% else %}
-                  <span class="material-symbols-outlined" style="font-size: 64px; color: #2badee">account_circle</span>
+                  <span class="material-symbols-outlined">account_circle</span>
                   {% endif %}
                 </div>
-                <h5 class="card-title mb-1">
-                  {{ user.name or user.username }}
-                </h5>
-                <p class="text-muted small mb-2">@{{ user.username }}</p>
-
+                
+                <!-- User Name -->
+                <h5 class="user-name">{{ user.name or user.username }}</h5>
+                
                 <!-- Streak Badge -->
                 {% if user.studyData and user.studyData.streak %}
-                <div class="badge bg-warning text-dark mb-2">
-                  🔥 {{ user.studyData.streak }} day streak
+                <div class="streak-badge">
+                  <span class="flame-icon">🔥</span>
+                  <span>{{ user.studyData.streak }} DAY STREAK</span>
                 </div>
                 {% endif %}
 
                 <!-- Bio -->
                 {% if user.bio %}
-                <p class="text-muted small mb-3" style="font-size: 0.85rem">
-                  {{ user.bio[:60] }}{% if user.bio|length > 60 %}...{% endif
-                  %}
+                <p class="user-bio">
+                  {{ user.bio[:60] }}{% if user.bio|length > 60 %}...{% endif %}
                 </p>
                 {% else %}
-                <p class="text-muted small mb-3">BookMe member</p>
+                <p class="user-bio">BookMe member</p>
                 {% endif %}
 
-                <div class="d-flex gap-2 justify-content-center">
-                  <button class="btn btn-primary btn-sm follow-btn" data-username="{{ user.username }}"
+                <!-- Buttons -->
+                <div class="button-group">
+                  <button class="btn btn-follow follow-btn" data-username="{{ user.username }}"
                     onclick="toggleFollow(this)">
-                    <span class="material-symbols-outlined" style="font-size: 16px">person_add</span>
-                    Follow
+                    FOLLOW
                   </button>
-                  <button class="btn btn-outline-secondary btn-sm" onclick="viewProfile('{{ user.username }}')">
-                    View Profile
+                  <button class="btn btn-view-profile" onclick="viewProfile('{{ user.username }}')">
+                    VIEW PROFILE
                   </button>
                 </div>
               </div>
@@ -286,18 +431,18 @@
 
       function setButtonToFollowing(button) {
         button.classList.add("following");
-        button.innerHTML = `<span class="material-symbols-outlined" style="font-size: 16px;">check</span> Following`;
+        button.innerHTML = `FOLLOWING`;
         button.onmouseover = () => {
-          button.innerHTML = `<span class="material-symbols-outlined" style="font-size: 16px;">person_remove</span> Unfollow`;
+          button.innerHTML = `UNFOLLOW`;
         };
         button.onmouseout = () => {
-          button.innerHTML = `<span class="material-symbols-outlined" style="font-size: 16px;">check</span> Following`;
+          button.innerHTML = `FOLLOWING`;
         };
       }
 
       function setButtonToFollow(button) {
         button.classList.remove("following");
-        button.innerHTML = `<span class="material-symbols-outlined" style="font-size: 16px;">person_add</span> Follow`;
+        button.innerHTML = `FOLLOW`;
         button.onmouseover = null;
         button.onmouseout = null;
       }

@@ -20,4 +20,4 @@ def study_index():
 
 @study_bp.route('/study/timer', endpoint='dashboard')
 def timer():
-    return render_template('study_timer.html', username=g.current_user, users=get_all_users())
+    return render_template('study_timer.html', username=g.current_user, users=get_all_users(), studyData=get_user_study_data(g.current_user))

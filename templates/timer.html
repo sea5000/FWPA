@@ -4,8 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Focus Timer | BookMe</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='styles-responsive.css') }}" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
   <script id="tailwind-config">
     tailwind.config = {
@@ -58,8 +60,43 @@
   </style>
 </head>
 
-<body class="antialiased text-bookme-charcoal overflow-hidden soft-bg">
-  <div class="relative flex h-screen w-full">
+<body class="antialiased text-bookme-charcoal soft-bg" style="overflow-x: hidden;">
+  <!-- Header -->
+  <header class="w-100 bg-white border-bottom site-header">
+    <div class="container d-flex align-items-center justify-content-between py-3">
+      <a class="col-1 d-flex align-items-center justify-content-center py-3 text-decoration-none" href="{{ url_for('home.index') }}">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Bookme Logo" class="header-logo-static">
+      </a>
+      <nav class="d-none d-md-flex align-items-center gap-2">
+        <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('home.index') }}">Home</a>
+        <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
+        <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('community.index') }}">Community</a>
+      </nav>
+      <div class="d-none d-md-flex align-items-center gap-3">
+        <div class="dropdown">
+          <button type="button" class="btn btn-link text-muted p-0" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications">
+            <span class="material-symbols-outlined">notifications</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 300px;">
+            <li class="text-center text-muted small py-3">No new notifications. <br>Can't start procrastinating now!</li>
+          </ul>
+        </div>
+        <div class="dropdown">
+          <a class="btn btn-link text-muted p-0" href="#" id="profileDropdown" data-bs-toggle="dropdown">
+            <span class="material-symbols-outlined fs-3">account_circle</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><h6 class="dropdown-header">Account</h6></li>
+            <li><a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><form method="POST" action="{{ url_for('auth.logout') }}" class="m-0"><button type="submit" class="dropdown-item">Log out</button></form></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="relative flex" style="height: calc(100vh - 80px);">
     <!-- Sidebar Navigation -->
     <nav class="w-20 flex flex-col items-center py-8 gap-10 border-r border-bookme-blue/20 z-20 bg-white/30 backdrop-blur-sm">
       <div class="size-10 bg-bookme-soft-yellow rounded-xl flex items-center justify-center mb-4 shadow-sm">
@@ -158,6 +195,24 @@
       </div>
     </main>
   </div>
+
+  <!-- Mobile Footer -->
+  <footer class="d-md-none fixed-bottom bg-white border-top">
+    <nav class="nav justify-content-around py-2">
+      <a class="nav-link text-muted" href="{{ url_for('home.index') }}">
+        <span class="material-symbols-outlined">home</span>
+        <small class="d-block">Home</small>
+      </a>
+      <a class="nav-link text-muted" href="{{ url_for('study.index') }}">
+        <span class="material-symbols-outlined">school</span>
+        <small class="d-block">Study</small>
+      </a>
+      <a class="nav-link text-muted" href="{{ url_for('community.index') }}">
+        <span class="material-symbols-outlined">groups</span>
+        <small class="d-block">Community</small>
+      </a>
+    </nav>
+  </footer>
 
   <!-- Bottom Home Indicator -->
   <div class="fixed bottom-1.5 left-1/2 -translate-x-1/2 w-32 h-1 bg-bookme-deep-blue/10 rounded-full z-30"></div>
@@ -412,5 +467,6 @@
       // Initialize
       updateStats();
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

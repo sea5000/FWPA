@@ -89,6 +89,13 @@ h1, h2, h3 {
 }
 
 /* =============================================
+   HEADER TOP PADDING
+   ============================================= */
+.site-header {
+  padding-top: 0.5rem;
+}
+
+/* =============================================
    DESKTOP HEADER ALIGNMENT (>= 768px)
    ============================================= */
 @media (min-width: 768px) {
@@ -109,13 +116,15 @@ h1, h2, h3 {
     gap: 0.5rem;
   }
   
-  /* Navigation - centered, use static positioning */
+  /* Navigation - centered, use absolute positioning for true center */
   .site-header .nav-centered {
-    position: static !important;
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
     display: flex !important;
     align-items: center !important;
-    transform: none !important;
-    margin: 0 auto;
+    margin: 0;
   }
   
   /* Header actions - remove absolute positioning, use flexbox alignment */

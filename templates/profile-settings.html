@@ -1,129 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0" />
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <meta name="referrer" content="no-referrer-when-downgrade" />
-    <title>Bookme - Profile & Settings</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <!-- <link href="https://fonts.googleapis.com" rel="preconnect" /> -->
+{% block title %}Bookme - Profile & Settings{% endblock %}
 
-    <link rel="stylesheet" href="../static/styles-theme.css" />
-    <link rel="stylesheet" href="../static/styles-profile-settings.css" />
-    
-    <!-- <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" /> -->
-    <!-- <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap"
-        rel="stylesheet" /> -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='styles-responsive.css') }}" rel="stylesheet" />
-    <style>
-        /* body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        } */
-    </style>
-  <style>
-    /* Streak button styling */
-    .streak-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background-color: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      color: #64748b;
-      text-decoration: none;
-      font-size: 0.875rem;
-      font-weight: 600;
-      transition: all 0.2s ease;
-    }
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles-profile-settings.css') }}" />
+{% endblock %}
 
-    .streak-btn:hover {
-      background-color: #e2e8f0;
-      color: #475569;
-    }
+{% block body_attrs %}class="bg-light text-dark"{% endblock %}
 
-    .streak-btn .material-symbols-outlined {
-      font-size: 1.25rem;
-      color: #f59e0b;
-    }
-
-    /* Fine-tune navigation centering */
-    @media (min-width: 768px) {
-      .site-header .nav-centered {
-        margin-left: 14px;
-      }
-    }
-  </style>
-</head>
-
-<body class="bg-light text-dark">
-    <div class="d-flex flex-column min-vh-100">
-                <header class="w-100 site-header">
-      <div class="container position-relative d-flex align-items-center justify-content-between py-3">
-        <!-- Logo -->
-        <a class="col-1 d-flex align-items-center justify-content-center py-3 text-decoration-none"
-          href="{{ url_for('home.index') }}">
-          <img src="{{ url_for('static', filename='logo.png') }}" alt="Bookme Logo" class="header-logo-static">
-        </a>
-        
-        <!-- Centered Navigation -->
-        <nav class="nav-centered d-none d-md-flex align-items-center gap-2 position-absolute top-50 start-50 translate-middle">
-          <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('home.index') }}">Home</a>
-          <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
-          <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('community.index') }}">Community</a>
-        </nav>
-        
-        <!-- Right side: Streak, Notification, Profile -->
-        <div class="d-none d-md-flex align-items-center gap-3">
-          <!-- Streak button -->
-          <a href="{{ url_for('streak.index') }}" class="streak-btn">
-            <span class="material-symbols-outlined">local_fire_department</span>
-            <span>{{ studyData.streak if studyData is defined else 0 }} DAY STREAK</span>
-          </a>
-          
-          <!-- Notification dropdown -->
-          <div class="dropdown">
-            <button type="button" class="btn btn-link text-muted p-0" data-bs-toggle="dropdown"
-              aria-expanded="false" aria-label="Notifications">
-              <span class="material-symbols-outlined">notifications</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 300px;">
-              <li class="text-center text-muted small py-3">
-                No new notifications. <br>Can't start procrastinating now!
-              </li>
-            </ul>
-          </div>
-          
-          <!-- Profile dropdown -->
-          <div class="dropdown">
-            <a class="btn btn-link text-muted p-0" href="{{ url_for('profile.index') }}"
-              id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile"
-              title="Profile">
-              <span class="material-symbols-outlined fs-3">account_circle</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-              <li>
-                <h6 class="dropdown-header">Account</h6>
-              </li>
-              <li>
-                <a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a>
-              </li>
-              <li>
-                <hr class="dropdown-divider" />
-              </li>
-              <li>
-                <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
-                  <button type="submit" class="dropdown-item">Log out</button>
-                </form>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </header>
+{% block content %}
         <div class="settings-container py-4 position-relative">
             <!-- Save changes button (hidden until changes are made) -->
             <button id="saveChangesBtn" class="btn btn-primary position-absolute d-none"
@@ -219,7 +104,6 @@
                 </div>
             </section>
         </div>
-    </div>
 
     <!-- Change Password Modal -->
     <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
@@ -293,12 +177,24 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle with Popper -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Mobile Footer -->
+    <footer class="d-md-none fixed-bottom bg-white border-top">
+        <nav class="nav justify-content-around py-2">
+            <a class="nav-link d-flex flex-column align-items-center text-muted"
+                href="{{ url_for('home.index') }}"><span class="material-symbols-outlined fs-4">home</span>
+                <small class="d-block">Home</small></a>
+            <a class="nav-link d-flex flex-column align-items-center text-muted"
+                href="{{ url_for('study.index') }}"><span class="material-symbols-outlined fs-4">school</span>
+                <small class="d-block">Study</small></a>
+            <a class="nav-link d-flex flex-column align-items-center text-muted"
+                href="{{ url_for('community.index') }}"><span class="material-symbols-outlined fs-4">groups</span>
+                <small class="d-block">Community</small></a>
+        </nav>
+    </footer>
+{% endblock %}
+
+{% block scripts %}
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <!-- Custom Scripts -->
     <script>
         // Delete Account Confirmation based on checkbox
         document.getElementById('confirmDelete').addEventListener('change', function () {
@@ -318,7 +214,6 @@
             if (!confirmBtn) return;
 
             confirmBtn.addEventListener('click', async function (e) {
-                // Prevent any other click handlers (old handler later in file)
                 e.stopImmediatePropagation();
 
                 if (!confirmCheckbox || !confirmCheckbox.checked) {
@@ -375,40 +270,11 @@
                 }
             });
         })();
-        // document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-        //     // Add your account deletion logic here
-        //     const toastHTML = `
-        //         <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-        //             <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-        //                 <div class="toast-header bg-danger text-white">
-        //                     <strong class="me-auto">Account Deleted</strong>
-        //                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-        //                 </div>
-        //                 <div class="toast-body">
-        //                     Your account has been successfully deleted. We're sorry to see you go!
-        //                 </div>
-        //             </div>
-        //         </div>
-        //     `;
-
-        //     // Show success message
-        //     document.body.insertAdjacentHTML('beforeend', toastHTML);
-
-        //     // Close modal
-        //     const modal = bootstrap.Modal.getInstance(document.getElementById('deleteAccountModal'));
-        //     modal.hide();
-
-        //     // Redirect after a delay
-        //     setTimeout(() => {
-        //         window.location.href = "{{ url_for('home.index') }}";
-        //     }, 3000);
-        // });
 
         // Handle sign out (if button exists)
         const signOutBtn = document.getElementById('signOutBtn');
         if (signOutBtn) {
             signOutBtn.addEventListener('click', function () {
-                // Add your sign out logic here
                 alert('Signing out...');
             });
         }
@@ -421,23 +287,7 @@
             const newPasswordInput = document.getElementById('newPasswordInput');
             const changePasswordForm = document.getElementById('changePasswordForm');
 
-            if (!changePasswordBtn) {
-                console.error('Change Password button not found');
-                return;
-            }
-
-            if (!changePasswordModal) {
-                console.error('Change Password modal not found');
-                return;
-            }
-
-            if (!confirmChangePasswordBtn) {
-                console.error('Confirm Change Password button not found');
-                return;
-            }
-
-            if (!newPasswordInput) {
-                console.error('New Password input not found');
+            if (!changePasswordBtn || !changePasswordModal || !confirmChangePasswordBtn || !newPasswordInput) {
                 return;
             }
 
@@ -445,11 +295,9 @@
             changePasswordBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Change Password button clicked');
                 try {
                     const modal = new bootstrap.Modal(changePasswordModal);
                     modal.show();
-                    // Clear input when modal opens
                     newPasswordInput.value = '';
                 } catch (err) {
                     console.error('Error showing modal:', err);
@@ -479,7 +327,6 @@
                     return;
                 }
 
-                // Disable button and show loading state
                 confirmChangePasswordBtn.disabled = true;
                 const originalHTML = confirmChangePasswordBtn.innerHTML;
                 confirmChangePasswordBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Updating...';
@@ -503,10 +350,8 @@
                     } catch (err) {
                         console.error('Error parsing response:', err);
                     }
-                    console.log('Response data:', data.success);
-                    console.log("resp.ok:", resp.ok);
+
                     if (resp.ok && data.success) {
-                        // Show success toast
                         const toastHTML = `
                             <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
                                 <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
@@ -522,14 +367,10 @@
                         `;
                         document.body.insertAdjacentHTML('beforeend', toastHTML);
 
-                        // Close modal
                         const modal = bootstrap.Modal.getInstance(changePasswordModal);
                         if (modal) modal.hide();
-
-                        // Clear input
                         newPasswordInput.value = '';
 
-                        // Remove toast after 3 seconds
                         setTimeout(() => {
                             const toast = document.querySelector('.toast');
                             if (toast && toast.parentElement) {
@@ -601,9 +442,7 @@
 
             // Remove profile picture
             removeBtn.addEventListener('click', function () {
-                // Reset to a default avatar placeholder
                 profileImg.src = 'https://ui-avatars.com/api/?name={{ profileData.name | urlencode }}&background=0D6EFD&color=fff&size=200';
-                // Clear file input so subsequent uploads work cleanly
                 fileInput.value = '';
                 wasRemoved = true;
                 markChanged();
@@ -619,7 +458,6 @@
                 } else if (f) {
                     form.append('avatar', f);
                 } else {
-                    // nothing to save
                     saveBtn.classList.add('d-none');
                     saveBtn.disabled = false;
                     return;
@@ -656,24 +494,4 @@
             });
         })();
     </script>
-    </div>
-
-    <!-- Mobile Footer -->
-    <footer class="d-md-none fixed-bottom bg-white border-top">
-        <nav class="nav justify-content-around py-2">
-            <a class="nav-link d-flex flex-column align-items-center text-muted"
-                href="{{ url_for('home.index') }}"><span class="material-symbols-outlined fs-4">home</span>
-                <small class="d-block">Home</small></a>
-            <a class="nav-link d-flex flex-column align-items-center text-muted"
-                href="{{ url_for('study.index') }}"><span class="material-symbols-outlined fs-4">school</span>
-                <small class="d-block">Study</small></a>
-            <a class="nav-link d-flex flex-column align-items-center text-muted"
-                href="{{ url_for('community.index') }}"><span class="material-symbols-outlined fs-4">groups</span>
-                <small class="d-block">Community</small></a>
-        </nav>
-    </footer>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
+{% endblock %}

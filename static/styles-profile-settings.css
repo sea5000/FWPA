@@ -13,12 +13,8 @@
     --card-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.03);
 }
 
-body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background-color: #ffffff;
-    color: #212529;
-    line-height: 1.6;
-}
+/* Body styling is inherited from styles-theme.css for consistency */
+
 
 /* Settings Container */
 .settings-container {
@@ -338,24 +334,11 @@ body {
     font-size: 1.75rem !important;
 }
 
-/* Desktop: Force header dimensions and spacing to match other pages */
+/* Desktop: Ensure profile page header matches other pages */
 @media (min-width: 768px) {
-    /* Container must use xl breakpoint width, not xxl */
+    /* Container uses same max-width as other pages */
     .site-header .container {
         max-width: 1140px !important;
-        padding: 1rem 1.5rem !important;
-        min-height: 70px;
-    }
-    
-    /* CRITICAL: Force py-3 padding on logo div (Bootstrap class not applying) */
-    .site-header .col-1.d-flex.align-items-center.justify-content-center.py-3 {
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
-    }
-    
-    /* Ensure header has proper height */
-    .site-header {
-        min-height: 105px;
     }
 }
 

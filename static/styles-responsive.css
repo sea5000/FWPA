@@ -60,7 +60,6 @@ h3, .h3 {
 }
 
 /* Logo sizing - responsive */
-/* Logo sizing - responsive */
 .site-header img[alt*="Logo"],
 .site-header img[src*="logo"] {
     /* DEFAULT OVERRIDDEN FOR HEADER LOGO TO BE STATIC */
@@ -68,7 +67,6 @@ h3, .h3 {
     width: auto;
 }
 
-/* Fixed static header logo */
 /* Fixed static header logo */
 .site-header .header-logo-static {
     height: 50px !important;

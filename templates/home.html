@@ -51,15 +51,16 @@
     <div class="d-flex flex-column min-vh-100">
         <header class="w-100 site-header">
             <div class="container d-flex align-items-center justify-content-between py-3">
-                <a class="col-1 d-flex align-items-center justify-content-center py-3 text-decoration-none" href="{{ url_for('home.index') }}">
-                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Bookme Logo" class="header-logo-static">
+                <a class="col-1 d-flex align-items-center justify-content-center py-3 text-decoration-none"
+                    href="{{ url_for('home.index') }}">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Bookme Logo"
+                        class="header-logo-static">
                 </a>
                 <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
                     <a class="btn btn-sm btn-primary rounded-pill text-white"
                         href="{{ url_for('home.index') }}">Home</a>
                     <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
                     <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('community.index') }}">Community</a>
-                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('challenges.index') }}">Challenge</a>
                 </nav>
                 <div class="d-none d-md-flex align-items-center gap-3">
                     <div class="dropdown">
@@ -150,7 +151,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row g-4">
+            <div class="row g-4 justify-content-around mt-3">
                 <div class="col-12 col-md-6 col-lg-4">
                     <a class="card h-100 text-decoration-none text-reset" href="{{ url_for('study.index') }}">
                         <div class="card-img-top" style="
@@ -191,26 +192,6 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-12 col-md-6 col-lg-4">
-                    <a class="card h-100 text-decoration-none text-reset" href="{{ url_for('challenges.index') }}">
-                        <div class="card-img-top" style="
-                  height: 192px;
-                  background-size: cover;
-                  background-position: center;
-                  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDQBOC3LXf_M-2k2Iosn4PTaY9sqpTG7SnGLeo8NrBq8aKJhDyI4Ont69yM0glOPxAfiGesZMJlD7YsqQC_R--umsPPVecvD9owxwQqTIVVHFt9SCk9Ms10UASd30xWTuesB3qBrdXWAmiAzRDi8qGyVJPD3QgTJddSZ5B5eqhT7s66-AkiUaq-E6A3gNcguVjIoersRjkaxbY7xjGPYUGQ03nTNFzgqBHlwKUDtkuC1RZ9981ra_-FdmHtxxVzC3HERYifW3ZwOYyf');
-                "></div>
-                        <div class="card-body">
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <span class="material-symbols-outlined text-primary">emoji_events</span>
-                                <h3 class="h5 mb-0">Challenge</h3>
-                            </div>
-                            <p class="text-muted small">
-                                Compete & Achieve. Participate in challenges, earn rewards,
-                                and climb the leaderboard.
-                            </p>
-                        </div>
-                    </a>
-                </div>
             </div>
             <div class="d-md-none d-sm-12" style="height:10vh"></div>
         </main>
@@ -225,10 +206,6 @@
                 <a class="nav-link d-flex flex-column align-items-center text-muted"
                     href="{{ url_for('community.index') }}"><span class="material-symbols-outlined fs-4">groups</span>
                     <small class="d-block">Community</small></a>
-                <a class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="{{ url_for('challenges.index') }}"><span
-                        class="material-symbols-outlined fs-4">emoji_events</span>
-                    <small class="d-block">Challenge</small></a>
             </nav>
         </footer>
     </div>

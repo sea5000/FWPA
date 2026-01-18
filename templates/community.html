@@ -1,172 +1,223 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin=""> -->
-  <!-- <link href="https://fonts.googleapis.com/css2?display=swap&amp;family=Plus+Jakarta+Sans:wght@400;500;700;800"rel="stylesheet"> -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-  <link href="{{ url_for('static', filename='styles-responsive.css') }}" rel="stylesheet" />
-  <title>Community - Notes | BookMe</title>
-  <style>
-    /* Streak button styling */
-    .streak-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background-color: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      color: #64748b;
-      text-decoration: none;
-      font-size: 0.875rem;
-      font-weight: 600;
-      transition: all 0.2s ease;
-    }
+{% block title %}Bookme - Community Hub{% endblock %}
 
-    .streak-btn:hover {
-      background-color: #e2e8f0;
-      color: #475569;
-    }
-
-    .streak-btn .material-symbols-outlined {
-      font-size: 1.25rem;
-      color: #f59e0b;
-    }
-
-    /* Fine-tune navigation centering */
-    @media (min-width: 768px) {
-      .site-header .nav-centered {
-        margin-left: 14px;
-      }
-    }
-    
-    /* Force logo sizing in case external CSS fails */
-    .site-header .header-logo-static {
-        height: 50px !important;
-        width: auto !important;
-    }
-  </style>
-</head>
-
-<body class="bg-light text-dark">
-  <div class="d-flex flex-column min-vh-100">
-    <!-- Header -->
-    <header class="w-100 site-header">
-      <div class="container position-relative d-flex align-items-center justify-content-between py-3">
-        <!-- Logo -->
-        <a class="col-1 d-flex align-items-center justify-content-center py-3 text-decoration-none"
-          href="{{ url_for('home.index') }}">
-          <img src="{{ url_for('static', filename='logo.png') }}" alt="Bookme Logo" class="header-logo-static">
-        </a>
+{% block head %}
+    <style>
+        /* ===================================
+           PAGE-SPECIFIC: COMMUNITY
+           =================================== */
         
-        <!-- Centered Navigation -->
-        <nav class="nav-centered d-none d-md-flex align-items-center gap-2 position-absolute top-50 start-50 translate-middle">
-          <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('home.index') }}">Home</a>
-          <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
-          <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('community.index') }}">Community</a>
-        </nav>
-        
-        <!-- Right side: Streak, Notification, Profile -->
-        <div class="d-none d-md-flex align-items-center gap-3">
-          <!-- Streak button -->
-          <a href="{{ url_for('streak.index') }}" class="streak-btn">
-            <span class="material-symbols-outlined">local_fire_department</span>
-            <span>{{ studyData.streak if studyData is defined else 0 }} DAY STREAK</span>
-          </a>
-          
-          <!-- Notification dropdown -->
-          <div class="dropdown">
-            <button type="button" class="btn btn-link text-muted p-0" data-bs-toggle="dropdown" aria-expanded="false"
-              aria-label="Notifications">
-              <span class="material-symbols-outlined">notifications</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 300px">
-              <li class="text-center text-muted small py-3">
-                No new notifications. <br />Can't start procrastinating now!
-              </li>
-            </ul>
-          </div>
-          
-          <!-- Profile dropdown -->
-          <div class="dropdown">
-            <a class="btn btn-link text-muted p-0" href="{{ url_for('profile.index') }}" id="profileDropdown"
-              data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile">
-              <span class="material-symbols-outlined fs-3">account_circle</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li>
-                <h6 class="dropdown-header">Account</h6>
-              </li>
-              <li>
-                <a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a>
-              </li>
-              <li>
-                <hr class="dropdown-divider" />
-              </li>
-              <li>
-                <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
-                  <button type="submit" class="dropdown-item">Log out</button>
-                </form>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </header>
+        .community-page-content {
+            background-color: #fff;
+        }
 
+        .community-title {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 4.5rem;
+            color: #1c1c1c;
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+        }
+
+        .community-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-bottom: 4rem;
+        }
+
+        /* Custom Tabs */
+        .nav-tabs-custom {
+            border-bottom: 1px solid #eee;
+            margin-bottom: 3rem;
+            display: flex;
+            gap: 2rem;
+            padding-bottom: 0;
+        }
+
+        .nav-link-custom {
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #999;
+            text-decoration: none;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-link-custom:hover {
+            color: #1a1a1a;
+        }
+
+        .nav-link-custom.active {
+            color: #1a1a1a;
+            border-bottom-color: #1a1a1a;
+        }
+
+        /* Section Header */
+        .section-title {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 2rem;
+            color: #1c1c1c;
+            margin: 0;
+        }
+
+        .btn-black-pill {
+            background-color: #1a1a1a;
+            color: #fff;
+            border-radius: 100px;
+            padding: 12px 24px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .btn-black-pill:hover {
+            background-color: #333;
+            color: #fff;
+        }
+        
+        /* Note Cards */
+        .note-card {
+            background-color: #F9F9F7;
+            border-radius: 24px;
+            padding: 2rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: none;
+            box-shadow: none;
+        }
+        
+        .note-tags span {
+            background-color: #E0E2E0;
+            color: #1a1a1a;
+            font-size: 0.65rem;
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .note-author {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .note-title {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 1.5rem;
+            color: #1c1c1c;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .note-desc {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            flex-grow: 1;
+        }
+
+        .note-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1rem;
+        }
+
+        .note-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .note-stats span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .note-action-delete {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #999;
+            text-decoration: none;
+            border: none;
+            background: none;
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+
+        .note-action-delete:hover {
+            color: #dc3545;
+        }
+
+        .btn-view-pill {
+            background-color: #1a1a1a;
+            color: #fff;
+            border-radius: 100px;
+            padding: 8px 24px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border: none;
+        }
+
+        .btn-view-pill:hover {
+            background-color: #333;
+            color: #fff;
+        }
+    </style>
+{% endblock %}
+
+{% block body_attrs %}class="community-page-content text-dark"{% endblock %}
+
+{% block content %}
     <!-- Main Content -->
     <main class="flex-grow-1">
       <div class="container my-5">
         <!-- Page Header -->
-        <div class="d-flex align-items-center justify-content-between mb-4">
-          <div>
-            <h2 class="h3 mb-0">Community</h2>
-            <small class="text-muted">Connect and share knowledge</small>
-          </div>
-        </div>
-
-        <!-- Navigation Tabs -->
-        <ul class="nav nav-tabs mb-4">
-          <li class="nav-item">
-            <a class="nav-link active" href="{{ url_for('community.index') }}">📝 Notes</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('friends.index') }}">👥 Friends</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('feed.index') }}">📰 Feed</a>
-          </li>
-        </ul>
-
-        <!-- Subject Folders Section -->
-        <div class="row mb-4">
-          <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h4 class="mb-0">Study Subjects</h4>
-              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
-                + Add Note
-              </button>
+        <div class="mb-5">
+            <h1 class="community-title">Community Hub</h1>
+            <p class="community-subtitle">Connect and share knowledge with fellow learners.</p>
+            
+            <!-- Custom Tabs -->
+            <div class="nav-tabs-custom">
+                <a href="{{ url_for('community.index') }}" class="nav-link-custom active">Notes</a>
+                <a href="{{ url_for('friends.index') }}" class="nav-link-custom">Friends</a>
+                <a href="{{ url_for('feed.index') }}" class="nav-link-custom">Feed</a>
             </div>
-          </div>
         </div>
 
-        <!-- Subject Folders Grid -->
-        <div class="row g-4 mb-5" id="subjectFolders">
-          <!-- Folders will be dynamically generated -->
-        </div>
-
-        <!-- Notes Display -->
-        <div class="row mb-3">
-          <div class="col-12">
-            <h4 class="mb-0" id="notesHeading">All Notes</h4>
-            <button class="btn btn-sm btn-link" id="backToFolders" style="display: none" onclick="showAllFolders()">
-              ← Back to Subjects
+        <!-- Notes Section Header -->
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h2 class="section-title">All Notes</h2>
+            <button class="btn-black-pill" data-bs-toggle="modal" data-bs-target="#addNoteModal">
+                + Add Note
             </button>
-          </div>
         </div>
 
         <!-- Notes Grid -->
@@ -174,115 +225,108 @@
           {% if notes %}
           {% for note in notes %}
           <div class="col-12 col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-              <div class="card-body d-flex flex-column">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="card-title mb-0">{{ note.title or 'Untitled note' }}</h5>
-                  <span class="badge text-bg-light">{{ note.subject or 'General' }}</span>
-                </div>
-                <p class="text-muted small mb-2">By {{ note.author or 'Unknown' }}</p>
-                <p class="card-text flex-grow-1">{{ note.content|default('', true)|truncate(180, True) }}</p>
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                  <div class="text-muted small d-flex align-items-center gap-3">
-                    <span class="d-inline-flex align-items-center gap-1">
-                      <span class="material-symbols-outlined" style="font-size: 18px">thumb_up</span>
-                      {{ note.likes or 0 }}
-                    </span>
-                    <span class="d-inline-flex align-items-center gap-1">
-                      <span class="material-symbols-outlined" style="font-size: 18px">comment</span>
-                      {{ note.comments|length if note.comments is defined else 0 }}
-                    </span>
+            <div class="note-card">
+              <div class="d-flex justify-content-between align-items-start">
+                  <div class="note-tags">
+                      <span>{{ note.subject or 'GENERAL' }}</span>
                   </div>
-                  <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-primary" onclick="viewNote('{{ note['_id'] }}')">View</button>
-                    <button class="btn btn-outline-danger" onclick="deleteNote('{{ note['_id'] }}')">Delete</button>
+                  <span class="note-author">by {{ note.author or 'Unknown' }}</span>
+              </div>
+              
+              <h3 class="note-title">{{ note.title or 'Untitled note' }}</h3>
+              <p class="note-desc">{{ note.content|default('', true)|truncate(120, True) }}</p>
+              
+              <div class="note-footer">
+                  <div class="note-stats">
+                      <span><span class="material-symbols-outlined" style="font-size: 1rem">visibility</span> {{ note.views or 0 }}</span>
                   </div>
-                </div>
+                  <div>
+                      {% if note.author == username %}
+                      <button class="note-action-delete" onclick="deleteNote('{{ note._id }}')">Delete</button>
+                      {% endif %}
+                      <button class="btn-view-pill" onclick="viewNote('{{ note._id }}')">VIEW</button>
+                  </div>
               </div>
             </div>
           </div>
           {% endfor %}
           {% else %}
-          <div class="col-12">
-            <div class="text-center py-5">
-              <span class="material-symbols-outlined" style="font-size: 64px; color: #ccc">note_stack</span>
-              <p class="text-muted mt-3">No notes yet. Add your first one!</p>
-            </div>
+          <div class="col-12 text-center py-5 text-muted">
+            <span class="material-symbols-outlined" style="font-size: 64px; opacity: 0.3">description</span>
+            <p class="mt-3">No notes yet. Be the first to share!</p>
           </div>
           {% endif %}
         </div>
+        
+        <!-- Mobile footer spacing -->
+        <div class="d-md-none" style="height:10vh"></div>
       </div>
-      <div class="d-md-none d-sm-12" style="height:10vh"></div>
     </main>
 
     <!-- Mobile Footer -->
     <footer class="d-md-none fixed-bottom bg-white border-top">
       <nav class="nav justify-content-around py-2">
-        <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('home.index') }}"><span
-            class="material-symbols-outlined fs-4">home</span>
-          <small class="d-block">Home</small></a>
-        <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('study.index') }}"><span
-            class="material-symbols-outlined fs-4">school</span>
-          <small class="d-block">Study</small></a>
-        <a class="nav-link d-flex flex-column align-items-center text-muted"
-          href="{{ url_for('community.index') }}"><span class="material-symbols-outlined fs-4">groups</span>
-          <small class="d-block">Community</small></a>
+        <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('home.index') }}">
+          <span class="material-symbols-outlined fs-4">home</span>
+          <small class="d-block">Home</small>
+        </a>
+        <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('study.index') }}">
+          <span class="material-symbols-outlined fs-4">school</span>
+          <small class="d-block">Study</small>
+        </a>
+        <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('community.index') }}">
+          <span class="material-symbols-outlined fs-4">groups</span>
+          <small class="d-block">Community</small>
+        </a>
       </nav>
     </footer>
-  </div>
 
-  <!-- Add Note Modal -->
-  <div class="modal fade" id="addNoteModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Add New Note</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- Add Note Modal -->
+    <div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content rounded-4">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" id="addNoteModalLabel">Add a New Note</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form id="noteForm">
+            <div class="modal-body">
+              <div class="mb-3">
+                <input type="text" class="form-control rounded-3" name="title" placeholder="Note Title" required />
+              </div>
+              <div class="mb-3">
+                <input type="text" class="form-control rounded-3" name="subject" placeholder="Subject (e.g. Mathematics)" />
+              </div>
+              <div class="mb-3">
+                <textarea class="form-control rounded-3" name="content" rows="5" placeholder="Note content..." required></textarea>
+              </div>
+            </div>
+            <div class="modal-footer border-0">
+              <button type="submit" class="btn-black-pill">Save Note</button>
+            </div>
+          </form>
         </div>
-        <form id="noteForm">
+      </div>
+    </div>
+
+    <!-- View Note Modal -->
+    <div class="modal fade" id="viewNoteModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content rounded-4">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" id="viewNoteTitle"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
           <div class="modal-body">
-            <div class="mb-3">
-              <label for="noteTitle" class="form-label">Title</label>
-              <input type="text" id="noteTitle" name="title" class="form-control" required />
-            </div>
-            <div class="mb-3">
-              <label for="noteContent" class="form-label">Content</label>
-              <textarea id="noteContent" name="content" class="form-control" rows="5" required></textarea>
-            </div>
+            <p class="text-muted small" id="viewNoteAuthor"></p>
+            <p id="viewNoteContent" style="white-space: pre-wrap"></p>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-primary">Save Note</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- View Note Modal -->
-  <div class="modal fade" id="viewNoteModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="viewNoteTitle"></h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <p class="text-muted mb-3" id="viewNoteAuthor"></p>
-          <div id="viewNoteContent"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Close
-          </button>
         </div>
       </div>
     </div>
-  </div>
+{% endblock %}
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}
   <script>
     // Add Note
     document
@@ -343,6 +387,4 @@
       }
     }
   </script>
-</body>
-
-</html>
+{% endblock %}

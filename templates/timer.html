@@ -45,6 +45,34 @@
     .soft-bg {
       background: radial-gradient(circle at top left, #fdf6e9, #f5e6d3);
     }
+    .theme-beige {
+      background: radial-gradient(circle at top left, #fdf6e9, #f5e6d3);
+    }
+    .theme-blue {
+      background: linear-gradient(135deg, #e0f4ff 0%, #b3e0ff 100%);
+    }
+    .theme-yellow {
+      background: linear-gradient(135deg, #fff9e6 0%, #ffe9b3 100%);
+    }
+    .theme-white {
+      background: #ffffff;
+    }
+    .theme-grey {
+      background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    }
+    .theme-black {
+      background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+    }
+    .theme-black .text-bookme-charcoal,
+    .theme-black .text-bookme-deep-blue {
+      color: #ffffff !important;
+    }
+    .theme-black .glass-panel {
+      background: rgba(50, 50, 50, 0.7);
+    }
+    .theme-black input::placeholder {
+      color: rgba(255, 255, 255, 0.5) !important;
+    }
     .glass-panel {
       background: var(--soft-white);
       backdrop-filter: blur(16px);
@@ -62,7 +90,7 @@
 
 <body class="antialiased text-bookme-charcoal soft-bg" style="overflow-x: hidden;">
   <!-- Header -->
-  <header class="w-100 bg-white border-bottom site-header">
+  <header class="w-100 border-bottom site-header" style="background-color: #faf8f4;">
     <div class="container d-flex align-items-center justify-content-between py-3">
       <a class="col-1 d-flex align-items-center justify-content-center py-3 text-decoration-none" href="{{ url_for('home.index') }}">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Bookme Logo" class="header-logo-static">
@@ -95,6 +123,7 @@
       </div>
     </div>
   </header>
+  <div style="height: 1px; background: linear-gradient(to right, transparent, rgba(142, 202, 230, 0.3) 20%, rgba(142, 202, 230, 0.3) 80%, transparent);"></div>
 
   <div class="relative" style="height: calc(100vh - 80px);">
     <!-- Main Content -->
@@ -139,6 +168,25 @@
             <button id="reset" class="size-16 rounded-full bg-white/60 flex items-center justify-center hover:bg-white transition-all border border-bookme-blue/20 shadow">
               <span class="material-symbols-outlined text-bookme-blue text-2xl">refresh</span>
             </button>
+          </div>
+
+          <!-- Theme Selector -->
+          <div class="mt-8 flex justify-center">
+            <div class="dropdown">
+              <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 border border-bookme-blue/20 hover:bg-white transition-all shadow-sm" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="material-symbols-outlined text-bookme-blue text-xl">palette</span>
+                <span class="text-sm font-medium text-bookme-charcoal">Theme</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><h6 class="dropdown-header">Background Theme</h6></li>
+                <li><a class="dropdown-item" href="#" onclick="changeTheme('beige'); return false;">☁️ Light Beige</a></li>
+                <li><a class="dropdown-item" href="#" onclick="changeTheme('blue'); return false;">💙 Light Blue</a></li>
+                <li><a class="dropdown-item" href="#" onclick="changeTheme('yellow'); return false;">☀️ Light Yellow</a></li>
+                <li><a class="dropdown-item" href="#" onclick="changeTheme('white'); return false;">⚪ White</a></li>
+                <li><a class="dropdown-item" href="#" onclick="changeTheme('grey'); return false;">🌫️ Grey</a></li>
+                <li><a class="dropdown-item" href="#" onclick="changeTheme('black'); return false;">🌙 Black</a></li>
+              </ul>
+            </div>
           </div>
         </section>
 
@@ -200,6 +248,32 @@
   <div class="fixed bottom-1.5 left-1/2 -translate-x-1/2 w-32 h-1 bg-bookme-deep-blue/10 rounded-full z-30"></div>
 
   <script>
+    // THEME SWITCHING
+    function changeTheme(theme) {
+      const body = document.body;
+      const themeClasses = ['theme-beige', 'theme-blue', 'theme-yellow', 'theme-white', 'theme-grey', 'theme-black'];
+      
+      // Remove all theme classes
+      themeClasses.forEach(cls => body.classList.remove(cls));
+      
+      // Add selected theme
+      body.classList.add(`theme-${theme}`);
+      
+      // Save to localStorage
+      localStorage.setItem('timerTheme', theme);
+    }
+
+    // Load saved theme on page load
+    function loadSavedTheme() {
+      const savedTheme = localStorage.getItem('timerTheme');
+      if (savedTheme) {
+        changeTheme(savedTheme);
+      }
+    }
+
+    // Initialize theme on page load
+    loadSavedTheme();
+
     // TIMER LOGIC
     let timer = null;
     let running = false;

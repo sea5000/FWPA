@@ -12,7 +12,6 @@ from routes import (
     study_bp,
     community_bp,
     flashcards_bp,
-    progress_bp,
     feed_bp,
     friends_bp,
     signup_bp,
@@ -33,7 +32,6 @@ app.register_blueprint(home_bp, url_prefix='/home')
 app.register_blueprint(study_bp, url_prefix='/study')
 app.register_blueprint(community_bp, url_prefix='/community')
 app.register_blueprint(flashcards_bp, url_prefix='/flashcards')
-app.register_blueprint(progress_bp, url_prefix='/progress')
 app.register_blueprint(feed_bp, url_prefix='/feed')
 app.register_blueprint(friends_bp, url_prefix='/friends')
 app.register_blueprint(signup_bp, url_prefix='/signup')

@@ -49,7 +49,7 @@
     function addNewCardRow(front, back) {
         const tmpl = document.getElementById('new-card-template');
         if (!tmpl) return;
-        // Clone the full template so structure/classes are preserved exactly
+        // Clone the full template so structure/classes are preserved
         const clone = tmpl.cloneNode(true);
         // Ensure it doesn't keep the template id and is visible
         clone.removeAttribute('id');
@@ -420,12 +420,6 @@ document.addEventListener('DOMContentLoaded', function () {
     messageInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') sendMessage();
     });
-
-    // File Drop Logic (Click trigger)
-    // Note: the primary fileDrop click handler is registered earlier in the floating chat
-    // panel script. Avoid duplicating `.click()` to prevent the browser opening the
-    // file picker twice. We only forward focus here when the user explicitly clicks
-    // the input element itself (no extra handler needed).
 
     fileInput.addEventListener('change', () => {
         if (fileInput.files.length > 0) {

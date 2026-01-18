@@ -15,6 +15,7 @@ All routes require JWT authentication.
 from flask import Blueprint, render_template, g
 from utils.auth import get_current_user_from_token  # JWT authentication
 from model.mongo import get_db  # Direct database access to get all users
+from model.studyData_model import get_user_study_data
 
 db = get_db()
 profiles_col = db.profiles
@@ -79,5 +80,6 @@ def friends_index():
     return render_template(
         'friends.html',
         username=g.current_user,  # Current logged-in user
-        users=all_users  # All users in the community
+        users=all_users,  # All users in the community
+        studyData=get_user_study_data(g.current_user),
     )

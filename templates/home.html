@@ -2,67 +2,305 @@
 <html lang="en">
 
 <head>
-    <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0" />
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Bookme Dashboard</title>
-    <!-- <link href="https://fonts.googleapis.com" rel="preconnect" /> -->
-    <!-- <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" /> -->
-    <!-- <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap"
-        rel="stylesheet" /> -->
+    
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-
+    
+    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    
+    <!-- Google Fonts: Playfair Display (serif) for headings, Inter (sans-serif) for body -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    
+    <!-- Custom responsive styles -->
     <link href="{{ url_for('static', filename='styles-responsive.css') }}" rel="stylesheet" />
+    
     <style>
-        /* .material-symbols-outlined {
-            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-        } */
+        /* ===================================
+           BASE STYLES & TYPOGRAPHY
+           =================================== */
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f9;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
 
-        /* Quote box styles */
-        #quoteBox {
+        /* Serif headings for elegant look */
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* ===================================
+           HEADER STYLES
+           =================================== */
+        
+        /* Streak button styling */
+        .streak-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .streak-btn:hover {
+            background-color: #e2e8f0;
+            color: #475569;
+        }
+
+        .streak-btn .material-symbols-outlined {
+            font-size: 1.25rem;
+            color: #f59e0b;
+        }
+
+        /* Fine-tune navigation centering */
+        @media (min-width: 768px) {
+            .site-header .nav-centered {
+                margin-left: 14px;
+            }
+        }
+
+        /* ===================================
+           HERO SECTION (Welcome + Quote)
+           =================================== */
+        
+        .hero-section {
             text-align: center;
-            margin-top: 0.5rem;
+            padding: 4rem 2rem 3rem;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
-        .quote-text {
+        /* Large welcome greeting */
+        .hero-greeting {
+            font-size: clamp(2.5rem, 5vw, 4rem);
             font-weight: 700;
-            font-size: 1rem;
-            color: var(--bs-dark);
+            color: #1a1a1a;
+            margin-bottom: 2rem;
+            line-height: 1.2;
         }
 
-        .quote-author {
-            font-size: 0.9rem;
-            color: #6c757d;
+        /* Motivational quote */
+        .hero-quote {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            font-style: italic;
+            color: #4a4a4a;
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
         }
 
-        .quote-fade {
-            transition: opacity 0.35s ease;
-            opacity: 1;
+        /* Quote author */
+        .hero-author {
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #6a6a6a;
+            margin-bottom: 2rem;
         }
 
-        .quote-fade.hidden {
-            opacity: 0;
+        /* Main CTA button */
+        .hero-btn {
+            display: inline-block;
+            padding: 0.875rem 2.5rem;
+            background-color: #1a1a1a;
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .hero-btn:hover {
+            background-color: #333;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            margin-top: 3rem;
+            opacity: 0.4;
+        }
+
+        .scroll-indicator .material-symbols-outlined {
+            font-size: 2rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* ===================================
+           CONTENT CARDS SECTION
+           =================================== */
+        
+        .cards-section {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem 4rem;
+        }
+
+        /* Individual card styling */
+        .content-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            height: 100%;
+        }
+
+        .content-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Card image container */
+        .card-image {
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Card content */
+        .card-content {
+            padding: 2rem;
+        }
+
+        .card-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+
+        .card-description {
+            font-size: 0.95rem;
+            color: #6a6a6a;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Card buttons */
+        .card-btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        /* Solid button (Study card) */
+        .card-btn-solid {
+            background-color: #1a1a1a;
+            color: white;
+        }
+
+        .card-btn-solid:hover {
+            background-color: #333;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Outlined button (Community card) */
+        .card-btn-outline {
+            background-color: transparent;
+            color: #1a1a1a;
+            border: 2px solid #1a1a1a;
+        }
+
+        .card-btn-outline:hover {
+            background-color: #1a1a1a;
+            color: white;
+        }
+
+        /* ===================================
+           RESPONSIVE DESIGN
+           =================================== */
+        
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 2rem 1rem;
+            }
+
+            .cards-section {
+                padding: 0 1rem 2rem;
+            }
+
+            .card-image {
+                height: 200px;
+            }
+
+            .card-content {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 
-<body class="bg-light text-dark">
+<body>
     <div class="d-flex flex-column min-vh-100">
+        <!-- ===================================
+             HEADER
+             =================================== -->
         <header class="w-100 site-header">
-            <div class="container d-flex align-items-center justify-content-between py-3">
+            <div class="container position-relative d-flex align-items-center justify-content-between py-3">
+                <!-- Logo -->
                 <a class="col-1 d-flex align-items-center justify-content-center py-3 text-decoration-none"
                     href="{{ url_for('home.index') }}">
                     <img src="{{ url_for('static', filename='logo.png') }}" alt="Bookme Logo"
                         class="header-logo-static">
                 </a>
-                <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
+                
+                <!-- Centered Navigation -->
+                <nav class="nav-centered d-none d-md-flex align-items-center gap-2 position-absolute top-50 start-50 translate-middle">
                     <a class="btn btn-sm btn-primary rounded-pill text-white"
                         href="{{ url_for('home.index') }}">Home</a>
                     <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
                     <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('community.index') }}">Community</a>
                 </nav>
+                
+                <!-- Right side: Streak, Notification, Profile -->
                 <div class="d-none d-md-flex align-items-center gap-3">
+                    <!-- Streak button -->
+                    <a href="{{ url_for('streak.index') }}" class="streak-btn">
+                        <span class="material-symbols-outlined">local_fire_department</span>
+                        <span>{{ studyData.streak if studyData is defined else 0 }} DAY STREAK</span>
+                    </a>
+                    
+                    <!-- Notification dropdown -->
                     <div class="dropdown">
                         <button type="button" class="btn btn-link text-muted p-0" data-bs-toggle="dropdown"
                             aria-expanded="false" aria-label="Notifications">
@@ -74,6 +312,7 @@
                             </li>
                         </ul>
                     </div>
+                    
                     <!-- Profile dropdown -->
                     <div class="dropdown">
                         <a class="btn btn-link text-muted p-0" href="{{ url_for('profile.index') }}"
@@ -101,117 +340,94 @@
                 </div>
             </div>
         </header>
-        <main class="flex-grow-1 container py-4">
-            <div class="mb-8">
-                <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white">
-                    Welcome back, {{profileData.name}}!
-                </h2>
-                <p class="text-slate-500 dark:text-slate-400 mt-1">
-                    Ready to crush your goals today?
-                </p>
-            </div>
-            <div class="mb-8 bg-white dark:bg-slate-900/50 p-4 rounded-xl flex items-center gap-4 shadow-sm">
-                <div class="bg-primary/20 text-primary p-3 rounded-lg">
-                    <span class="material-symbols-outlined text-3xl">local_fire_department</span>
+
+        <!-- ===================================
+             MAIN CONTENT
+             =================================== -->
+        <main class="flex-grow-1">
+            <!-- Hero Section: Welcome + Quote -->
+            <section class="hero-section">
+                <h1 class="hero-greeting">Welcome back, {{profileData.name}}.</h1>
+                
+                <p class="hero-quote" id="quoteText"></p>
+                <p class="hero-author" id="quoteAuthor"></p>
+                
+                <a href="{{ url_for('streak.index') }}" class="hero-btn">Check Streak Details</a>
+                
+                <!-- Scroll indicator -->
+                <div class="scroll-indicator">
+                    <span class="material-symbols-outlined">keyboard_arrow_down</span>
                 </div>
-                <div>
-                    <div class="w-100 text-center">
-                        <p class="text-2xl font-bold text-slate-900 dark:text-white mb-0">
-                            {{studyData.streak}} Day Streak
-                        </p>
+            </section>
+
+            <!-- Content Cards: Personal Study & Community -->
+            <section class="cards-section">
+                <div class="row g-4">
+                    <!-- Personal Study Card -->
+                    <div class="col-12 col-md-6">
+                        <a href="{{ url_for('study.index') }}" class="content-card">
+                            <div class="card-image" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD7LdNx_ViIAXDvKs8gevmNtu5dBmmn2rD5UGO9aoti9wNL1uuW8KN3kmZzDSuJlGRwI0fk0-x5TJ9N6aAQhBTRqnTl0ob5YPBZY7RIxvo04rbLBj1rWMtdD4z9iwymqLV3mtdWvA_6H97Kaa5kdh5zPgSj8aFqmDCqfocZPmdqSimb8jPVF4awa2XdA0K2ue-vOwZjhkESD1vUDi6DgMA26R9UMcUJ1YAbz8fJuxMBhpqUPyCv4AF06hdSt2ofpvFnMlaEeIkYzzZB');"></div>
+                            <div class="card-content">
+                                <h2 class="card-title">Personal Study</h2>
+                                <p class="card-description">
+                                    Focus & Productivity. Dive into your study sessions, track your progress, and unlock achievements.
+                                </p>
+                                <span class="card-btn card-btn-solid">Enter Session</span>
+                            </div>
+                        </a>
                     </div>
-                    </p>
-                    <style>
-                        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap');
 
-                        #quoteBox {
-                            font-family: 'Dancing Script', 'Segoe Script', 'Brush Script MT', cursive;
-                            line-height: 1.2;
-                        }
-
-                        #quoteBox .quote-text {
-                            font-weight: 700;
-                            font-size: 1.5rem;
-                        }
-
-                        #quoteBox .quote-author {
-                            font-weight: 400;
-                            font-size: 0.95rem;
-                            color: #000000;
-                        }
-                    </style>
-                    <div id="quoteBox" class="mt-3 text-center">
-                        <p id="quoteText" class="quote-text mb-1 quote-fade"></p>
-                        <p id="quoteAuthor" class="quote-author mb-0 quote-fade"></p>
-                    </div>
-                    <div class="d-flex justify-content-center mt-3">
-                        <a href="{{ url_for('streak.index') }}" class="btn btn-sm btn-primary rounded-pill">
-                            Check Streak Details here
+                    <!-- Community Card -->
+                    <div class="col-12 col-md-6">
+                        <a href="{{ url_for('community.index') }}" class="content-card">
+                            <div class="card-image" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDU3G6GtnPefYHQJZy9EyhIiRrTfkwaa2dtZlHhdfSsSSSvccJYqRw3abU5N0M5Oe_HY8WqopfdP5rR95I_w04pX4WTpo-eBYBms5vzzSTUd8yGIctqwakNgk5LLDvA3j7_xngpKU1q3oDZqP8waumImAVHOpSWjJuVZfnz8c52QTab9WQsKPZrMM00LUJ6kgmySl-LKc0_juz_kj85H7vpmbmTmlTg2_wq4yqAgGVkpbhlYJyRJa0PLl_HYBoZZUW1VmwwTUhbbmoh');"></div>
+                            <div class="card-content">
+                                <h2 class="card-title">Community</h2>
+                                <p class="card-description">
+                                    Connect & Collaborate. Engage with fellow learners, share insights, and collaborate on projects.
+                                </p>
+                                <span class="card-btn card-btn-outline">Explore Hub</span>
+                            </div>
                         </a>
                     </div>
                 </div>
-            </div>
-            <div class="row g-4 justify-content-around mt-3">
-                <div class="col-12 col-md-6 col-lg-4">
-                    <a class="card h-100 text-decoration-none text-reset" href="{{ url_for('study.index') }}">
-                        <div class="card-img-top" style="
-                  height: 192px;
-                  background-size: cover;
-                  background-position: center;
-                  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD7LdNx_ViIAXDvKs8gevmNtu5dBmmn2rD5UGO9aoti9wNL1uuW8KN3kmZzDSuJlGRwI0fk0-x5TJ9N6aAQhBTRqnTl0ob5YPBZY7RIxvo04rbLBj1rWMtdD4z9iwymqLV3mtdWvA_6H97Kaa5kdh5zPgSj8aFqmDCqfocZPmdqSimb8jPVF4awa2XdA0K2ue-vOwZjhkESD1vUDi6DgMA26R9UMcUJ1YAbz8fJuxMBhpqUPyCv4AF06hdSt2ofpvFnMlaEeIkYzzZB');
-                "></div>
-                        <div class="card-body">
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <span class="material-symbols-outlined text-primary">school</span>
-                                <h3 class="h5 mb-0">Study</h3>
-                            </div>
-                            <p class="text-muted small">
-                                Focus & Productivity. Dive into your study sessions, track
-                                your progress, and unlock achievements.
-                            </p>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-12 col-md-6 col-lg-4">
-                    <a class="card h-100 text-decoration-none text-reset" href="{{ url_for('community.index') }}">
-                        <div class="card-img-top" style="
-                  height: 192px;
-                  background-size: cover;
-                  background-position: center;
-                  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDU3G6GtnPefYHQJZy9EyhIiRrTfkwaa2dtZlHhdfSsSSSvccJYqRw3abU5N0M5Oe_HY8WqopfdP5rR95I_w04pX4WTpo-eBYBms5vzzSTUd8yGIctqwakNgk5LLDvA3j7_xngpKU1q3oDZqP8waumImAVHOpSWjJuVZfnz8c52QTab9WQsKPZrMM00LUJ6kgmySl-LKc0_juz_kj85H7vpmbmTmlTg2_wq4yqAgGVkpbhlYJyRJa0PLl_HYBoZZUW1VmwwTUhbbmoh');
-                "></div>
-                        <div class="card-body">
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <span class="material-symbols-outlined text-primary">groups</span>
-                                <h3 class="h5 mb-0">Community</h3>
-                            </div>
-                            <p class="text-muted small">
-                                Connect & Collaborate. Connect with fellow learners, share
-                                insights, and collaborate on projects.
-                            </p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="d-md-none d-sm-12" style="height:10vh"></div>
+            </section>
+
+            <!-- Spacer for mobile footer -->
+            <div class="d-md-none" style="height:10vh"></div>
         </main>
+
+        <!-- ===================================
+             MOBILE FOOTER
+             =================================== -->
         <footer class="d-md-none fixed-bottom bg-white border-top">
             <nav class="nav justify-content-around py-2">
                 <a class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="{{ url_for('home.index') }}"><span class="material-symbols-outlined fs-4">home</span>
-                    <small class="d-block">Home</small></a>
+                    href="{{ url_for('home.index') }}">
+                    <span class="material-symbols-outlined fs-4">home</span>
+                    <small class="d-block">Home</small>
+                </a>
                 <a class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="{{ url_for('study.index') }}"><span class="material-symbols-outlined fs-4">school</span>
-                    <small class="d-block">Study</small></a>
+                    href="{{ url_for('study.index') }}">
+                    <span class="material-symbols-outlined fs-4">school</span>
+                    <small class="d-block">Study</small>
+                </a>
                 <a class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="{{ url_for('community.index') }}"><span class="material-symbols-outlined fs-4">groups</span>
-                    <small class="d-block">Community</small></a>
+                    href="{{ url_for('community.index') }}">
+                    <span class="material-symbols-outlined fs-4">groups</span>
+                    <small class="d-block">Community</small>
+                </a>
             </nav>
         </footer>
     </div>
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ===================================
+         JAVASCRIPT: Navigation Highlighting
+         =================================== -->
     <script>
-        // Highlight header/footer nav link using the folder slug
         document.addEventListener("DOMContentLoaded", function () {
             try {
                 const navAreas = [];
@@ -221,29 +437,23 @@
                 navAreas.push(...footers);
 
                 const parts = location.pathname.split("/").filter(Boolean);
-                const currentSlug =
-                    parts.length >= 2 ? parts[parts.length - 2] : parts[0] || "home";
+                const currentSlug = parts.length >= 2 ? parts[parts.length - 2] : parts[0] || "home";
 
                 navAreas.forEach((area) => {
                     const links = Array.from(area.querySelectorAll("a[href]"));
                     links.forEach((a) => {
                         try {
-                            if (a.id === "logoButton") return;
+                            // Skip logo and streak button
+                            if (a.id === "logoButton" || a.classList.contains("streak-btn")) return;
+                            
                             const url = new URL(a.getAttribute("href"), location.origin);
                             const linkParts = url.pathname.split("/").filter(Boolean);
-                            const linkSlug =
-                                linkParts.length >= 2
-                                    ? linkParts[linkParts.length - 2]
-                                    : linkParts[0] || "home";
+                            const linkSlug = linkParts.length >= 2 ? linkParts[linkParts.length - 2] : linkParts[0] || "home";
 
-                            a.classList.remove(
-                                "active",
-                                "text-primary",
-                                "fw-bold",
-                                "text-white",
-                                "btn-primary"
-                            );
+                            // Remove all active classes
+                            a.classList.remove("active", "text-primary", "fw-bold", "text-white", "btn-primary");
 
+                            // Add active classes if current page
                             if (linkSlug === currentSlug) {
                                 if (a.classList.contains("btn")) {
                                     a.classList.remove("btn-light");
@@ -257,10 +467,7 @@
                                     a.classList.remove("text-primary", "fw-bold");
                                     a.classList.add("text-muted");
                                 }
-                                if (
-                                    a.classList.contains("btn") &&
-                                    !a.classList.contains("btn-light")
-                                ) {
+                                if (a.classList.contains("btn") && !a.classList.contains("btn-light")) {
                                     a.classList.add("btn-light");
                                 }
                             }
@@ -270,8 +477,13 @@
             } catch (e) { }
         });
     </script>
+    
+    <!-- ===================================
+         JAVASCRIPT: Quote Rotation
+         =================================== -->
     <script>
         (function () {
+            // Array of motivational quotes
             const quotes = [
                 {
                     text: "The only way to do great work is to love what you do.",
@@ -294,33 +506,31 @@
                     author: "Franklin D. Roosevelt",
                 },
             ];
+
             let currentIndex = -1;
             const quoteText = document.getElementById("quoteText");
             const quoteAuthor = document.getElementById("quoteAuthor");
 
+            // Display a random quote
             function showRandomQuote() {
                 if (!quoteText || !quoteAuthor) return;
+                
+                // Get a different quote than the current one
                 let idx;
                 do {
                     idx = Math.floor(Math.random() * quotes.length);
                 } while (quotes.length > 1 && idx === currentIndex);
                 currentIndex = idx;
 
-                // fade out, change, fade in
-                quoteText.classList.add("hidden");
-                quoteAuthor.classList.add("hidden");
-                setTimeout(() => {
-                    quoteText.textContent = `"${quotes[idx].text}"`;
-                    quoteAuthor.textContent = `— ${quotes[idx].author}`;
-                    quoteText.classList.remove("hidden");
-                    quoteAuthor.classList.remove("hidden");
-                }, 300);
+                // Update quote text and author
+                quoteText.textContent = `"${quotes[idx].text}"`;
+                quoteAuthor.textContent = `— ${quotes[idx].author}`;
             }
 
+            // Show initial quote and rotate every 2 minutes
             document.addEventListener("DOMContentLoaded", function () {
                 showRandomQuote();
-                // rotate every 2 minutes (120000 ms)
-                setInterval(showRandomQuote, 120000);
+                setInterval(showRandomQuote, 120000); // 120000ms = 2 minutes
             });
         })();
     </script>

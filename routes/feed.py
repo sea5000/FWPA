@@ -15,6 +15,7 @@ from flask import Blueprint, request, jsonify, render_template, g
 from datetime import datetime
 from utils.auth import get_current_user_from_token  # Get current user from JWT token
 from model.login_model import get_user_by_username  # Get user profile data
+from model.studyData_model import get_user_study_data
 from model.feed_post_model import (
     list_posts,
     get_post,
@@ -63,7 +64,7 @@ def feed_page():
     profile_data = get_user_by_username(g.current_user)
     # Pass the profile data to the template so user can see their avatar/name
     return render_template(
-        "feed.html", username=g.current_user, profileData=profile_data
+        "feed.html", username=g.current_user, profileData=profile_data, studyData=get_user_study_data(g.current_user)
     )
 
 

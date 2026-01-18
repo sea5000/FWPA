@@ -14,6 +14,7 @@ from bson import ObjectId
 from flask import Blueprint, render_template, g, request, jsonify
 from utils.auth import get_current_user_from_token  # JWT authentication
 from model.login_model import get_all_users  # Get user list for template
+from model.studyData_model import get_user_study_data
 from model.notes_model import upload_note as upload_note_model, view_note as view_note_model
 from model.mongo import get_db  # Direct database access for complex operations
 from datetime import datetime
@@ -77,7 +78,8 @@ def community_index():
         "community.html",
         username=g.current_user,
         users=get_all_users(),  # Get all users for potential collaboration features
-        notes=notes  # Pass all notes to be displayed
+        notes=notes,  # Pass all notes to be displayed
+        studyData=get_user_study_data(g.current_user),
     )
 
 

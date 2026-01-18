@@ -15,6 +15,7 @@ All routes require JWT authentication.
 from flask import Blueprint, render_template, g, request, jsonify
 from utils.auth import get_current_user_from_token  # JWT authentication
 from model.login_model import get_all_users  # Get user list for templates
+from model.studyData_model import get_user_study_data
 from model.study_session_model import (
     log_session,  # Insert session into database
     list_sessions,  # Get user's session history
@@ -63,7 +64,8 @@ def timer_index():
     return render_template(
         'timer.html',
         username=g.current_user,
-        users=get_all_users()  # Pass all users for potential friend features
+        users=get_all_users(),  # Pass all users for potential friend features
+        studyData=get_user_study_data(g.current_user),
     )
 
 

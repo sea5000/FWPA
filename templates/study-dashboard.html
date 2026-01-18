@@ -15,9 +15,38 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <link href="{{ url_for('static', filename='styles-responsive.css') }}" rel="stylesheet">
     <style>
-        /* body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        } */
+        /* Streak button styling */
+        .streak-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .streak-btn:hover {
+            background-color: #e2e8f0;
+            color: #475569;
+        }
+
+        .streak-btn .material-symbols-outlined {
+            font-size: 1.25rem;
+            color: #f59e0b;
+        }
+
+        /* Fine-tune navigation centering */
+        @media (min-width: 768px) {
+            .site-header .nav-centered {
+                margin-left: 14px;
+            }
+        }
 
         .gradient-bg {
             background-image: linear-gradient(120deg, #e0f7fa 0%, #d4eaf7 100%);
@@ -32,17 +61,28 @@
 <body class="bg-light text-dark">
     <div class="d-flex flex-column min-vh-100">
         <header class="w-100 site-header">
-            <div class="container d-flex align-items-center justify-content-between py-3">
+            <div class="container position-relative d-flex align-items-center justify-content-between py-3">
+                <!-- Logo -->
                 <a class="col-1 d-flex align-items-center justify-content-center py-3 text-decoration-none" href="{{ url_for('home.index') }}">
                     <img src="{{ url_for('static', filename='logo.png') }}" alt="Bookme Logo" class="header-logo-static">
                 </a>
-                <nav class="nav-centered d-none d-md-flex align-items-center gap-2">
+                
+                <!-- Centered Navigation -->
+                <nav class="nav-centered d-none d-md-flex align-items-center gap-2 position-absolute top-50 start-50 translate-middle">
                     <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('home.index') }}">Home</a>
-                    <a class="btn btn-sm btn-primary rounded-pill text-white"
-                        href="{{ url_for('study.index') }}">Study</a>
+                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
                     <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('community.index') }}">Community</a>
                 </nav>
+                
+                <!-- Right side: Streak, Notification, Profile -->
                 <div class="d-none d-md-flex align-items-center gap-3">
+                    <!-- Streak button -->
+                    <a href="{{ url_for('streak.index') }}" class="streak-btn">
+                        <span class="material-symbols-outlined">local_fire_department</span>
+                        <span>{{ studyData.streak if studyData is defined else 0 }} DAY STREAK</span>
+                    </a>
+                    
+                    <!-- Notification dropdown -->
                     <div class="dropdown">
                         <button type="button" class="btn btn-link text-muted p-0" data-bs-toggle="dropdown"
                             aria-expanded="false" aria-label="Notifications">
@@ -54,6 +94,8 @@
                             </li>
                         </ul>
                     </div>
+                    
+                    <!-- Profile dropdown -->
                     <div class="dropdown">
                         <a class="btn btn-link text-muted p-0" href="{{ url_for('profile.index') }}"
                             id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile"
@@ -166,7 +208,7 @@
                     const links = Array.from(area.querySelectorAll('a[href]'));
                     links.forEach(a => {
                         try {
-                            if (a.id === "logoButton") return;
+                            if (a.id === "logoButton" || a.classList.contains("streak-btn")) return;
                             const url = new URL(a.getAttribute('href'), location.origin);
                             const linkParts = url.pathname.split('/').filter(Boolean);
                             const linkSlug = linkParts.length >= 2 ? linkParts[linkParts.length - 2] : (linkParts[0] || 'home');

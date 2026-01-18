@@ -56,6 +56,21 @@
         margin-left: 14px;
       }
     }
+    
+    .flashcards-page .btn-primary,
+    .flashcards-page .btn-info {
+      background-color: #000 !important;
+      border-color: #000 !important;
+      color: #fff !important;
+    }
+
+    .flashcards-page .btn:hover,
+    .flashcards-page .btn:focus {
+      background-color: #333 !important;
+      border-color: #333 !important;
+      color: #fff !important;
+      transform: translateY(-1px) !important;
+    }
   </style>
 </head>
 
@@ -125,7 +140,7 @@
       </div>
     </header>
         <main>
-            <div class="bg-body container p-4">
+            <div class="bg-body container p-4 flashcards-page">
                 <div class="row">
                     <div class="col">
                         <!-- col-12 col-lg-8 -->
@@ -139,12 +154,6 @@
                                 <span class="material-symbols-outlined" aria-hidden="true"
                                     style="font-size:18px;">add_box</span>
                                 <span class="fw-semibold">New Deck</span>
-                            </a>
-                            <a href="{{ url_for('progress.index') }}"
-                                class="btn btn-info btn-sm rounded-pill d-inline-flex align-items-center gap-2">
-                                <span class="material-symbols-outlined" aria-hidden="true"
-                                    style="font-size:18px;">elevation</span>
-                                <span>Progress</span>
                             </a>
                         </div>
                     </div>

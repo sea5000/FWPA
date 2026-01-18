@@ -17,7 +17,6 @@ from routes.home import home_bp
 from routes.study import study_bp
 from routes.community import community_bp
 from routes.flashcards import flashcards_bp
-from routes.progress import progress_bp
 from routes.feed import feed_bp
 from routes.friends import friends_bp
 from routes.signup import signup_bp
@@ -33,7 +32,6 @@ __all__ = [
 	'study_bp',
 	'community_bp',
 	'flashcards_bp',
-	'progress_bp',
 	'feed_bp',
 	'friends_bp',
 	'signup_bp',

@@ -2,11 +2,9 @@ from flask import Blueprint, jsonify, g, request
 from werkzeug.utils import secure_filename
 import tempfile
 from utils.auth import get_current_user_from_token
-# from model.studyData_model import add_card, update_deckInfo
 from dotenv import load_dotenv
 import os
 import json
-import ast
 from google import genai
 from google.genai import types
 from model.logs_model import insert_ai_log

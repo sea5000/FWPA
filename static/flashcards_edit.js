@@ -256,7 +256,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const formData = new FormData();
         formData.append('message', text);
         if (file) {
-            formData.append('file', file);
+            // include the filename explicitly to ensure Flask/Werkzeug recognizes it correctly
+            try { formData.append('file', file, file.name); } catch (e) { formData.append('file', file); }
         }
 
         // Show loading state on send button and disable it to prevent duplicates
@@ -288,11 +289,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         appendMessage(feedback, 'ai');
                     }
 
-                    if (jsonResp) {
+                        if (jsonResp) {
                         try {
                             // jsonResp may already be an object or a JSON string
                             let parsed = jsonResp;
-                            console.log(parsed)
+                            // parsed may be string or object
                             if (typeof parsed === 'string') {
                                 // First try native parse, then fallbacks that extract code fences
                                 try {
@@ -336,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             }
 
-                            if (flashcardsArray && Array.isArray(flashcardsArray)) {
+                            if (flashcardsArray && Array.isArray(flashcardsArray) && flashcardsArray.length > 0) {
                                 flashcardsArray.forEach(fc => {
                                     const front = fc.front || fc.question || fc.prompt || '';
                                     const back = fc.back || fc.answer || fc.response || '';
@@ -393,7 +394,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                 notice.innerHTML = `\n        <div class="alert alert-info d-flex justify-content-between align-items-center mb-0">\n            <div>AI added <strong>${flashcardsArray.length}</strong> card(s) to this form. Review them and click <strong>Save changes</strong> to persist.</div>\n            <div><button type="submit" class="btn btn-sm btn-primary" id="ai-save-now">Save now</button></div>\n        </div>`;
                                 appendMessage('Added ' + flashcardsArray.length + ' card(s) to the edit form. Click Save changes to persist.', 'ai');
                             } else {
-                                appendMessage(data.reply || JSON.stringify(parsed), 'ai');
+                                // No flashcards were produced — surface feedback or raw reply instead
+                                const noCardsMessage = (parsed && parsed.feedback) ? parsed.feedback : (data.reply || JSON.stringify(parsed));
+                                appendMessage(noCardsMessage, 'ai');
                             }
                         } catch (procErr) {
                             console.error('Error processing AI response', procErr);
@@ -403,7 +406,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         appendMessage(data.reply || 'No structured content returned', 'ai');
                     }
                 } else {
-                    appendMessage("Error: " + data.message, 'ai');
+                    const errMsg = data.message || 'Unknown error from AI proxy';
+                    appendMessage("Error: " + errMsg, 'ai');
                 }
 
                 // Reset file input

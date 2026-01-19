@@ -1,4 +1,6 @@
 from flask import Blueprint, render_template, jsonify, g, request
+from werkzeug.utils import secure_filename
+import tempfile
 from utils.auth import get_current_user_from_token
 from model.login_model import get_all_users
 # from model.studyData_model import add_card, update_deckInfo
@@ -49,8 +51,12 @@ def upload_file_to_gemini(file_path):
         print("Error: Gemini client not initialized. GEMINI_API_KEY may be missing.")
         return None
     try:
-        file = client.files.upload(path=file_path)
-        print(f"Uploaded file: {file.name}")
+        # google.genai client expects keyword 'file' (path or filename), not 'path'
+        file = client.files.upload(file=file_path)
+        try:
+            print(f"Uploaded file: {file.name}")
+        except Exception:
+            print("Uploaded file (no name available)")
         return file
     except Exception as e:
         print(f"File upload error: {e}")
@@ -71,22 +77,50 @@ def chat_proxy():
     if not client:
         return jsonify({"error": "AI service not available. GEMINI_API_KEY is not configured."}), 503
     
+    # Basic request diagnostics to help debug missing file uploads
+    # minimal diagnostics preserved in logs only when needed
+
     user_message = request.form.get('message')
     uploaded_file = request.files.get('file')
+    # uploaded_file may be present; handled below
 
     # 1. Handle File Upload (If applicable)
     uploaded_gemini_file = None
     if uploaded_file:
-        # Save temporarily and upload to Gemini
-        temp_path = f"/tmp/{uploaded_file.filename}"
-        uploaded_file.save(temp_path)
-        uploaded_gemini_file = upload_file_to_gemini(temp_path)
-        uploaded_file.close()
-        # Clean up temp file
+        # Save temporarily and upload to Gemini using a secure, unique temp file
         try:
-            os.remove(temp_path)
-        except Exception:
-            pass
+            filename = secure_filename(uploaded_file.filename or 'upload')
+            # Use NamedTemporaryFile to avoid path issues and ensure cleanup
+            with tempfile.NamedTemporaryFile(prefix='ai_upload_', suffix='_' + filename, delete=False) as tmp:
+                tmp_name = tmp.name
+                # stream the uploaded file into the temp file
+                uploaded_file.save(tmp_name)
+            uploaded_gemini_file = upload_file_to_gemini(tmp_name)
+        except Exception as e:
+            # keep a concise error log
+            print(f"File handling/upload error: {e}")
+            uploaded_gemini_file = None
+        finally:
+            try:
+                uploaded_file.close()
+            except Exception:
+                pass
+            # Clean up temp file if it exists
+            try:
+                if 'tmp_name' in locals() and os.path.exists(tmp_name):
+                    os.remove(tmp_name)
+            except Exception:
+                pass
+
+    # If a file was posted but we couldn't upload it to Gemini, return a clear error
+    if uploaded_file and not uploaded_gemini_file:
+        fname = getattr(uploaded_file, 'filename', '(unknown)')
+        print(f"File received but upload to AI failed: {fname}")
+        return jsonify({
+            "status": "error",
+            "message": "File received but upload to AI failed.",
+            "file_received": fname
+        }), 502
     
     # 2. Prepare content for Gemini
     fullPrompt = systemPrompt + user_message
@@ -146,9 +180,8 @@ def chat_proxy():
         try:
             # 1) Direct JSON parse
             parsed = json.loads(jsonResp)
-        except json.JSONDecodeError as e:
-            print(f'Initial JSON parse failed: {e}')
-            print(f'Attempting to repair truncated JSON...')
+        except json.JSONDecodeError:
+            # Attempt to repair truncated or malformed JSON
             
             # 2) Aggressively repair truncated JSON
             try:
@@ -173,11 +206,11 @@ def chat_proxy():
                     # Add feedback field and close main object
                     cleaned += ',\n  "feedback": "Response was truncated. Some flashcards may be missing."\n}'
                     
-                    print(f'Repaired JSON (last 200 chars): ...{cleaned[-200:]}')
+                    # repaired JSON attempted
                     
                     # Try to parse the repaired JSON
                     parsed = json.loads(cleaned)
-                    print(f'Successfully repaired truncated JSON! Recovered {len(parsed.get("flashcards", []))} flashcards.')
+                    # repaired JSON parsed
                     
             except json.JSONDecodeError as e2:
                 print(f'First repair attempt failed: {e2}')
@@ -205,17 +238,14 @@ def chat_proxy():
                         parsed = json.loads(cleaned)
                         print(f'Second repair succeeded! Recovered {len(parsed.get("flashcards", []))} flashcards.')
                         
-                except json.JSONDecodeError as e3:
-                    print(f'Second repair attempt failed: {e3}')
+                except json.JSONDecodeError:
+                    # second repair attempt failed
                     # 4) Last resort: try ast.literal_eval
                     try:
                         parsed_candidate = ast.literal_eval(jsonResp)
                         parsed = json.loads(json.dumps(parsed_candidate))
-                    except Exception as e4:
-                        parse_error = f"JSON parse error: {str(e)}"
-                        print(f'All repair attempts failed.')
-                        print(f'AI raw response (last 500 chars): ...{ai_text[-500:]}')
-                        print(f'Extracted JSON (last 500 chars): ...{jsonResp[-500:]}')
+                    except Exception:
+                        parse_error = "JSON parse error"
         
         # Extract feedback from parsed JSON if present
         feedback = ''
@@ -228,6 +258,20 @@ def chat_proxy():
                 insert_ai_log(g.current_user, None, fullPrompt, ai_text, parsed=parsed, feedback=feedback, success=True)
             except Exception:
                 pass
+
+            # If no flashcards were produced, return an error status (no verbose preview)
+            try:
+                fc_len = len(parsed.get('flashcards', [])) if isinstance(parsed, dict) else 0
+            except Exception:
+                fc_len = 0
+            if fc_len == 0:
+                return jsonify({
+                    "status": "error",
+                    "message": feedback or "AI returned no flashcards",
+                    "json": parsed,
+                    "no_flashcards": True
+                })
+
             return jsonify({
                 "status": "success", 
                 "json": parsed, 

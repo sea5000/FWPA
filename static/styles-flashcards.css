@@ -133,7 +133,7 @@
 .study-subtitle {
     font-family: 'Inter', sans-serif;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 750;
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color: #9ca3af;
@@ -142,10 +142,11 @@
 /* Buttons */
 .btn-study-outline {
     background-color: transparent;
-    border: 1px solid #e5e7eb;
-    color: #6b7280;
-    font-size: 0.7rem;
-    font-weight: 600;
+    border: 1px solid #4b5563;
+    background-color: #ffffff;
+    color: #4b5563;
+    font-size: 0.8rem;
+    font-weight: 750;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     padding: 0.75rem 1.5rem;
@@ -159,8 +160,9 @@
 
 .btn-study-outline:hover {
     border-color: #1a1a1a;
-    color: #1a1a1a;
-    background-color: transparent;
+    color: #e8e8e8;
+    font-weight: 600;
+    background-color: #1a1a1a;
 }
 
 .btn-study-primary {
@@ -376,7 +378,11 @@
     color: #fff;
     transform: scale(1.02);
 }
-
+button.btn-primary:nth-child(1):hover {
+    background-color: #333;
+    color: #fff;
+    transform: scale(1.02);
+}
 /* Edit Button */
 .btn-edit {
     width: 40px;
@@ -511,6 +517,7 @@
     border: 1px solid #e5e7eb;
     background: #ffffff;
     padding: 0.6rem 0.75rem;
+    resize: none;
     width: 100%;
     outline: none;
     line-height: 1.2;

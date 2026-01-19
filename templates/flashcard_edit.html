@@ -13,25 +13,25 @@
 <main>
     <div class="study-page-container">
         <form method="POST" id="edit-deck-form">
-            <div class="study-header-section align-items-center mb-4 d-flex justify-content-between">
+            <div class="d-flex gap-2 ms-4 align-items-center justify-content-end">
+                <a href="{{ url_for('flashcards.index', deck_id = deck_id) }}" class="btn-study-outline">BACK</a>
+                <button type="button" id="shareBtn" class="btn-study-outline">SHARE</button>
+                <button type="button" id="deleteBtn" class="btn-study-danger">DELETE</button>
+            </div>
+            <div class="study-header-section align-items-sm-start d-md-inline mb-4 d-flex justify-content-between">
                 <div style="flex:1;">
                     <div class="study-subtitle mb-2">EDITING DECK</div>
-                    <input type="text" class="edit-title-input form-control mb-2" name="deck_name" value="{{ deck.name }}" placeholder="Deck Name">
-                    <textarea class="edit-summary-input auto-expand form-control" name="deck_summary" rows="1" placeholder="Add a brief summary...">{{ deck.summary }}</textarea>
-                </div>
-                <div class="d-flex gap-2 ms-4 align-items-start">
-                    <a href="{{ url_for('flashcards.index', deck_id = deck_id) }}" class="btn-study-outline">BACK</a>
-                    <button type="button" id="shareBtn" class="btn-study-outline">SHARE</button>
-                    <button type="button" id="deleteBtn" class="btn-study-danger">DELETE</button>
+                    <textarea type="text" class="edit-title-input auto-expand form-control mb-2" name="deck_name"
+                        placeholder="Deck Name">{{ deck.name }}</textarea>
+                    <textarea class="edit-summary-input auto-expand form-control" name="deck_summary" rows="1"
+                        placeholder="Add a brief summary...">{{ deck.summary }}</textarea>
+                    <label class="study-subtitle mb-2">Tags</label>
+                    <input class="form-control" name="tags" id="tags" value="">
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Tags</label>
-                <input class="form-control" name="tags" id="tags" value="">
-            </div>
 
-            <div class="deck-cards-list mb-3">
+            <div class="deck-cards-list my-3">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div class="study-subtitle">CARDS IN DECK</div>
                     <button type="button" id="add-new-card" class="btn-study-outline">ADD CARD</button>
@@ -40,22 +40,28 @@
                 <div class="list-group list-group-flush col-12">
                     {% for cardn, card in deck.cards.items() %}
                     <div class="edit-card-item position-relative mb-3" id="card-row-{{ cardn }}">
-                        <div class="card-deleted-overlay position-absolute top-0 start-0 w-100 h-100 d-none flex-column align-items-center justify-content-center" style="background: rgba(255,255,255,0.95); z-index: 10; border-radius: 8px;">
+                        <div class="card-deleted-overlay position-absolute top-0 start-0 w-100 h-100 d-none flex-column align-items-center justify-content-center"
+                            style="background: rgba(255,255,255,0.95); z-index: 10; border-radius: 8px;">
                             <div class="text-danger fw-bold mb-3">MARKED FOR DELETION</div>
-                            <button type="button" class="btn-study-outline card-undo-btn" data-target="{{ cardn }}">UNDO</button>
+                            <button type="button" class="btn-study-outline card-undo-btn"
+                                data-target="{{ cardn }}">UNDO</button>
                         </div>
                         <div class="d-flex gap-3 align-items-start">
                             <div class="flex-grow-1">
                                 <label class="edit-card-label">FRONT</label>
-                                <textarea class="edit-card-textarea auto-expand form-control" name="front_{{ cardn }}" rows="1">{{ card.front }}</textarea>
+                                <textarea class="edit-card-textarea auto-expand form-control" name="front_{{ cardn }}"
+                                    rows="1">{{ card.front }}</textarea>
                             </div>
                             <div class="flex-grow-1">
                                 <label class="edit-card-label">BACK</label>
-                                <textarea class="edit-card-textarea auto-expand form-control" name="back_{{ cardn }}" rows="1">{{ card.back }}</textarea>
+                                <textarea class="edit-card-textarea auto-expand form-control" name="back_{{ cardn }}"
+                                    rows="1">{{ card.back }}</textarea>
                             </div>
                             <div class="pt-2">
-                                <input class="form-check-input d-none card-delete-checkbox" type="checkbox" name="delete_{{ cardn }}" id="delete_{{ cardn }}">
-                                <button type="button" class="btn btn-link text-danger p-0 border-0 card-delete-trigger" data-target="{{ cardn }}" title="Delete Card">
+                                <input class="form-check-input d-none card-delete-checkbox" type="checkbox"
+                                    name="delete_{{ cardn }}" id="delete_{{ cardn }}">
+                                <button type="button" class="btn btn-link text-danger p-0 border-0 card-delete-trigger"
+                                    data-target="{{ cardn }}" title="Delete Card">
                                     <span class="material-symbols-outlined">delete</span>
                                 </button>
                             </div>
@@ -67,15 +73,18 @@
                 <div id="new-cards-container"></div>
                 <div class="d-none" id="new-card-template">
                     <div class="edit-card-item new-card-row position-relative">
-                        <button type="button" class="btn-close position-absolute remove-new-card" aria-label="Remove" style="top: 0.5rem; right: 0.5rem;"></button>
+                        <button type="button" class="btn-close position-absolute remove-new-card" aria-label="Remove"
+                            style="top: 0.5rem; right: 0.5rem;"></button>
                         <div class="d-flex gap-3">
                             <div class="flex-grow-1">
                                 <label class="edit-card-label">FRONT</label>
-                                <textarea class="edit-card-textarea auto-expand form-control" name="new_front[]" rows="1" placeholder="Front text"></textarea>
+                                <textarea class="edit-card-textarea auto-expand form-control" name="new_front[]"
+                                    rows="1" placeholder="Front text"></textarea>
                             </div>
                             <div class="flex-grow-1">
                                 <label class="edit-card-label">BACK</label>
-                                <textarea class="edit-card-textarea auto-expand form-control" name="new_back[]" rows="1" placeholder="Back text"></textarea>
+                                <textarea class="edit-card-textarea auto-expand form-control" name="new_back[]" rows="1"
+                                    placeholder="Back text"></textarea>
                             </div>
                         </div>
                     </div>
@@ -90,7 +99,8 @@
         </form>
     </div>
 
-    <div id="confirmDeleteModal" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="z-index:3000;background:rgba(0,0,0,0.45);">
+    <div id="confirmDeleteModal" class="position-fixed top-0 start-0 w-100 h-100 d-none"
+        style="z-index:3000;background:rgba(0,0,0,0.45);">
         <div class="d-flex align-items-center justify-content-center h-100 p-3">
             <div class="bg-white rounded shadow-sm p-4" style="max-width:480px; width:100%; border-radius: 12px;">
                 <div class="d-flex justify-content-between align-items-start mb-2">
@@ -109,76 +119,90 @@
     </div>
 
 </main>
-    <!-- Floating chat button -->
-    <button id="floating-chat-button" class="btn btn-primary d-inline-flex align-items-center justify-content-center" aria-label="Open chat" title="Chat">
-        <span class="material-symbols-outlined" style="font-size:22px;">chat</span>
-    </button>
-    <!-- Chat panel -->
-    <div id="floating-chat-panel" role="dialog" aria-hidden="true" aria-label="Chat window" style="display:none;">
-        <div id="floating-chat-header">
-            <div>
-                <div class="chat-title">AI Assistant</div>
-                <div class="chat-sub">Flashcard Maker</div>
-            </div>
-            <button id="floating-chat-close" type="button" class="btn btn-sm btn-light" aria-label="Close" title="Close"><span class="material-symbols-outlined">close</span></button>
+<!-- Floating chat button -->
+<button id="floating-chat-button" class="btn btn-primary d-inline-flex align-items-center justify-content-center"
+    aria-label="Open chat" title="Chat">
+    <span class="material-symbols-outlined" style="font-size:22px;">chat</span>
+</button>
+<!-- Chat panel -->
+<div id="floating-chat-panel" role="dialog" aria-hidden="true" aria-label="Chat window" style="display:none;">
+    <div id="floating-chat-header">
+        <div>
+            <div class="chat-title">AI Assistant</div>
+            <div class="chat-sub">Flashcard Maker</div>
         </div>
-        <div id="floating-chat-body">
-            <div class="text-muted small">Type request...</div>
-        </div>
-        <div id="floating-chat-footer">
-             <div id="file-drop" class="file-drop" title="Drop file"><span class="material-symbols-outlined">attach_file</span><input id="file-drop-input" type="file" style="display:none" /></div>
-            <input id="chat-message-input" class="form-control form-control-sm chat-input" type="text" placeholder="Write a message..." />
-            <button id="chat-send-btn" class="btn btn-primary send-btn" type="button"><span class="material-symbols-outlined">send</span></button>
-        </div>
+        <button id="floating-chat-close" type="button" class="btn btn-sm btn-light" aria-label="Close"
+            title="Close"><span class="material-symbols-outlined">close</span></button>
     </div>
+    <div id="floating-chat-body">
+        <div class="text-muted small">Type request...</div>
+    </div>
+    <div id="floating-chat-footer">
+        <div id="file-drop" class="file-drop" title="Drop file"><span
+                class="material-symbols-outlined">attach_file</span><input id="file-drop-input" type="file"
+                style="display:none" /></div>
+        <input id="chat-message-input" class="form-control form-control-sm chat-input" type="text"
+            placeholder="Write a message..." />
+        <button id="chat-send-btn" class="btn btn-primary send-btn" type="button"><span
+                class="material-symbols-outlined">send</span></button>
+    </div>
+</div>
 
-    <!-- Share Modal -->
-    <div class="modal fade" id="shareModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 20px; border: none;">
-                <div class="modal-header border-bottom-0">
-                    <h5 class="modal-title" style="font-family: 'Playfair Display', serif;">Share Deck</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input id="share-search" class="form-control mb-3" placeholder="Search friends..." style="border-radius: 12px;">
-                    <table class="table table-sm table-borderless">
-                        <tbody id="share-list"></tbody>
-                    </table>
-                    <div id="share-empty" class="text-center text-muted small d-none">No friends found.</div>
-                </div>
-                <div class="modal-footer border-top-0">
-                    <button type="button" id="share-save" class="btn-study-primary">Save Permissions</button>
-                </div>
+<!-- Share Modal -->
+<div class="modal fade" id="shareModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; border: none;">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title" style="font-family: 'Playfair Display', serif;">Share Deck</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="share-search" class="form-control mb-3" placeholder="Search users..."
+                    style="border-radius: 12px;">
+                <table class="table table-sm table-borderless">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th class="text-center">Read</th>
+                            <th class="text-center">Write</th>
+                        </tr>
+                    </thead>
+                    <tbody id="share-list"></tbody>
+                </table>
+                <div id="share-empty" class="text-center text-muted small d-none">No friends found.</div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" id="share-save" class="btn-study-primary">Save Permissions</button>
             </div>
         </div>
     </div>
-    <!-- Mobile Footer (small screens) -->
-    <div class="d-md-none" style="height:70px;" id="mobile-footer-spacer"></div>
-    <footer class="d-md-none fixed-bottom bg-white border-top" id="mobile-footer">
-        <nav class="nav justify-content-around py-2">
-            <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('home.index') }}">
-                <span class="material-symbols-outlined fs-4">home</span>
-                <small class="d-block">Home</small>
-            </a>
-            <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('study.index') }}">
-                <span class="material-symbols-outlined fs-4">school</span>
-                <small class="d-block">Study</small>
-            </a>
-            <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('community.index') }}">
-                <span class="material-symbols-outlined fs-4">groups</span>
-                <small class="d-block">Community</small>
-            </a>
-        </nav>
-    </footer>
+</div>
+<!-- Mobile Footer (small screens) -->
+<div class="d-md-none" style="height:70px;" id="mobile-footer-spacer"></div>
+<footer class="d-md-none fixed-bottom bg-white border-top" id="mobile-footer">
+    <nav class="nav justify-content-around py-2">
+        <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('home.index') }}">
+            <span class="material-symbols-outlined fs-4">home</span>
+            <small class="d-block">Home</small>
+        </a>
+        <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('study.index') }}">
+            <span class="material-symbols-outlined fs-4">school</span>
+            <small class="d-block">Study</small>
+        </a>
+        <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('community.index') }}">
+            <span class="material-symbols-outlined fs-4">groups</span>
+            <small class="d-block">Community</small>
+        </a>
+    </nav>
+</footer>
 {% endblock %}
 
 {% block scripts %}
 <script>
     window.SHARE_FRIENDS = [
         {% for friend in friends %}
-        { username: "{{ friend.username }}", id: "{{ friend.id }}" }{% if not loop.last %}, {% endif %}
-        {% endfor %}
+    { username: "{{ friend.username }}", id: "{{ friend.id }}" } {% if not loop.last %}, {% endif %}
+    {% endfor %}
     ];
     window.CURRENT_DECK_ID = "{{ deck_id }}";
 </script>
@@ -220,7 +244,7 @@
         } catch (e) { /* ignore */ }
     });
 
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         const trigger = e.target.closest('.card-delete-trigger');
         if (trigger) {
             const cardN = trigger.dataset.target;

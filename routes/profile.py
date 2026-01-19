@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, g, request, jsonify, url_for, current_app
 from utils.auth import get_current_user_from_token
 from model.login_model import get_all_users, get_user_by_username, update_user_profile_pic, update_user_password
+from model.studyData_model import get_user_study_data
 import os
 from werkzeug.utils import secure_filename
 
@@ -24,6 +25,7 @@ def profile_index():
         username=g.current_user,
         users=get_all_users(),
         profileData=get_user_by_username(g.current_user),
+        studyData=get_user_study_data(g.current_user),
     )
 
 

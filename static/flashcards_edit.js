@@ -80,10 +80,14 @@
             });
         }
 
-        // Append in the same container as the template so markup matches
-        const container = document.getElementById('new-cards-container');
-        if (container) container.appendChild(clone);
-        else document.getElementById('new-cards-container').appendChild(clone);
+        // Insert into the main list at the top when possible, otherwise prepend to new-cards container
+        const list = document.querySelector('.list-group.list-group-flush');
+        if (list) list.insertBefore(clone, list.firstChild);
+        else {
+            const container = document.getElementById('new-cards-container');
+            if (container) container.insertBefore(clone, container.firstChild);
+            else document.getElementById('new-cards-container').appendChild(clone);
+        }
         // Trigger auto-expand on appended textareas now that they're in the DOM
         try {
             const autos = clone.querySelectorAll('.auto-expand');
@@ -350,7 +354,13 @@ document.addEventListener('DOMContentLoaded', function () {
                                             if (b) b.value = back;
                                             const btn = clone.querySelector('.remove-new-card');
                                             if (btn) btn.addEventListener('click', () => clone.remove());
-                                            document.getElementById('new-cards-container').appendChild(clone);
+                                                    const list = document.querySelector('.list-group.list-group-flush');
+                                                    if (list) list.insertBefore(clone, list.firstChild);
+                                                    else {
+                                                        const container = document.getElementById('new-cards-container');
+                                                        if (container) container.insertBefore(clone, container.firstChild);
+                                                        else document.getElementById('new-cards-container').appendChild(clone);
+                                                    }
                                         }
                                     }
                                 });
@@ -561,3 +571,75 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     });
+
+// Floating chat panel wiring (toggle, close, file-drop)
+document.addEventListener('DOMContentLoaded', function () {
+    try {
+        const openBtn = document.getElementById('floating-chat-button');
+        const panel = document.getElementById('floating-chat-panel');
+        const closeBtn = document.getElementById('floating-chat-close');
+        const fileDrop = document.getElementById('file-drop');
+        const fileInput = document.getElementById('file-drop-input');
+
+        function showPanel(show) {
+            if (!panel) return;
+            try {
+                if (show) {
+                    panel.classList.add('show');
+                    panel.setAttribute('aria-hidden', 'false');
+                    panel.style.display = 'flex';
+                } else {
+                    panel.classList.remove('show');
+                    panel.setAttribute('aria-hidden', 'true');
+                    panel.style.display = 'none';
+                }
+            } catch (e) { }
+        }
+
+        if (openBtn) openBtn.addEventListener('click', function (e) { e.stopPropagation(); showPanel(true); });
+        if (closeBtn) closeBtn.addEventListener('click', function (e) { e.stopPropagation(); showPanel(false); });
+
+        // Click outside chat panel closes it
+        document.addEventListener('click', function (ev) {
+            if (!panel || !panel.classList.contains('show')) return;
+            const tgt = ev.target;
+            if (tgt.closest && (tgt.closest('#floating-chat-panel') || tgt.closest('#floating-chat-button'))) return;
+            showPanel(false);
+        });
+
+        if (fileDrop && fileInput) {
+            fileDrop.addEventListener('click', function () { fileInput.click(); });
+            fileInput.addEventListener('change', function () {
+                if (fileInput.files && fileInput.files.length) fileDrop.style.color = 'green';
+            });
+            fileDrop.addEventListener('dragover', function (e) { e.preventDefault(); fileDrop.classList.add('dragover'); });
+            fileDrop.addEventListener('dragleave', function () { fileDrop.classList.remove('dragover'); });
+            fileDrop.addEventListener('drop', function (e) {
+                e.preventDefault();
+                fileDrop.classList.remove('dragover');
+                const files = (e.dataTransfer && e.dataTransfer.files) ? e.dataTransfer.files : null;
+                if (files && files.length) {
+                    try {
+                        // Best-effort: assign files if allowed by browser
+                        fileInput.files = files;
+                    } catch (err) { }
+                    fileDrop.style.color = 'green';
+                }
+            });
+        }
+    } catch (e) { /* ignore */ }
+});
+
+// Add `has-mobile-footer` to body when a mobile footer is present so responsive CSS can add bottom padding
+document.addEventListener('DOMContentLoaded', function () {
+    try {
+        const mf = document.getElementById('mobile-footer');
+        if (!mf) return;
+        function updateBodyClass() {
+            if (window.innerWidth <= 767) document.body.classList.add('has-mobile-footer');
+            else document.body.classList.remove('has-mobile-footer');
+        }
+        updateBodyClass();
+        window.addEventListener('resize', updateBodyClass);
+    } catch (e) { /* ignore */ }
+});

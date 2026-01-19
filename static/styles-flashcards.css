@@ -1,4 +1,663 @@
-/* Floating chat button */
+/* =============================================
+   FLASHCARD LIBRARY PAGE STYLES
+   ============================================= */
+
+/* Page background */
+.flashcard-page {
+    background-color: #f9f9f9;
+    min-height: 100vh;
+}
+
+/* Library Header */
+.flashcard-library {
+    padding-bottom: 100px;
+}
+
+.library-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 3rem;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.library-subtitle {
+    font-size: 1rem;
+    color: #6b7280;
+}
+
+/* Header Buttons */
+.btn-library {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 0.75rem 1.5rem;
+    border-width: 2px;
+    transition: all 0.2s ease;
+}
+
+.btn-library.btn-outline-dark {
+    background-color: transparent;
+    border-color: #1a1a1a;
+    color: #1a1a1a;
+}
+
+.btn-library.btn-outline-dark:hover {
+    background-color: #1a1a1a;
+    color: #fff;
+}
+
+.btn-library.btn-dark {
+    background-color: #1a1a1a;
+    border-color: #1a1a1a;
+    color: #fff;
+}
+
+.btn-library.btn-dark:hover {
+    background-color: #333;
+    border-color: #333;
+}
+
+/* Deck List */
+.deck-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Deck Card */
+.deck-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.deck-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+/* Deck Icon */
+.deck-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+
+.deck-icon .material-symbols-outlined {
+    font-size: 24px;
+    color: #4a5568;
+}
+
+/* =============================================
+   STUDY MODE STYLES
+   ============================================= */
+
+.study-page-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* Header Section */
+.study-header-section {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+}
+
+.study-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 3.5rem;
+    color: #1a1a1a;
+    margin-bottom: 0.25rem;
+    line-height: 1.1;
+}
+
+.study-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #9ca3af;
+}
+
+/* Buttons */
+.btn-study-outline {
+    background-color: transparent;
+    border: 1px solid #e5e7eb;
+    color: #6b7280;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-study-outline:hover {
+    border-color: #1a1a1a;
+    color: #1a1a1a;
+    background-color: transparent;
+}
+
+.btn-study-primary {
+    background-color: #1a1a1a;
+    border: 1px solid #1a1a1a;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    transition: all 0.2s ease;
+    min-width: 160px;
+}
+
+.btn-study-primary:hover {
+    background-color: #333;
+    border-color: #333;
+    color: #fff;
+}
+
+/* Study Card */
+.study-card {
+    background: #ffffff;
+    border-radius: 32px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); /* subtle shadow */
+    padding: 3rem;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin-bottom: 3rem;
+}
+
+.card-meta-top {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.card-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #9ca3af; /* muted */
+}
+
+.card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+}
+
+.card-text-display {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; /* Match reference "Bonjour" */
+    font-size: 3.5rem;
+    color: #1a1a1a;
+    margin-bottom: 2rem;
+    transition: opacity 0.3s ease;
+}
+
+.card-type-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Answer Section */
+.answer-reveal {
+    animation: fadeIn 0.3s ease;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.answer-text {
+    font-family: 'Inter', sans-serif; /* Contrast to question */
+    font-size: 1.5rem;
+    color: #4b5563;
+    margin-bottom: 2rem;
+    font-weight: 400;
+}
+
+/* Navigation Controls (Bottom) */
+.study-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.nav-circle-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.nav-circle-btn:hover {
+    border-color: #d1d5db;
+    color: #1a1a1a;
+}
+
+/* Deck Info */
+.deck-info {
+    flex-grow: 1;
+}
+
+.deck-name {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.35rem;
+    color: #1a1a1a;
+    margin-bottom: 0.25rem;
+}
+
+.deck-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: #9ca3af;
+}
+
+.meta-separator {
+    color: #d1d5db;
+}
+
+/* Deck Actions */
+.deck-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Stats Button */
+.btn-stats {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background-color: #f5f5f5;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-stats:hover {
+    background-color: #e8e8e8;
+}
+
+.btn-stats .material-symbols-outlined {
+    font-size: 20px;
+    color: #6b7280;
+}
+
+/* Stats Dropdown */
+.stats-dropdown {
+    min-width: 200px;
+    padding: 0.5rem 0;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.stats-dropdown .dropdown-item {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* Study Button */
+.btn-study {
+    background-color: #1a1a1a;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 0.75rem 1.5rem;
+    border-radius: 24px;
+    border: none;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-study:hover {
+    background-color: #333;
+    color: #fff;
+    transform: scale(1.02);
+}
+
+/* Edit Button */
+.btn-edit {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background-color: #f5f5f5;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.btn-edit:hover {
+    background-color: #e8e8e8;
+}
+
+.btn-edit .material-symbols-outlined {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+/* Empty State */
+.empty-state {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 3rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: #d1d5db;
+}
+
+.empty-state h3 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: #1a1a1a;
+}
+
+/* Material Icons settings */
+.flashcard-page .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* =============================================
+   RESPONSIVE STYLES
+   ============================================= */
+
+@media (max-width: 991.98px) {
+    .library-title {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .library-header {
+        text-align: center;
+    }
+    
+    .library-header .d-flex.gap-3 {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .library-title {
+        font-size: 2rem;
+    }
+    
+    .deck-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .deck-card .d-flex.align-items-center.gap-3 {
+        width: 100%;
+    }
+    
+    .deck-actions {
+        justify-content: flex-end;
+        width: 100%;
+    }
+    
+    .btn-library {
+        font-size: 0.65rem;
+        padding: 0.6rem 1rem;
+    }
+    
+    .btn-study {
+        font-size: 0.65rem;
+        padding: 0.6rem 1rem;
+    }
+    
+    /* Add space for mobile footer */
+    .flashcard-library {
+        padding-bottom: 120px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .deck-icon {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .deck-name {
+        font-size: 1.15rem;
+    }
+    
+    .deck-meta {
+        flex-wrap: wrap;
+        font-size: 0.6rem;
+    }
+}
+
+
+/* =============================================
+   EDIT MODE STYLES
+   ============================================= */
+
+/* Main Title Input */
+.edit-title-input {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 2.2rem;
+    color: #1a1a1a;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    padding: 0.6rem 0.75rem;
+    width: 100%;
+    outline: none;
+    line-height: 1.2;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.edit-title-input:focus {
+    border-color: #1a1a1a;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.edit-title-input::placeholder {
+    color: #d1d5db;
+}
+
+/* Summary Input */
+.edit-summary-input {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    padding: 0.45rem 0.65rem;
+    width: 100%;
+    outline: none;
+    resize: none;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.edit-summary-input:focus {
+    border-color: #1a1a1a;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+}
+
+/* Edit Card Item */
+.edit-card-item {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.edit-card-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.edit-card-item.new-card-row {
+    border: 1px dashed #d1d5db;
+    background: #fdfdfd;
+}
+
+/* Card Inputs */
+.edit-card-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9ca3af;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.edit-card-textarea {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    color: #1a1a1a;
+    background: #f9f9f9;
+    width: 100%;
+    outline: none;
+    transition: all 0.2s ease;
+    resize: none;
+}
+
+.edit-card-textarea:focus {
+    background: #fff;
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+}
+
+/* Danger Button Variant */
+.btn-study-danger {
+    background-color: transparent;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-study-danger:hover {
+    background-color: #ef4444;
+    color: #fff;
+}
+
+/* Save Bar */
+.save-bar {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 100;
+    animation: slideUp 0.3s ease;
+}
+
+.save-bar button {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+@keyframes slideUp {
+    from { transform: translate(-50%, 100%); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+/* =============================================
+   FLOATING CHAT PANEL (preserved from original)
+   ============================================= */
+
 #floating-chat-button {
     position: fixed;
     right: 20px;
@@ -10,7 +669,19 @@
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
 }
 
-/* Chat panel */
+/* Make floating chat button match primary site buttons */
+#floating-chat-button {
+    background-color: #1a1a1a;
+    border: 1px solid #1a1a1a;
+    color: #ffffff;
+}
+
+#floating-chat-button:hover {
+    background-color: #333;
+    border-color: #333;
+    color: #fff;
+}
+
 #floating-chat-panel {
     position: fixed;
     right: 20px;
@@ -19,7 +690,7 @@
     width: 360px;
     max-width: calc(100% - 40px);
     max-height: 70vh;
-    display: none; /* hidden by default; toggled by JS */
+    display: none;
     flex-direction: column;
     background: #fff;
     border: 1px solid rgba(0, 0, 0, 0.08);
@@ -86,7 +757,6 @@
     justify-content: center;
 }
 
-/* small header title */
 .chat-title {
     font-weight: 600;
     font-size: .95rem;
@@ -97,10 +767,7 @@
     color: #6c757d;
 }
 
-/* When the mobile footer is visible (Bootstrap md breakpoint and below),
-   raise the floating chat controls above the footer so they are not covered. */
 @media (max-width: 767.98px) {
-    /* footer height ~56px; add a small gap */
     #floating-chat-button {
         bottom: calc(20px + 56px);
     }
@@ -111,21 +778,9 @@
     }
 }
 
-/* Stack card rows on small screens for easier editing */
+/* When a mobile footer is present, lift fixed save bar so it isn't covered */
 @media (max-width: 767.98px) {
-    .list-group-item .row.g-2.align-items-center {
-        display: block;
-    }
-    .list-group-item .row.g-2.align-items-center > .col-1,
-    .list-group-item .row.g-2.align-items-center > .col {
-        display: block;
-        width: 100%;
-    }
-    .list-group-item .col-1.text-center {
-        text-align: left;
-        margin-bottom: .5rem;
-    }
-    .list-group-item .form-check {
-        margin-top: .25rem;
+    body.has-mobile-footer .save-bar {
+        bottom: calc(2rem + 70px); /* 70px footer height + original 2rem offset */
     }
 }

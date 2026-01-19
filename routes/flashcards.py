@@ -111,7 +111,7 @@ def flashcards_deck(deck_id):
     deck_obj = get_deck_by_id(deck_id)
     if not deck_obj:
         return render_template('404.html'), 404
-    return render_template('flashcard_deck.html', username=g.current_user, users=get_all_users(), deck=deck_obj, deck_id=deck_id)
+    return render_template('flashcard_deck.html', username=g.current_user, users=get_all_users(), deck=deck_obj, deck_id=deck_id, studyData=get_user_study_data(g.current_user))
 
 @flashcards_bp.route('/<deck_id>/delete', endpoint='delete', methods=['POST'])
 @require_edit_permission
@@ -251,7 +251,7 @@ def flashcards_edit(deck_id):
 
         return redirect(url_for('flashcards.edit', deck_id=deck_id))
 
-    return render_template('flashcard_edit.html', username=g.current_user, users=get_all_users(), deck=deck_obj, deck_id=deck_id, friends=friends)
+    return render_template('flashcard_edit.html', username=g.current_user, users=get_all_users(), deck=deck_obj, deck_id=deck_id, friends=friends, studyData=get_user_study_data(g.current_user))
 
 @flashcards_bp.route('/<deck_id>/study', endpoint='study')
 @require_review_permission
@@ -260,7 +260,7 @@ def flashcards_study(deck_id):
     print(deck_id)
     if not deck_id:
         abort(400)
-    return render_template('flashcard_study.html', username=g.current_user, users=get_all_users(), permissions=get_user_permissions(g.current_user), deck=get_deck(deck_id), deck_id=deck_id)
+    return render_template('flashcard_study.html', username=g.current_user, users=get_all_users(), permissions=get_user_permissions(g.current_user), deck=get_deck(deck_id), deck_id=deck_id, studyData=get_user_study_data(g.current_user))
 
 @flashcards_bp.route('/study/review', methods=['POST'])
 @require_review_permission

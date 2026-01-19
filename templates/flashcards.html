@@ -1,362 +1,144 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0">
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Bookme Dashboard</title>
-    <!-- <link href="https://fonts.googleapis.com" rel="preconnect">
-  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"> -->
+{% block title %}Bookme - Flashcard Library{% endblock %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-    <link href="{{ url_for('static', filename='styles-responsive.css') }}" rel="stylesheet">
-    <style>
-        .material-symbols-outlined {
-            font-variation-settings:
-                'FILL' 0,
-                'wght' 400,
-                'GRAD' 0,
-                'opsz' 24
-        }
-    </style>
-    <link href="{{ url_for('static', filename='styles-responsive.css') }}" rel="stylesheet" />
-    <style>
-        /* Streak button styling */
-        .streak-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background-color: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            color: #64748b;
-            text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles-flashcards.css') }}">
+{% endblock %}
 
-        .streak-btn:hover {
-            background-color: #e2e8f0;
-            color: #475569;
-        }
+{% block body_attrs %}class="flashcard-page"{% endblock %}
 
-        .streak-btn .material-symbols-outlined {
-            font-size: 1.25rem;
-            color: #f59e0b;
-        }
-
-        /* Fine-tune navigation centering */
-        @media (min-width: 768px) {
-            .site-header .nav-centered {
-                margin-left: 14px;
-            }
-        }
-
-        .flashcards-page .btn-primary,
-        .flashcards-page .btn-info {
-            background-color: #000 !important;
-            border-color: #000 !important;
-            color: #fff !important;
-        }
-
-        .flashcards-page .btn:hover,
-        .flashcards-page .btn:focus {
-            background-color: #333 !important;
-            border-color: #333 !important;
-            color: #fff !important;
-            transform: translateY(-1px) !important;
-        }
-    </style>
-</head>
-
-<body class="bg-light text-dark">
-    <div class="d-flex flex-column min-vh-100">
-        <header class="w-100 site-header">
-            <div class="container position-relative d-flex align-items-center justify-content-between py-3">
-                <!-- Logo -->
-                <a class="col-1 d-flex align-items-center justify-content-center py-3 text-decoration-none"
-                    href="{{ url_for('home.index') }}">
-                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Bookme Logo"
-                        class="header-logo-static">
-                </a>
-
-                <!-- Centered Navigation -->
-                <nav
-                    class="nav-centered d-none d-md-flex align-items-center gap-2 position-absolute top-50 start-50 translate-middle">
-                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('home.index') }}">Home</a>
-                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('study.index') }}">Study</a>
-                    <a class="btn btn-sm btn-light rounded-pill" href="{{ url_for('community.index') }}">Community</a>
-                </nav>
-
-                <!-- Right side: Streak, Notification, Profile -->
-                <div class="d-none d-md-flex align-items-center gap-3">
-                    <!-- Streak button -->
-                    <a href="{{ url_for('streak.index') }}" class="streak-btn">
-                        <span class="material-symbols-outlined">local_fire_department</span>
-                        <span>{{ studyData.streak if studyData is defined else 0 }} DAY STREAK</span>
+{% block content %}
+    <main class="flashcard-library">
+        <div class="container py-5">
+            <!-- Header Section -->
+            <div class="library-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end mb-5">
+                <div class="mb-3 mb-md-0">
+                    <h1 class="library-title">Flashcard Library</h1>
+                    <p class="library-subtitle text-muted mb-0">Browse, create, and manage your personalized study decks.</p>
+                </div>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('flashcards.new_deck') }}" class="btn btn-dark btn-library rounded-pill px-4">
+                        + NEW DECK
                     </a>
-
-                    <!-- Notification dropdown -->
-                    <div class="dropdown">
-                        <button type="button" class="btn btn-link text-muted p-0" data-bs-toggle="dropdown"
-                            aria-expanded="false" aria-label="Notifications">
-                            <span class="material-symbols-outlined">notifications</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 300px;">
-                            <li class="text-center text-muted small py-3">
-                                No new notifications. <br>Can't start procrastinating now!
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Profile dropdown -->
-                    <div class="dropdown">
-                        <a class="btn btn-link text-muted p-0" href="{{ url_for('profile.index') }}"
-                            id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile"
-                            title="Profile">
-                            <span class="material-symbols-outlined fs-3">account_circle</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                            <li>
-                                <h6 class="dropdown-header">Account</h6>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url_for('profile.index') }}">Profile & Settings</a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider" />
-                            </li>
-                            <li>
-                                <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
-                                    <button type="submit" class="dropdown-item">Log out</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
             </div>
-        </header>
-        <main>
-            <div class="bg-body container p-4 flashcards-page">
-                <div class="row">
-                    <div class="col">
-                        <!-- col-12 col-lg-8 -->
-                        <h2 class="h2 fw-bold">Flashcard Decks</h2>
-                        <t class="text-muted mt-1">Browse, create, and explore your flashcard decks.</t>
-                    </div>
-                    <div class="col-12 col-md-4 text-center text-md-end align-content-center mt-3 mt-md-0">
-                        <div class="d-flex justify-content-center justify-content-md-end gap-2">
-                            <a href="{{ url_for('flashcards.new_deck')}}"
-                                class="btn btn-primary btn-sm rounded-pill d-inline-flex align-items-center gap-2">
-                                <span class="material-symbols-outlined" aria-hidden="true"
-                                    style="font-size:18px;">add_box</span>
-                                <span class="fw-semibold">New Deck</span>
-                            </a>
+
+            <!-- Deck List -->
+            <div class="deck-list">
+                {% for deck in decks %}
+                <div class="deck-card">
+                    <div class="d-flex align-items-center gap-3 flex-grow-1">
+                        <!-- Deck Icon -->
+                        <div class="deck-icon">
+                            <span class="material-symbols-outlined">
+                                {% if loop.index % 4 == 1 %}description{% elif loop.index % 4 == 2 %}language{% elif loop.index % 4 == 3 %}public{% else %}auto_stories{% endif %}
+                            </span>
+                        </div>
+                        
+                        <!-- Deck Info -->
+                        <div class="deck-info">
+                            <h3 class="deck-name">{{ deck.name }}</h3>
+                            <div class="deck-meta">
+                                <span class="deck-cards">{{ deck.len }} CARDS</span>
+                                <span class="meta-separator">•</span>
+                                <span class="deck-reviewed">LAST REVIEWED: {{ deck.last_reviewed | default('NEVER') | upper }}</span>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="d-flex flex-column ">
-                            <!-- col-12 col-lg-8 -->
-                            <hr class="">
-                            <!-- Header row for list/table labels (visible on medium+ screens) -->
-                            <div class="row fw-bold border-bottom py-2 d-none d-md-flex text-center">
-                                <div class="col">Deck Name</div>
-                                <div class="col">Cards</div>
-                                <div class="col">Actions</div>
+                    
+                    <!-- Actions -->
+                    <div class="deck-actions d-flex align-items-center gap-3">
+                        <!-- Stats Button -->
+                        <button type="button" class="btn-stats" data-bs-toggle="dropdown" aria-expanded="false" aria-label="View stats for {{ deck.name }}">
+                            <span class="material-symbols-outlined">bar_chart</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end stats-dropdown">
+                            <div class="dropdown-item d-flex justify-content-between">
+                                <span>Total cards:</span>
+                                <strong id="tc-{{ deck.id }}">—</strong>
                             </div>
-                            <div class="list-group list-group-flush">
-                                {% for deck in decks%}
-                                <div class="list-group-item py-3">
-                                    <div class="list-group-item py-3">
-                                        <div class="row col-12 d-flex flex-row text-center align-items-center">
-
-                                            <!-- Deck Name -->
-                                            <div class="col-12 col-md-4 mb-2 mb-md-0">
-                                                <a class="text-primary d-inline-block my-2"
-                                                    href="{{ url_for('flashcards.study', deck_id=deck.id) }}">
-                                                    {{ deck.name }}
-                                                </a>
-                                                {% if deck.tags %}
-                                                <h5>
-                                                    {% for tag in deck.tags %}
-                                                    <span class="badge bg-secondary">{{ tag }}</span>
-                                                    {% endfor %}
-                                                </h5>
-                                                {% endif %}
-                                            </div>
-                                            <div
-                                                class="col-12 col-md-8 d-flex gap-2 flex-row container justify-content-center">
-                                                <!-- Deck Length -->
-                                                <div class="col-4 col-sm-6 mb-2 mb-md-0">
-                                                    {{ deck.len }}
-                                                    <div class="medium text-muted mb-1">Cards</div>
-                                                </div>
-
-                                                <!-- Buttons Column -->
-                                                <div
-                                                    class="col-4 col-xs-6 d-flex flex-row gap-2 align-items-center justify-content-center">
-                                                    <!-- Stats Button -->
-                                                    <div class="btn-group mb-2 mb-md-0">
-                                                        <button type="button"
-                                                            class="btn btn-sm btn-info text-white dropdown-toggle"
-                                                            data-bs-toggle="dropdown" aria-haspopup="true"
-                                                            aria-expanded="false"
-                                                            id="statsButton-{{ deck.id }}">Stats</button>
-                                                        <div class="dropdown-menu"
-                                                            aria-labelledby="statsButton-{{ deck.id }}">
-                                                            <a class="dropdown-item">Total cards: <strong
-                                                                    id="tc-{{deck.id}}"></strong></a>
-                                                            <a class="dropdown-item">Total correct answers: <strong
-                                                                    id="ca-{{deck.id}}"
-                                                                    style="color:green"></strong></a>
-                                                            <a class="dropdown-item">Total incorrect answers: <strong
-                                                                    id="ia-{{deck.id}}" style="color:red"></strong></a>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Edit Button -->
-                                                    {% if deck.id in permissions.editor %}
-                                                    <a href="{{ url_for('flashcards.edit', deck_id=deck.id) }}"
-                                                        class="btn btn-sm btn-secondary text-white mb-2 mb-md-0">Edit</a>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                                <!-- <div class="list-group-item py-3">
-                  <div class="row align-items-center text-center">
-                    <div class="col">
-                      <a class="text-primary d-inline-block" href="#">Math and Stats II</a>
+                            <div class="dropdown-item d-flex justify-content-between">
+                                <span>Correct:</span>
+                                <strong id="ca-{{ deck.id }}" class="text-success">—</strong>
+                            </div>
+                            <div class="dropdown-item d-flex justify-content-between">
+                                <span>Incorrect:</span>
+                                <strong id="ia-{{ deck.id }}" class="text-danger">—</strong>
+                            </div>
+                        </div>
+                        
+                        <!-- Study Button -->
+                        <a href="{{ url_for('flashcards.study', deck_id=deck.id) }}" class="btn btn-study">
+                            STUDY NOW
+                        </a>
+                        
+                        {% if deck.id in permissions.editor %}
+                        <!-- Edit Button -->
+                        <a href="{{ url_for('flashcards.edit', deck_id=deck.id) }}" class="btn-edit d-flex" title="Edit deck">
+                            <span class="material-symbols-outlined">edit</span>
+                        </a>
+                        {% endif %}
                     </div>
-                    <div class="col-2">100</div>
-                    <div class="col">
-                      <a href="#" class="btn btn-sm btn-primary text-white me-2">Stats</a>
-                      <a href="#" class="btn btn-sm btn-secondary text-white">Edit</a>
-                    </div>
-                  </div>
                 </div>
-              </div> -->
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-md-none d-sm-12" style="height:10vh"></div>
-        </main>
-        <footer class="d-md-none fixed-bottom bg-white border-top">
-            <nav class="nav justify-content-around py-2">
-                <a class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="{{ url_for('home.index') }}"><span class="material-symbols-outlined fs-4">home</span> <small
-                        class="d-block">Home</small></a> <a
-                    class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="{{ url_for('study.index') }}"><span class="material-symbols-outlined fs-4">school</span>
-                    <small class="d-block">Study</small></a> <a
-                    class="nav-link d-flex flex-column align-items-center text-muted"
-                    href="{{ url_for('community.index') }}"><span class="material-symbols-outlined fs-4">groups</span>
-                    <small class="d-block">Community</small></a>
-            </nav>
-        </footer>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+                {% endfor %}
+                
+                {% if not decks %}
+                <div class="empty-state text-center py-5">
+                    <span class="material-symbols-outlined empty-icon">library_books</span>
+                    <h3 class="mt-3">No flashcard decks yet</h3>
+                    <p class="text-muted">Create your first deck to start studying!</p>
+                    <a href="{{ url_for('flashcards.new_deck') }}" class="btn btn-dark btn-library rounded-pill px-4 mt-3">
+                        + CREATE YOUR FIRST DECK
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+    <!-- Mobile Footer -->
+    <footer class="d-md-none fixed-bottom bg-white border-top">
+        <nav class="nav justify-content-around py-2">
+            <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('home.index') }}">
+                <span class="material-symbols-outlined fs-4">home</span>
+                <small class="d-block">Home</small>
+            </a>
+            <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('study.index') }}">
+                <span class="material-symbols-outlined fs-4">school</span>
+                <small class="d-block">Study</small>
+            </a>
+            <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('community.index') }}">
+                <span class="material-symbols-outlined fs-4">groups</span>
+                <small class="d-block">Community</small>
+            </a>
+        </nav>
+    </footer>
+    
+{% endblock %}
+
+{% block scripts %}
     <script>
-        //statsButton = document.getElementById('statsButton');
-        //statsButton.addEventListener('click', function () {
+        // Fetch stats JSON for each deck and populate the stats dropdown
+        document.addEventListener('DOMContentLoaded', function() {
+            const tcEls = document.querySelectorAll('[id^="tc-"]');
+            tcEls.forEach(tc => {
+                const deckId = tc.id.replace('tc-', '');
+                if (!deckId) return;
 
-        //test
-        //});
-
-        // Highlight header/footer nav link using the folder slug
-        document.addEventListener('DOMContentLoaded', function () {
-            try {
-                const navAreas = [];
-                const header = document.querySelector('header');
-                if (header) navAreas.push(header);
-                const footers = Array.from(document.querySelectorAll('footer'));
-                navAreas.push(...footers);
-
-                const parts = location.pathname.split('/').filter(Boolean);
-                const currentSlug = parts.length >= 2 ? parts[parts.length - 2] : (parts[0] || 'home');
-
-                navAreas.forEach(area => {
-                    const links = Array.from(area.querySelectorAll('a[href]'));
-                    links.forEach(a => {
-                        try {
-                            if (a.id === "logoButton") return;
-                            const url = new URL(a.getAttribute('href'), location.origin);
-                            const linkParts = url.pathname.split('/').filter(Boolean);
-                            const linkSlug = linkParts.length >= 2 ? linkParts[linkParts.length - 2] : (linkParts[0] || 'home');
-
-                            a.classList.remove('active', 'text-primary', 'fw-bold', 'text-white', 'btn-primary');
-
-                            if (linkSlug === currentSlug) {
-                                if (a.classList.contains('btn')) {
-                                    a.classList.remove('btn-light');
-                                    a.classList.add('btn-primary', 'text-white');
-                                } else {
-                                    a.classList.add('text-primary', 'fw-bold');
-                                }
-                                a.classList.add('active');
-                            } else {
-                                if (!a.classList.contains('btn')) {
-                                    a.classList.remove('text-primary', 'fw-bold');
-                                    a.classList.add('text-muted');
-                                }
-                                if (a.classList.contains('btn') && !a.classList.contains('btn-light')) {
-                                    a.classList.add('btn-light');
-                                }
-                            }
-                        } catch (e) { }
+                fetch(`/flashcards/${deckId}/stats`, { headers: { 'Accept': 'application/json' } })
+                    .then(resp => resp.ok ? resp.json() : Promise.reject('Failed'))
+                    .then(data => {
+                        const stats = data.stats || data;
+                        document.getElementById(`tc-${deckId}`).textContent = stats.total_cards ?? '0';
+                        document.getElementById(`ca-${deckId}`).textContent = stats.total_correct ?? '0';
+                        document.getElementById(`ia-${deckId}`).textContent = stats.total_incorrect ?? '0';
+                    })
+                    .catch(() => {
+                        document.getElementById(`tc-${deckId}`).textContent = '—';
+                        document.getElementById(`ca-${deckId}`).textContent = '—';
+                        document.getElementById(`ia-${deckId}`).textContent = '—';
                     });
-                });
-            } catch (e) { }
+            });
         });
     </script>
-    <script>
-        // Fetch stats JSON for each deck and populate the dropdown items.
-        document.addEventListener('DOMContentLoaded', function () {
-            try {
-                const tcEls = Array.from(document.querySelectorAll('[id^="tc-"]'));
-                tcEls.forEach(tc => {
-                    const parts = tc.id.split('-');
-                    const deckId = parts.slice(1).join('-');
-                    if (!deckId) return;
-
-                    // fetch stats as JSON
-                    fetch(`/flashcards/${deckId}/stats`, { headers: { 'Accept': 'application/json' } })
-                        .then(resp => {
-                            if (!resp.ok) throw new Error('Network response was not ok');
-                            return resp.json();
-                        })
-                        .then(data => {
-                            const stats = data && data.stats ? data.stats : data;
-                            const tcEl = document.getElementById(`tc-${deckId}`);
-                            const caEl = document.getElementById(`ca-${deckId}`);
-                            const iaEl = document.getElementById(`ia-${deckId}`);
-                            if (tcEl) tcEl.textContent = stats.total_cards ?? '0';
-                            if (caEl) caEl.textContent = stats.total_correct ?? '0';
-                            if (iaEl) iaEl.textContent = stats.total_incorrect ?? '0';
-                        })
-                        .catch(err => {
-                            console.warn('Failed to load stats for deck', deckId, err);
-                            const tcEl = document.getElementById(`tc-${deckId}`);
-                            const caEl = document.getElementById(`ca-${deckId}`);
-                            const iaEl = document.getElementById(`ia-${deckId}`);
-                            if (tcEl) tcEl.textContent = '—';
-                            if (caEl) caEl.textContent = '—';
-                            if (iaEl) iaEl.textContent = '—';
-                        });
-                });
-            } catch (e) {
-                console.error('Error in stats loader', e);
-            }
-        });
-    </script>
-</body>
-
-</html>
+{% endblock %}

@@ -75,6 +75,8 @@ def friends_index():
         following = relationships_col.count_documents({'follower': user.get('username')})
         user['followers_count'] = followers
         user['following_count'] = following
+        # Fetch each user's study data to get their actual streak
+        user['studyData'] = get_user_study_data(user.get('username'))
     
     # Render template with current user and all community members
     return render_template(

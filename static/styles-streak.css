@@ -313,23 +313,4 @@ main {
   }
 }
 
-/* Header responsive improvements */
-.site-header {
-  background-color: #ffffff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.site-header .container {
-  max-width: 1200px;
-}
-
-@media (max-width: 768px) {
-  .site-header .container {
-    padding: 0.75rem 1rem;
-  }
-
-  .site-header h1 {
-    font-size: 1.25rem;
-  }
-}
+/* Header styling is inherited from styles-theme.css for consistency */

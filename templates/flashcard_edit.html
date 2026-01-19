@@ -12,6 +12,7 @@
 {% block content %}
 <main>
     <div class="study-page-container">
+        <!-- Deck Edit Form: edit deck metadata (name, summary, tags) and manage cards -->
         <form method="POST" id="edit-deck-form">
             <div class="d-flex gap-2 ms-4 align-items-center justify-content-end">
                 <a href="{{ url_for('flashcards.index', deck_id = deck_id) }}" class="btn-study-outline">BACK</a>
@@ -70,6 +71,7 @@
                     {% endfor %}
                 </div>
 
+                <!-- Container where new card rows are injected by JS -->
                 <div id="new-cards-container"></div>
                 <div class="d-none" id="new-card-template">
                     <div class="edit-card-item new-card-row position-relative">
@@ -99,6 +101,7 @@
         </form>
     </div>
 
+    <!-- Confirmation modal for deleting the entire deck -->
     <div id="confirmDeleteModal" class="position-fixed top-0 start-0 w-100 h-100 d-none"
         style="z-index:3000;background:rgba(0,0,0,0.45);">
         <div class="d-flex align-items-center justify-content-center h-100 p-3">
@@ -124,7 +127,7 @@
     aria-label="Open chat" title="Chat">
     <span class="material-symbols-outlined" style="font-size:22px;">chat</span>
 </button>
-<!-- Chat panel -->
+<!-- Chat panel: in-page AI assistant for generating flashcards from text or uploads -->
 <div id="floating-chat-panel" role="dialog" aria-hidden="true" aria-label="Chat window" style="display:none;">
     <div id="floating-chat-header">
         <div>
@@ -148,7 +151,7 @@
     </div>
 </div>
 
-<!-- Share Modal -->
+<!-- Share Modal: manage user permissions (read/write) for this deck -->
 <div class="modal fade" id="shareModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 20px; border: none;">
@@ -163,8 +166,8 @@
                     <thead>
                         <tr>
                             <th>User</th>
-                            <th class="text-center">Read</th>
                             <th class="text-center">Write</th>
+                            <th class="text-center">Read</th>
                         </tr>
                     </thead>
                     <tbody id="share-list"></tbody>
@@ -198,7 +201,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
+    <script>
     window.SHARE_FRIENDS = [
         {% for friend in friends %}
     { username: "{{ friend.username }}", id: "{{ friend.id }}" } {% if not loop.last %}, {% endif %}
@@ -220,6 +223,7 @@
     }
 
     // Auto-expand textareas with class `auto-expand`.
+    // Purpose: adjust textarea height to fit content as the user types.
     function autoExpand(el) {
         if (!el) return;
         try {
@@ -230,6 +234,7 @@
     }
 
     // Delegate input events to handle dynamic elements as well.
+    // Purpose: run autoExpand for any textarea.auto-expand, including ones added dynamically.
     document.addEventListener('input', function (e) {
         const t = e.target;
         if (t && t.matches && t.matches('textarea.auto-expand')) {
@@ -238,6 +243,7 @@
     });
 
     // Initialize existing textareas on load (server-rendered ones).
+    // Purpose: ensure server-rendered textareas have correct height on page load.
     document.addEventListener('DOMContentLoaded', function () {
         try {
             Array.from(document.querySelectorAll('textarea.auto-expand')).forEach(autoExpand);

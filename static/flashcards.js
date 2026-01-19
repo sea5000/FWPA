@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const cancel = document.getElementById('cancelDelete');
     const closeX = document.getElementById('closeDeleteModal');
 
+    // showModal/hideModal: control visibility of the confirm-delete overlay
     function showModal() { modal.classList.remove('d-none'); document.body.style.overflow = 'hidden'; }
     function hideModal() { modal.classList.add('d-none'); document.body.style.overflow = ''; }
 

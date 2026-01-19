@@ -1,8 +1,7 @@
-from flask import Blueprint, render_template, jsonify, g, request
+from flask import Blueprint, jsonify, g, request
 from werkzeug.utils import secure_filename
 import tempfile
 from utils.auth import get_current_user_from_token
-from model.login_model import get_all_users
 # from model.studyData_model import add_card, update_deckInfo
 from dotenv import load_dotenv
 import os
@@ -15,6 +14,13 @@ from model.logs_model import insert_ai_log
 load_dotenv()
 # blueprint should have a simple import name; the URL is provided by app.register_blueprint
 chatProxy_bp = Blueprint('chatProxy', __name__)
+
+"""AI proxy endpoints used to generate flashcards from user text or uploaded files.
+
+This module accepts multipart form requests, optionally uploads files to
+Gemini, forwards prompts to the model, parses JSON output, and returns
+structured JSON back to the frontend.
+"""
 
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 MODEL_NAME = "gemini-2.5-flash"
@@ -74,6 +80,11 @@ def require_auth():
 
 @chatProxy_bp.route('/', methods=['POST', 'OPTIONS'], endpoint='chatProxy')
 def chat_proxy():
+    """Main proxy endpoint: accept form input, call Gemini, return parsed JSON.
+
+    Handles optional file uploads, model invocation, robust JSON parsing,
+    and logs results to the application's AI log.
+    """
     if not client:
         return jsonify({"error": "AI service not available. GEMINI_API_KEY is not configured."}), 503
     

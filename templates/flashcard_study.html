@@ -14,7 +14,7 @@
 {% block content %}
     <main>
         <div class="study-page-container">
-            <!-- Header Section -->
+            <!-- Header Section: deck title and controls -->
             <div class="study-header-section d-flex justify-content-between align-items-center">
                 <div>
                     <h1 class="study-title">{{ deck.name }}</h1>
@@ -32,7 +32,7 @@
                 </div>
             </div>
 
-            <!-- Flashcard -->
+            <!-- Flashcard: displays front/back and review controls -->
             <div class="study-card mt-4">
                 <!-- Card Top Meta -->
                 <div class="card-meta-top d-flex justify-content-between">
@@ -66,8 +66,9 @@
                 <button id="btn-next" class="nav-circle-btn"><span class="material-symbols-outlined">chevron_right</span></button>
             </div>
 
-            <!-- Hidden inputs/data for JS -->
+            <!-- Inline data and study logic for the review UI -->
             <script>
+                // STUDY_CARDS: client-side array of cards used by the study UI
                 const STUDY_CARDS = [
                     {% for cid, card in deck.cards.items() %}
                         { "id": {{ cid | tojson }}, "front": {{ card.front | tojson }}, "back": {{ card.back | tojson }} }{% if not loop.last %},{% endif %}
@@ -91,6 +92,7 @@
                     const deckId = `{{ deck_id }}`;
                     const reviewUrl = `{{ url_for('flashcards.flashcards_review') }}`;
 
+                    // render(): update the visible card, index counters, and button state
                     function render() {
                         if (STUDY_CARDS.length === 0) {
                             frontText.textContent = 'No cards in this deck.';
@@ -117,6 +119,7 @@
                         if (stateLabel) stateLabel.textContent = 'FRONT';
                     }
 
+                    // postReview(): send review result to server, advance index on response
                     function postReview(cardId, correct) {
                         fetch(reviewUrl, {
                             method: 'POST',

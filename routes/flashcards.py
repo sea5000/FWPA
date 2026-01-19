@@ -1,16 +1,25 @@
-from flask import Blueprint, render_template, g, request, abort, redirect, url_for
+from flask import Blueprint, render_template, g, request, abort, redirect, url_for, jsonify
 from utils.auth import get_current_user_from_token
 from model.login_model import get_all_users
 from model.studyData_model import get_user_permissions, get_user_decks, get_user_study_data, get_deck, update_card, add_card, delete_card, record_review, create_deck, add_deck_to_user, get_deck_by_id, update_deckInfo, delete_deck, add_deck_permissions, rem_deck_permissions, get_friends, get_deck_permissions, addTag, remTag
-from flask import jsonify
 from functools import wraps
 import re
 import json
 
 flashcards_bp = Blueprint('flashcards', __name__)
 
+"""Routes and helpers for flashcard deck CRUD, sharing, and review flows.
+
+Each view handles a specific UI page or API endpoint used by the
+flashcards frontend (listing, editing, studying, permissions, etc.).
+"""
 
 def require_edit_permission(fn):
+    """Decorator: allow only users who can edit the given deck_id.
+
+    Checks the current user's permissions and deck ownership and aborts
+    with 403 if editing is not allowed.
+    """
     @wraps(fn)
     def wrapper(*args, **kwargs):
         # determine deck_id from kwargs or positional args
@@ -52,6 +61,10 @@ def require_edit_permission(fn):
 
 
 def require_review_permission(fn):
+    """Decorator: allow only users who can review (study) the deck.
+
+    Similar to the edit decorator but checks reviewer permissions.
+    """
     @wraps(fn)
     def wrapper(*args, **kwargs):
         # determine deck_id from kwargs or positional args
@@ -64,7 +77,8 @@ def require_review_permission(fn):
         if not perms:
             abort(403)
 
-        editors = perms.get('reviewer') or perms.get('reviewer') or []
+        # reviewers may be stored under 'reviewers' or 'reviewer'
+        editors = perms.get('reviewers') or perms.get('reviewer') or []
         owners = perms.get('owner') or []
 
         allowed = False
@@ -93,6 +107,11 @@ def require_review_permission(fn):
 
 @flashcards_bp.before_request
 def require_auth():
+    """Ensure each request has an authenticated user set on `g`.
+
+    Uses the token helper and returns the helper's response if it
+    indicates an auth/redirect response (e.g. login redirect).
+    """
     user = get_current_user_from_token()
     if not isinstance(user, str):
         return user
@@ -101,7 +120,7 @@ def require_auth():
 
 @flashcards_bp.route('/', endpoint='index')
 def flashcards_index():
-    # userDecks = get_user_decks(g.current_user)
+    """Render the main flashcards listing page for the current user."""
     return render_template('flashcards.html', username=g.current_user, users=get_all_users(), decks=get_user_decks(g.current_user), permissions=get_user_permissions(g.current_user), studyData=get_user_study_data(g.current_user))
 
 @flashcards_bp.route('/<deck_id>/', endpoint='deck')
@@ -125,7 +144,10 @@ def flashcards_delete(deck_id):
 @flashcards_bp.route('/<deck_id>/stats', endpoint='stats', methods=['GET'])
 @require_review_permission
 def flashcards_stats(deck_id):
-    # return JSON stats for use by JavaScript
+    """Return JSON statistics and normalized card list for a deck.
+
+    Used by frontend JS to show deck stats without a full page reload.
+    """
     deck_obj = get_deck_by_id(deck_id)
     if not deck_obj:
         return jsonify({'ok': False, 'error': 'deck not found'}), 404
@@ -178,7 +200,10 @@ def flashcards_stats(deck_id):
 @flashcards_bp.route('/<deck_id>/edit', endpoint='edit', methods=['GET', 'POST'])
 @require_edit_permission
 def flashcards_edit(deck_id):
-    """Edit a deck: show the edit UI and accept POSTed updates. For now, render the template and leave full save logic for later."""
+    """Edit a deck: render the edit UI and handle form POST updates.
+
+    Handles tag diffs, per-card edits/deletes, and adding new cards.
+    """
     from model.studyData_model import get_deck_by_id
     deck_obj = get_deck_by_id(deck_id)
     if not deck_obj:
@@ -256,8 +281,7 @@ def flashcards_edit(deck_id):
 @flashcards_bp.route('/<deck_id>/study', endpoint='study')
 @require_review_permission
 def flashcards_study(deck_id):
-    #deck_id = request.args.get('deck_id')
-    print(deck_id)
+    """Render the study view for a deck (flashcard review UI)."""
     if not deck_id:
         abort(400)
     return render_template('flashcard_study.html', username=g.current_user, users=get_all_users(), permissions=get_user_permissions(g.current_user), deck=get_deck(deck_id), deck_id=deck_id, studyData=get_user_study_data(g.current_user))
@@ -305,7 +329,11 @@ def flashcards_review():
 
 @flashcards_bp.route('/new_deck',endpoint='new_deck', methods=['get'])
 def flashcards_new_deck():
-    """Render the new deck creation page (form)."""
+    """Create a new deck and redirect to its edit page.
+
+    This is a lightweight helper that seeds a new deck record and
+    attaches it to the current user, then redirects to edit.
+    """
     # create_deck(name, summary) -> create a new deck record and persist it
     deck = create_deck("New Deck", "Summary goes here", g.current_user)
     # attach the newly-created deck to the current user's studyData
@@ -316,9 +344,10 @@ def flashcards_new_deck():
 @flashcards_bp.route('/<deck_id>/share', methods=['POST'])
 @require_edit_permission
 def flashcards_share(deck_id):
-    """Accepts JSON payload of shares and updates permissions.
+    """Accept JSON shares payload and update deck permissions.
 
-    Expected body: { shares: [ { username: 'alice', editor: true, reviewer: false }, ... ] }
+    Expects an array of {username, editor, reviewer} entries and
+    toggles editor/reviewer permissions accordingly.
     """
     data = request.get_json(silent=True)
     if not data or 'shares' not in data:
@@ -350,12 +379,24 @@ def flashcards_share(deck_id):
 @flashcards_bp.route('/<deck_id>/permissions', methods=['GET'])
 @require_edit_permission
 def flashcards_permissions(deck_id):
+    """Return the deck's permission lists (editors/reviewers), JSON.
+
+    Removes internal 'admin' entry before returning to the client.
+    """
     perm = get_deck_permissions(deck_id)
-    print(perm)
-    perm['editors'].remove('admin')
-    perm['reviewers'].remove('admin') 
     if not perm:
         return jsonify({'ok': False, 'error': 'not found'}), 404
+    # defensively remove internal admin user if present
+    try:
+        if 'admin' in perm.get('editors', []):
+            perm['editors'].remove('admin')
+    except Exception:
+        pass
+    try:
+        if 'admin' in perm.get('reviewers', []):
+            perm['reviewers'].remove('admin')
+    except Exception:
+        pass
     return jsonify({'ok': True, 'permissions': perm})
 
 @flashcards_bp.route('/userlist', methods=['GET'])
@@ -378,5 +419,7 @@ def returnUserList():
     # include the special 'all' selector
     if 'all' not in seen:
         usernames.append('all')
-    usernames.remove('admin')
+    # remove internal admin user if present
+    if 'admin' in usernames:
+        usernames.remove('admin')
     return jsonify({'users': usernames})

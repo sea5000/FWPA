@@ -267,6 +267,17 @@ def add_card(deck_id, front, back):
     _refresh_deck_length(sid)
     return new_card
 
+def addTag(deck_id, tag):
+    _deck_tags_col.insert_one({'deck_id':deck_id,"tag": tag})
+    #...
+    
+def remTag(deck_id, tag):
+    delete = _deck_tags_col.find_one_and_delete({'deck_id': deck_id, 'tag': tag})
+    if delete:
+        return True
+    else:
+        return False
+    
 def delete_card(deck_id, card_id):
     """Delete a card from a deck. Returns True if deleted, False otherwise."""
     deck = get_deck_by_id(deck_id)
@@ -349,6 +360,7 @@ def add_deck_permissions(deck_id, field, value):
     """
     sid = str(deck_id)
     _permissions_col.update_one({'deck_id': sid}, {'$addToSet': {field: value}}, upsert=True)
+    
 def create_deck(name, summary, owner, subject: Optional[str] = None, category: Optional[str] = None, tags: Optional[list] = None):
     """Create a new deck with the given name and summary."""
     existing_ids = []
@@ -402,6 +414,7 @@ def get_user_permissions(username):
     edit = [d.get('deck_id') for d in edit_docs if d.get('deck_id')]
     own = [d.get('deck_id') for d in own_docs if d.get('deck_id')]
     return {'reviewer': list(set(rev)), 'editor': list(set(edit)), 'owner': list(set(own))}
+
 def add_deck_to_user(username, deck_id, role:str='owner'):
     """Add a user to the flashcard deck's permissions.
 

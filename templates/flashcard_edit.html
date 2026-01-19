@@ -186,9 +186,12 @@
                                         name="deck_summary" rows="1"
                                         placeholder="Deck summary">{% if deck.summary %}{{ deck.summary }}{% endif %}</textarea>
                                 </p>
-                                <input type="text" value="Amsterdam,Washington,Sydney,Beijing,Cairo" data-role="tagsinput">
+                                <input class="bg-white" name='tags' id='tags' value='tag1, tag2'>
                             </div>
-
+                            <div class="list-group-item py-3 text-end">
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                            </div>
+                            
                             <div class="row">
                                 <div class="d-flex flex-column">
                                     <hr class="">
@@ -489,6 +492,7 @@
     </div>
 
     <script>
+
         window.SHARE_FRIENDS = {{ friends | tojson }};
         window.CURRENT_DECK_ID = "{{ deck_id }}";
     </script>
@@ -496,6 +500,20 @@
     <script src="{{ url_for('static', filename='flashcards.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='flashcards_edit.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+    <script>
+        let tags = {{ deck.tags | tojson }};
+        console.log(tags);
+        let input = document.querySelector('input[name=tags]');
+        // join tags with a comma+space so the value becomes: "greeting, basic"
+        let tagsString = Array.isArray(tags) ? tags.join(', ') : (tags || '');
+        input.value = tagsString;
+        console.log(tagsString);
+        // initialize Tagify on the above input node reference
+        new Tagify(input);
+    </script>
     <script>
         (function () {
             function autoExpand(el) {
@@ -513,4 +531,5 @@
         })();
     </script>
 </body>
+
 </html>

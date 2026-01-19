@@ -199,10 +199,10 @@
                             </div>
 
                             <script>
-                                const STUDY_CARDS = [
+                                window.STUDY_CARDS = [
                                     {% for cid, card in deck.cards.items() %}
-                                { "id": { { cid | tojson } }, "front": { { card.front | tojson } }, "back": { { card.back | tojson } } } {% if not loop.last %}, {% endif %}
-                                {% endfor %}
+                                        { "id": {{ cid | tojson }}, "front": {{ card.front | tojson }}, "back": {{ card.back | tojson }}} {% if not loop.last %}, {% endif %}
+                                    {% endfor %}
                                 ];
 
                                 (function () {

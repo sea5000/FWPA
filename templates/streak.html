@@ -15,7 +15,7 @@
         <h2 class="fw-bold mb-3">Your Login Streak</h2>
         <div class="card p-3" data-streak="{{ studyData.streak | default(0) }}">
           <div class="month-labels" id="month-labels"></div>
-          <div class="d-flex gap-2">
+          <div class="streak-row">
             <div class="weekday-labels">
               <div></div>
               <div>Mon</div>
@@ -31,10 +31,10 @@
           </div>
         </div>
         <div class="streak-legend">
-          <span class="text-muted small">No login</span>
           <div class="streak-day" data-level="0"></div>
+          <span>No login</span>
           <div class="streak-day" data-level="1"></div>
-          <span class="text-muted small">Logged in</span>
+          <span>Logged in</span>
         </div>
       </div>
 
@@ -73,85 +73,107 @@
       const grid = document.getElementById("streak-grid");
       const monthLabelsContainer = document.getElementById("month-labels");
       const today = new Date();
-      const daysInGrid = 371; // 53 weeks * 7 days
-
-      // Use server-provided streak data from data attribute
-      const streakContainer = document.querySelector(
-        ".streak-container .card"
-      );
-      const streakDays =
-        parseInt(streakContainer.getAttribute("data-streak")) || 0;
-      const loginDays = new Set();
-
-      // Populate loginDays: mark consecutive days starting from today going backwards
-      // Only track login days, not minutes
-      for (let i = 0; i < streakDays && i < daysInGrid; i++) {
-        const date = new Date();
+      
+      // Configuration
+      const DAYS_PER_WEEK = 7;
+      
+      // Get streak data from server
+      const streakContainer = document.querySelector(".streak-container .card");
+      const streakDays = parseInt(streakContainer.getAttribute("data-streak")) || 0;
+      
+      // Build a set of logged-in dates (consecutive days from today backwards)
+      const loginDates = new Set();
+      for (let i = 0; i < streakDays; i++) {
+        const date = new Date(today);
         date.setDate(today.getDate() - i);
-        // Mark this day as logged in
-        loginDays.add(date.toLocaleDateString());
+        loginDates.add(date.toDateString());
       }
 
-      function getLevel(isLoggedIn) {
-        // Binary: 0 = not logged in, 1 = logged in
-        return isLoggedIn ? 1 : 0;
-      }
+      // Month names
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-      const monthLabels = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ];
-      const visibleMonths = new Array(12).fill(0);
-
-      for (let i = 0; i < daysInGrid; i++) {
-        const date = new Date();
-        date.setDate(today.getDate() - (daysInGrid - 1 - i));
-        const isLoggedIn = loginDays.has(date.toLocaleDateString());
-        const level = getLevel(isLoggedIn);
-
-        const day = document.createElement("div");
-        day.className = "streak-day";
-        day.dataset.level = level;
-        day.title = isLoggedIn
-          ? `${date.toDateString()}: Logged in`
-          : `${date.toDateString()}: No login`;
-        grid.appendChild(day);
-
-        // For month labels
-        if (date.getDate() === 1) {
-          visibleMonths[date.getMonth()]++;
+      // =====================================================
+      // STEP 1: Set START date to January 1, 2026
+      // =====================================================
+      // Start from January 1st of the current year (2026)
+      const startDate = new Date(2026, 0, 1); // January 1, 2026
+      
+      // Show full year - 52 weeks
+      const NUM_WEEKS = 52;
+      
+      // =====================================================
+      // STEP 2: Generate the grid - COLUMN BY COLUMN
+      // =====================================================
+      // CSS grid-auto-flow: column means items fill top-to-bottom per column
+      
+      const allDates = []; // Store dates for month label calculation
+      
+      // Find the Sunday before or on January 1
+      const firstSunday = new Date(startDate);
+      firstSunday.setDate(startDate.getDate() - startDate.getDay());
+      
+      for (let week = 0; week < NUM_WEEKS; week++) {
+        for (let dayOfWeek = 0; dayOfWeek < DAYS_PER_WEEK; dayOfWeek++) {
+          // Calculate the date for this cell
+          const cellDate = new Date(firstSunday);
+          cellDate.setDate(firstSunday.getDate() + (week * 7) + dayOfWeek);
+          
+          // Create the day element
+          const dayElement = document.createElement("div");
+          dayElement.className = "streak-day";
+          
+          // Check if date is before Jan 1, 2026 (hide those)
+          if (cellDate < startDate) {
+            dayElement.classList.add("empty");
+            dayElement.dataset.level = "0";
+          } else {
+            // Check if user was logged in on this date (past dates only)
+            const isLoggedIn = cellDate <= today && loginDates.has(cellDate.toDateString());
+            dayElement.dataset.level = isLoggedIn ? "1" : "0"; // 0 = grey, 1 = green
+            dayElement.title = `${cellDate.toDateString()}: ${isLoggedIn ? "Logged in" : "No login"}`;
+          }
+          
+          grid.appendChild(dayElement);
+          
+          // Store the first day of each week for month labels
+          if (dayOfWeek === 0) {
+            allDates.push({ week: week, date: new Date(cellDate) });
+          }
         }
       }
 
+      // =====================================================
+      // STEP 3: Generate month labels
+      // =====================================================
       let lastMonth = -1;
-      for (let i = 0; i < 53; i++) {
-        const date = new Date();
-        date.setDate(today.getDate() - (daysInGrid - 1) + i * 7);
-        const month = date.getMonth();
+      const cellWidth = 12; // Width of each cell
+      const gapWidth = 3;   // Gap between cells
+      
+      for (const item of allDates) {
+        // Skip dates before Jan 1, 2026
+        if (item.date < startDate) continue;
+        
+        const month = item.date.getMonth();
+        
+        // Only show label when month changes
         if (month !== lastMonth) {
           const label = document.createElement("div");
-          label.textContent = monthLabels[month];
-          label.style.gridColumn = i + 1;
+          label.textContent = monthNames[month];
+          // Position using left offset based on week number
+          label.style.position = "absolute";
+          label.style.left = (item.week * (cellWidth + gapWidth)) + "px";
           monthLabelsContainer.appendChild(label);
           lastMonth = month;
         }
       }
 
-      const tooltipTriggerList = [].slice.call(
-        document.querySelectorAll("[title]")
-      );
-      tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-        new bootstrap.Tooltip(tooltipTriggerEl);
+      // =====================================================
+      // STEP 4: Initialize Bootstrap tooltips
+      // =====================================================
+      const tooltipElements = document.querySelectorAll(".streak-day[title]");
+      tooltipElements.forEach(function (el) {
+        new bootstrap.Tooltip(el);
       });
     });
   </script>

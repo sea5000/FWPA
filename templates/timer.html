@@ -3,195 +3,304 @@
 {% block title %}Focus Timer | BookMe{% endblock %}
 
 {% block head %}
-    <!-- TailwindCSS for timer-specific styling -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    
-    <script id="tailwind-config">
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              "bookme-blue": "#8ecae6",
-              "bookme-deep-blue": "#023047",
-              "bookme-beige": "#fdf6e9",
-              "bookme-beige-dark": "#f5e6d3",
-              "bookme-yellow": "#ffb703",
-              "bookme-soft-yellow": "#ffeaae",
-              "bookme-charcoal": "#333333"
-            },
-            fontFamily: {
-              "sans": ["'Plus Jakarta Sans'", "sans-serif"]
-            }
-          },
-        },
-      }
-    </script>
-    <style type="text/tailwindcss">
+    <style>
       :root {
-        --soft-blue: #8ecae6;
-        --soft-white: rgba(255, 255, 255, 0.7);
-        --baby-yellow: #ffeaae;
+        --bookme-blue: #8ecae6;
+        --bookme-deep-blue: #023047;
+        --bookme-yellow: #ffb703;
+        --bookme-soft-yellow: #ffeaae;
+        --bookme-charcoal: #333333;
       }
-      .material-symbols-outlined {
-        font-variation-settings: "FILL" 1, "wght" 300, "GRAD" 0, "opsz" 24
-      }
+      
+      /* Fix global scrolling for this page only */
       body {
+        overflow: hidden; /* Prevent scrolling on the page body */
+      }
+
+      /* Base layout override to lock height */
+      .d-flex.flex-column.min-vh-100 {
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      /* 
+         TIMER WRAPPER
+         Flex content to fill space below header.
+         We do NOT touch the header styles.
+      */
+      .timer-wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        overflow: hidden;
+        height: 100%;
+        /* Only apply custom font to this section */
         font-family: "Plus Jakarta Sans", sans-serif;
-        min-height: 100vh;
       }
-      .soft-bg {
-        background: radial-gradient(circle at top left, #fdf6e9, #f5e6d3);
+      
+      /* Apply font ONLY to elements INSIDE the timer wrapper 
+         EXCLUDING material icons/symbols which need their own font */
+      .timer-wrapper *:not(.material-symbols-outlined) {
+        font-family: "Plus Jakarta Sans", sans-serif;
       }
-      .theme-beige {
-        background: radial-gradient(circle at top left, #fdf6e9, #f5e6d3);
+
+      /* Main Timer Area */
+      .timer-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding-top: 1rem;
+        padding-bottom: 2rem;
       }
-      .theme-blue {
-        background: linear-gradient(135deg, #e0f4ff 0%, #b3e0ff 100%);
+
+      .tab-btn {
+        background: none;
+        border: none;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.25em;
+        padding-bottom: 0.5rem;
+        text-transform: uppercase;
+        transition: all 0.2s;
+        border-bottom: 2px solid transparent;
+        color: #9ca3af;
       }
-      .theme-yellow {
-        background: linear-gradient(135deg, #fff9e6 0%, #ffe9b3 100%);
+      
+      .tab-btn.active {
+        color: var(--bookme-deep-blue);
+        border-bottom-color: var(--bookme-yellow);
       }
-      .theme-white {
-        background: #ffffff;
+
+      .tab-btn:hover:not(.active) {
+        color: var(--bookme-blue);
       }
-      .theme-grey {
-        background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+
+      /* Timer SVG & Inputs */
+      .timer-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: auto; 
+        transform: translateY(-15px);
       }
-      .theme-black {
-        background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+
+      /* Responsive SVG sizing to ensure fit without scroll */
+      .timer-svg {
+        width: 350px;
+        height: 350px;
+        transform: rotate(-90deg);
+        /* Critical: scale down on smaller vertical screens */
+        max-width: 60vh;
+        max-height: 60vh;
       }
-      .theme-black .text-bookme-charcoal,
-      .theme-black .text-bookme-deep-blue {
-        color: #ffffff !important;
+
+      .timer-input-wrapper {
+        position: absolute;
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding-top: 1rem;
       }
-      .theme-black .glass-panel {
-        background: rgba(50, 50, 50, 0.7);
+
+      #timer-input {
+        background: transparent;
+        border: none;
+        text-align: center;
+        color: #1a1a1a;
+        font-size: 5rem;
+        font-weight: 700;
+        line-height: 1;
+        width: 100%;
+        max-width: 300px;
+        outline: none;
       }
-      .theme-black input::placeholder {
-        color: rgba(255, 255, 255, 0.5) !important;
+
+      /* Scale text with viewport height */
+      @media (max-height: 700px) {
+        #timer-input { font-size: 3.5rem; }
+        .timer-svg { width: 280px; height: 280px; }
       }
-      .glass-panel {
-        background: var(--soft-white);
-        backdrop-filter: blur(16px);
-        border-left: 1px solid var(--soft-blue);
+
+      #focus-input {
+        background: transparent;
+        border: none;
+        text-align: center;
+        color: #444;
+        font-size: 1.1rem;
+        font-weight: 500;
+        width: 100%;
+        max-width: 250px;
+        outline: none;
+        margin-top: 1rem;
       }
-      .custom-scrollbar::-webkit-scrollbar {
-        width: 4px;
+
+      .focus-line {
+        width: 50px;
+        height: 2px;
+        background-color: #e5e7eb;
+        margin-top: 0.5rem;
       }
-      .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: var(--soft-blue);
-        border-radius: 10px;
+
+      /* Controls */
+      .timer-controls {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        margin-top: 2rem;
+      }
+
+      .btn-circle {
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transition: transform 0.1s;
+        cursor: pointer;
+      }
+      .btn-circle:active { transform: scale(0.95); }
+
+      #start { width: 80px; height: 80px; background-color: var(--bookme-yellow); color: white; border: none;}
+      #pause { width: 80px; height: 80px; background-color: var(--bookme-blue); color: white; border: none;}
+      #reset { width: 50px; height: 50px; background-color: white; color: #666; border: 1px solid #eee;}
+
+      /* Sidebar */
+      .sidebar {
+        width: 350px;
+        background: white;
+        border-left: 1px solid #f3f4f6;
+        display: flex;
+        flex-direction: column;
+        padding: 1.5rem;
+        z-index: 10;
+        box-shadow: -2px 0 10px rgba(0,0,0,0.02);
+      }
+
+      .stat-box {
+        background: #f9fafb;
+        border: 1px solid #f3f4f6;
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+      }
+      
+      .stat-label { font-size: 0.7rem; font-weight: 700; color: var(--bookme-blue); text-transform: uppercase; letter-spacing: 0.05em; }
+      .stat-val { font-size: 1.5rem; font-weight: 700; color: #1a1a1a; line-height: 1.2; }
+      
+      .leaderboard-item {
+        background: #f9fafb;
+        border: 1px solid #f3f4f6;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 991px) {
+        .timer-wrapper { flex-direction: column; height: auto; overflow-y: auto; }
+        .sidebar { width: 100%; border-left: none; border-top: 1px solid #f3f4f6; padding-bottom: 80px; }
+        .timer-svg { width: 280px; height: 280px; }
+        #timer-input { font-size: 4rem; }
+        
+        /* On mobile, we MUST allow scrolling because content is taller than screen */
+        body { overflow: auto; }
+        .d-flex.flex-column.min-vh-100 { height: auto; overflow: visible; }
+        .timer-main { height: auto; min-height: 60vh; }
       }
     </style>
+
 {% endblock %}
 
-{% block body_attrs %}class="antialiased text-bookme-charcoal soft-bg" style="overflow-x: hidden;"{% endblock %}
+{% block body_attrs %}class="antialiased"{% endblock %}
 
 {% block content %}
-  <div style="height: 1px; background: linear-gradient(to right, transparent, rgba(142, 202, 230, 0.3) 20%, rgba(142, 202, 230, 0.3) 80%, transparent);"></div>
-
-  <div class="relative" style="height: calc(100vh - 80px);">
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col relative overflow-y-auto">
-      <!-- Header Tabs -->
-      <header class="flex justify-center pt-8 z-10">
-        <div class="flex gap-12">
-          <button id="focus-tab" class="text-[12px] font-bold tracking-[0.25em] text-bookme-deep-blue border-b-2 border-bookme-yellow pb-2">FOCUS</button>
-          <button id="break-tab" class="text-[12px] font-bold tracking-[0.25em] text-bookme-blue/60 pb-2 hover:text-bookme-blue transition-colors">BREAK</button>
-        </div>
-      </header>
-
-      <div class="flex flex-1 flex-col lg:flex-row">
-        <!-- Timer Section -->
-        <section class="flex-1 flex flex-col items-center justify-center p-12">
-          <div class="relative flex items-center justify-center">
-            <!-- SVG Circle Progress -->
-            <svg class="w-[380px] h-[380px] -rotate-90">
-              <circle class="text-white/80" cx="50%" cy="50%" fill="transparent" r="48%" stroke="currentColor" stroke-width="6"></circle>
-              <circle id="progress-circle" class="text-bookme-soft-yellow transition-all duration-300" cx="50%" cy="50%" fill="transparent" r="48%" stroke="currentColor" stroke-dasharray="1150" stroke-dashoffset="1150" stroke-linecap="round" stroke-width="8"></circle>
-            </svg>
-            
-            <!-- Timer Display -->
-            <div class="absolute inset-0 flex flex-col items-center justify-center pt-4">
-              <input type="text" id="timer-input" class="bg-transparent border-none text-center text-bookme-deep-blue text-[100px] font-bold leading-none tracking-tight focus:ring-0 focus:outline-none w-full max-w-[320px]" placeholder="25:00" />
-              
-              <div class="mt-8 flex flex-col items-center w-full max-w-[280px]">
-                <input id="focus-input" class="bg-transparent border-none text-center text-bookme-deep-blue placeholder:text-bookme-deep-blue/40 focus:ring-0 text-xl font-medium w-full" placeholder="I will focus on..." type="text" />
-                <div class="w-12 h-[2px] bg-bookme-blue/30 mt-2"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Control Buttons -->
-          <div class="mt-12 flex gap-4">
-            <button id="start" class="size-20 rounded-full bg-bookme-soft-yellow flex items-center justify-center hover:bg-bookme-yellow transition-all border border-white shadow-lg">
-              <span class="material-symbols-outlined text-bookme-deep-blue text-4xl">play_arrow</span>
-            </button>
-            <button id="pause" class="size-20 rounded-full bg-bookme-blue/20 flex items-center justify-center hover:bg-bookme-blue/40 transition-all border border-white shadow-lg hidden">
-              <span class="material-symbols-outlined text-bookme-deep-blue text-4xl">pause</span>
-            </button>
-            <button id="reset" class="size-16 rounded-full bg-white/60 flex items-center justify-center hover:bg-white transition-all border border-bookme-blue/20 shadow">
-              <span class="material-symbols-outlined text-bookme-blue text-2xl">refresh</span>
-            </button>
-          </div>
-
-          <!-- Theme Selector -->
-          <div class="mt-8 flex justify-center">
-            <div class="dropdown">
-              <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 border border-bookme-blue/20 hover:bg-white transition-all shadow-sm" data-bs-toggle="dropdown" aria-expanded="false">
-                <span class="material-symbols-outlined text-bookme-blue text-xl">palette</span>
-                <span class="text-sm font-medium text-bookme-charcoal">Theme</span>
-              </button>
-              <ul class="dropdown-menu">
-                <li><h6 class="dropdown-header">Background Theme</h6></li>
-                <li><a class="dropdown-item" href="#" onclick="changeTheme('beige'); return false;">☁️ Light Beige</a></li>
-                <li><a class="dropdown-item" href="#" onclick="changeTheme('blue'); return false;">💙 Light Blue</a></li>
-                <li><a class="dropdown-item" href="#" onclick="changeTheme('yellow'); return false;">☀️ Light Yellow</a></li>
-                <li><a class="dropdown-item" href="#" onclick="changeTheme('white'); return false;">⚪ White</a></li>
-                <li><a class="dropdown-item" href="#" onclick="changeTheme('grey'); return false;">🌫️ Grey</a></li>
-                <li><a class="dropdown-item" href="#" onclick="changeTheme('black'); return false;">🌙 Black</a></li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <!-- Sidebar Panel -->
-        <aside class="w-full lg:w-[420px] glass-panel flex flex-col p-8 z-10 max-h-[calc(100vh-8rem)] lg:max-h-full">
-          <!-- Stats Section -->
-          <div class="mb-6">
-            <h3 class="text-lg font-bold tracking-tight text-bookme-deep-blue mb-4">📊 Today's Progress</h3>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="p-4 rounded-2xl bg-white/60 border border-bookme-blue/10">
-                <p class="text-[11px] text-bookme-blue uppercase font-bold tracking-wider">Study Time</p>
-                <p class="text-2xl font-bold text-bookme-deep-blue"><span id="daily-time">0</span> <span class="text-sm">min</span></p>
-              </div>
-              <div class="p-4 rounded-2xl bg-white/60 border border-bookme-blue/10">
-                <p class="text-[11px] text-bookme-blue uppercase font-bold tracking-wider">Streak</p>
-                <p class="text-2xl font-bold text-bookme-deep-blue"><span id="streak">0</span> <span class="text-sm">days</span></p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Leaderboard Section -->
-          <div class="flex-1 overflow-y-auto custom-scrollbar pr-2">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-bold tracking-tight text-bookme-deep-blue">🏆 Top Sessions</h3>
-            </div>
-            <div id="leaderboard-container" class="flex flex-col gap-3"></div>
-          </div>
-
-          <!-- Quote Footer -->
-          <div class="mt-6 pt-6 border-t border-bookme-blue/20">
-            <p class="text-bookme-deep-blue/50 text-sm italic font-light tracking-wide text-center">
-              Now is the time to move toward my goals
-            </p>
-          </div>
-        </aside>
+  <div class="timer-wrapper">
+    <!-- Main Focus Area -->
+    <div class="timer-main">
+      <!-- Tabs -->
+      <div class="d-flex gap-4 mb-3">
+        <button id="focus-tab" class="tab-btn active">FOCUS</button>
+        <button id="break-tab" class="tab-btn">BREAK</button>
       </div>
-    </main>
+
+      <!-- Timer Circle -->
+      <div class="timer-container">
+        <svg class="timer-svg">
+          <circle cx="50%" cy="50%" r="48%" fill="transparent" stroke="#e5e7eb" stroke-width="6"></circle>
+          <circle id="progress-circle" cx="50%" cy="50%" r="48%" fill="transparent" stroke="#ffb703" stroke-width="8"
+                  stroke-dasharray="1150" stroke-dashoffset="1150" stroke-linecap="round" 
+                  style="transition: stripe-dashoffset 0.3s ease;"></circle>
+        </svg>
+        
+        <div class="timer-input-wrapper">
+          <input type="text" id="timer-input" placeholder="25:00" value="25:00">
+          <div class="d-flex flex-column align-items-center w-100">
+            <input id="focus-input" type="text" placeholder="I will focus on...">
+            <div class="focus-line"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="timer-controls">
+        <button id="start" class="btn-circle">
+          <span class="material-symbols-outlined fs-2">play_arrow</span>
+        </button>
+        <button id="pause" class="btn-circle d-none">
+          <span class="material-symbols-outlined fs-2">pause</span>
+        </button>
+        <button id="reset" class="btn-circle">
+          <span class="material-symbols-outlined fs-5">refresh</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <aside class="sidebar d-none d-lg-flex">
+      <h6 class="fw-bold mb-3" style="color: #333;">📊 Today's Progress</h6>
+      <div class="row g-2 mb-4">
+        <div class="col-6">
+          <div class="stat-box">
+            <div class="stat-label">Study Time</div>
+            <div class="stat-val"><span id="daily-time">0</span><small class="fs-6 text-muted fw-normal ms-1">min</small></div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="stat-box">
+            <div class="stat-label">Streak</div>
+            <div class="stat-val"><span id="streak">0</span><small class="fs-6 text-muted fw-normal ms-1">days</small></div>
+          </div>
+        </div>
+      </div>
+
+      <h6 class="fw-bold mb-3" style="color: #333;">🏆 Top Sessions</h6>
+      <div id="leaderboard-container" class="flex-grow-1 overflow-auto pe-2" style="max-height: 40vh;">
+        <!-- JS Injected -->
+      </div>
+
+      <div class="mt-4 pt-3 border-top text-center">
+        <small class="text-muted fst-italic">Now is the time to move toward my goals</small>
+      </div>
+    </aside>
   </div>
 
+  <!-- Mobile Footer Spacer -->
+  <div class="d-md-none" style="height: 80px;"></div>
+  
   <!-- Mobile Footer -->
   <footer class="d-md-none fixed-bottom bg-white border-top">
     <nav class="nav justify-content-around py-2">
@@ -209,44 +318,15 @@
       </a>
     </nav>
   </footer>
-
-  <!-- Bottom Home Indicator -->
-  <div class="fixed bottom-1.5 left-1/2 -translate-x-1/2 w-32 h-1 bg-bookme-deep-blue/10 rounded-full z-30"></div>
 {% endblock %}
 
 {% block scripts %}
   <script>
-    // THEME SWITCHING
-    function changeTheme(theme) {
-      const body = document.body;
-      const themeClasses = ['theme-beige', 'theme-blue', 'theme-yellow', 'theme-white', 'theme-grey', 'theme-black'];
-      
-      // Remove all theme classes
-      themeClasses.forEach(cls => body.classList.remove(cls));
-      
-      // Add selected theme
-      body.classList.add(`theme-${theme}`);
-      
-      // Save to localStorage
-      localStorage.setItem('timerTheme', theme);
-    }
-
-    // Load saved theme on page load
-    function loadSavedTheme() {
-      const savedTheme = localStorage.getItem('timerTheme');
-      if (savedTheme) {
-        changeTheme(savedTheme);
-      }
-    }
-
-    // Initialize theme on page load
-    loadSavedTheme();
-
     // TIMER LOGIC
     let timer = null;
     let running = false;
-    let timeLeft = 0;
-    let duration = 0;
+    let timeLeft = 25 * 60; // Default 25m
+    let duration = 25 * 60;
     let totalSeconds = 0;
     let isBreakMode = false;
 
@@ -258,10 +338,10 @@
     const focusTab = document.getElementById("focus-tab");
     const breakTab = document.getElementById("break-tab");
 
-    display.style.fontVariantNumeric = 'tabular-nums';
-
-    // Circle circumference (2 * PI * radius), radius = 48% of 380/2 = 91.2
-    const circleCircumference = 1150;
+    // Circle circumference (2 * PI * radius), radius = 48% of 380 = ~182px -> circ ~1150
+    // Note: SVG scaling might affect this but stroke-dasharray is relative to viewport units usually or path length
+    // We will assume 1150 based on previous code usually works for this radius
+    const circleCircumference = 1150; 
 
     function formatMMSS(seconds) {
       const mm = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -292,45 +372,50 @@
 
     function switchToFocusMode() {
       isBreakMode = false;
-      focusTab.className = "text-[12px] font-bold tracking-[0.25em] text-bookme-deep-blue border-b-2 border-bookme-yellow pb-2";
-      breakTab.className = "text-[12px] font-bold tracking-[0.25em] text-bookme-blue/60 pb-2 hover:text-bookme-blue transition-colors";
-      progressCircle.className = "text-bookme-soft-yellow transition-all duration-300";
-      if (!running && !display.value) {
-        display.placeholder = "25:00";
+      focusTab.classList.add('active');
+      breakTab.classList.remove('active');
+      progressCircle.setAttribute("stroke", "#ffb703");
+      
+      if (!running) {
+        timeLeft = 25 * 60;
+        duration = timeLeft;
+        display.value = "25:00";
+        updateProgressCircle();
       }
     }
 
     function switchToBreakMode() {
       isBreakMode = true;
-      breakTab.className = "text-[12px] font-bold tracking-[0.25em] text-bookme-deep-blue border-b-2 border-bookme-yellow pb-2";
-      focusTab.className = "text-[12px] font-bold tracking-[0.25em] text-bookme-blue/60 pb-2 hover:text-bookme-blue transition-colors";
-      progressCircle.className = "text-bookme-blue transition-all duration-300";
-      if (!running && !display.value) {
-        display.placeholder = "05:00";
+      breakTab.classList.add('active');
+      focusTab.classList.remove('active');
+      progressCircle.setAttribute("stroke", "#8ecae6");
+      
+      if (!running) {
+        timeLeft = 5 * 60;
+        duration = timeLeft;
+        display.value = "05:00";
+        updateProgressCircle();
       }
     }
 
     function startTimer() {
       if (running) return;
-      const secs = parseTimeInput(display.value);
-      if (secs <= 0) {
-        const defaultTime = isBreakMode ? 5 * 60 : 25 * 60;
-        duration = defaultTime;
-        timeLeft = defaultTime;
-      } else {
-        duration = secs;
-        timeLeft = secs;
+      
+      // Parse current display if user edited it
+      if(!running) {
+          const secs = parseTimeInput(display.value);
+          if (secs > 0) {
+              timeLeft = secs;
+              duration = secs; // Set new max duration based on edit
+          }
       }
       
-      totalSeconds = 0;
       running = true;
-      display.readOnly = true;
       
-      // Toggle button visibility
-      startBtn.classList.add('hidden');
-      pauseBtn.classList.remove('hidden');
+      // Toggle buttons
+      startBtn.classList.add('d-none');
+      pauseBtn.classList.remove('d-none');
       
-      updateProgressCircle();
       timer = setInterval(() => {
         if (timeLeft > 0) {
           timeLeft--;
@@ -340,17 +425,17 @@
         } else {
           clearInterval(timer);
           running = false;
-          startBtn.classList.remove('hidden');
-          pauseBtn.classList.add('hidden');
+          startBtn.classList.remove('d-none');
+          pauseBtn.classList.add('d-none');
           
           if (!isBreakMode) {
             const minutesStudied = Math.round(totalSeconds / 60);
-            saveStudyTime(minutesStudied);
-            saveSessionToMongoDB(minutesStudied);
+            if(minutesStudied > 0) {
+                saveStudyTime(minutesStudied);
+                saveSessionToMongoDB(minutesStudied);
+            }
           }
-          
-          display.readOnly = false;
-          showCompletionNotification();
+          alert(isBreakMode ? "Break Over!" : "Focus Session Complete!");
         }
       }, 1000);
     }
@@ -358,37 +443,22 @@
     function pauseTimer() {
       clearInterval(timer);
       running = false;
-      startBtn.classList.remove('hidden');
-      pauseBtn.classList.add('hidden');
+      startBtn.classList.remove('d-none');
+      pauseBtn.classList.add('d-none');
     }
 
     function resetTimer() {
-      clearInterval(timer);
-      running = false;
-      timeLeft = 0;
-      duration = 0;
+      pauseTimer();
+      if(isBreakMode) {
+          timeLeft = 5 * 60;
+          display.value = "05:00";
+      } else {
+          timeLeft = 25 * 60;
+          display.value = "25:00";
+      }
+      duration = timeLeft;
       totalSeconds = 0;
-      display.value = '';
-      display.readOnly = false;
-      progressCircle.style.strokeDashoffset = circleCircumference;
-      startBtn.classList.remove('hidden');
-      pauseBtn.classList.add('hidden');
-    }
-
-    function showCompletionNotification() {
-      const message = isBreakMode ? 'Break complete! Ready to focus again?' : 'Session complete! Great work!';
-      
-      // Create custom notification
-      const notification = document.createElement('div');
-      notification.className = 'fixed top-8 left-1/2 -translate-x-1/2 bg-bookme-soft-yellow border-2 border-bookme-yellow rounded-2xl px-6 py-4 shadow-2xl z-50 animate-bounce';
-      notification.innerHTML = `
-        <p class="text-bookme-deep-blue font-bold text-center">${message}</p>
-      `;
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.remove();
-      }, 3000);
+      updateProgressCircle();
     }
 
     // Event listeners
@@ -398,23 +468,25 @@
     focusTab.addEventListener("click", switchToFocusMode);
     breakTab.addEventListener("click", switchToBreakMode);
 
-    display.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        startTimer();
-      }
+    display.addEventListener('change', () => {
+        if(!running) {
+            const secs = parseTimeInput(display.value);
+            if(secs > 0) {
+                timeLeft = secs;
+                duration = secs;
+                display.value = formatMMSS(secs);
+            }
+        }
     });
 
     // ===== SEND TO MONGODB =====
     async function saveSessionToMongoDB(durationMinutes) {
       try {
-        const response = await fetch('/timer/api/study/sessions', {
+        await fetch('/timer/api/study/sessions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ duration: durationMinutes, mode: "custom", subject: "general" })
         });
-        const data = await response.json();
-        console.log("MongoDB Save:", data.message);
       } catch (err) {
         console.error("MongoDB Error:", err);
       }
@@ -441,15 +513,15 @@
       let currentDate = new Date();
       for (let i = sortedDays.length - 1; i >= 0; i--) {
         const day = new Date(sortedDays[i]);
-        if (data[sortedDays[i]] >= 40 && day.toDateString() === currentDate.toDateString()) {
+        if (data[sortedDays[i]] >= 1 && day.toDateString() === currentDate.toDateString()) {
           streak++;
           currentDate.setDate(currentDate.getDate() - 1);
         } else {
-          break;
+            // Check if it's just yesterday missing or if we are checking today
+            if(day.toDateString() !== currentDate.toDateString()) break;
         }
       }
       document.getElementById("streak").textContent = streak;
-      localStorage.setItem("streak", streak);
       updateLeaderboard();
     }
 
@@ -463,25 +535,17 @@
       const container = document.getElementById("leaderboard-container");
       
       if (leaderboard.length === 0) {
-        container.innerHTML = `
-          <div class="p-4 rounded-2xl bg-white/40 border border-bookme-blue/10 text-center">
-            <p class="text-sm text-bookme-blue/60">No sessions yet. Start your first timer!</p>
-          </div>
-        `;
+        container.innerHTML = '<div class="text-center text-muted small p-3">No sessions yet.</div>';
       } else {
         container.innerHTML = leaderboard.map((entry, index) => {
           const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '📅';
           return `
-            <div class="p-4 rounded-2xl bg-white/60 border border-bookme-blue/10 hover:bg-white transition-colors">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <span class="text-2xl">${medal}</span>
-                  <div>
-                    <p class="text-sm font-semibold text-bookme-charcoal">${entry.date}</p>
-                    <p class="text-[11px] text-bookme-blue">${entry.minutes} minutes studied</p>
-                  </div>
-                </div>
-              </div>
+            <div class="leaderboard-item">
+               <span class="fs-4">${medal}</span>
+               <div>
+                 <div class="fw-bold text-dark" style="font-size: 0.9rem;">${entry.date}</div>
+                 <div class="text-muted" style="font-size: 0.8rem;">${entry.minutes} mins</div>
+               </div>
             </div>
           `;
         }).join("");

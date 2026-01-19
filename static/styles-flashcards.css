@@ -496,6 +496,158 @@
     }
 }
 
+
+/* =============================================
+   EDIT MODE STYLES
+   ============================================= */
+
+/* Main Title Input */
+.edit-title-input {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 2.5rem;
+    color: #1a1a1a;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    padding: 0.5rem 0;
+    width: 100%;
+    outline: none;
+    line-height: 1.2;
+    transition: border-color 0.2s ease;
+}
+
+.edit-title-input:focus {
+    border-bottom-color: #e5e7eb;
+}
+
+.edit-title-input::placeholder {
+    color: #d1d5db;
+}
+
+/* Summary Input */
+.edit-summary-input {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #6b7280;
+    border: none;
+    border-bottom: 1px solid transparent;
+    background: transparent;
+    padding: 0.25rem 0;
+    width: 100%;
+    outline: none;
+    resize: none;
+}
+
+.edit-summary-input:focus {
+    border-bottom-color: #e5e7eb;
+}
+
+/* Edit Card Item */
+.edit-card-item {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.edit-card-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.edit-card-item.new-card-row {
+    border: 1px dashed #d1d5db;
+    background: #fdfdfd;
+}
+
+/* Card Inputs */
+.edit-card-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9ca3af;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.edit-card-textarea {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    color: #1a1a1a;
+    background: #f9f9f9;
+    width: 100%;
+    outline: none;
+    transition: all 0.2s ease;
+    resize: none;
+}
+
+.edit-card-textarea:focus {
+    background: #fff;
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+}
+
+/* Danger Button Variant */
+.btn-study-danger {
+    background-color: transparent;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-study-danger:hover {
+    background-color: #ef4444;
+    color: #fff;
+}
+
+/* Save Bar */
+.save-bar {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 100;
+    animation: slideUp 0.3s ease;
+}
+
+.save-bar button {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+@keyframes slideUp {
+    from { transform: translate(-50%, 100%); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
 /* =============================================
    FLOATING CHAT PANEL (preserved from original)
    ============================================= */

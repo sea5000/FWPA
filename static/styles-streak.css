@@ -1,4 +1,4 @@
-/* Streak Component Styles */
+/* Streak Component Styles - GitHub-style Contribution Heatmap */
 .material-symbols-outlined {
   font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
 }
@@ -9,41 +9,95 @@
   padding: 0 15px;
 }
 
-.streak-grid {
-  display: grid;
-  grid-template-columns: repeat(53, 1fr);
-  grid-template-rows: repeat(7, 1fr);
-  grid-auto-flow: column;
-  gap: 3px;
-  width: 100%;
-  max-width: 100%;
+.streak-container .card {
   overflow-x: auto;
-  padding-bottom: 4px;
+  overflow-y: visible;
+  padding: 1rem;
 }
 
+/* Month labels row - positioned above the grid */
+.month-labels {
+  display: flex;
+  font-size: 0.75rem;
+  margin-left: 48px; /* Align with grid (weekday labels width) */
+  margin-bottom: 4px;
+  gap: 3px;
+  position: relative;
+  height: 16px;
+}
+
+.month-labels > div {
+  position: absolute;
+  color: #656d76;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Main container for weekday labels + grid */
+.streak-row {
+  display: flex;
+  gap: 8px;
+}
+
+/* Weekday labels on the left */
+.weekday-labels {
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+  gap: 3px;
+  font-size: 0.7rem;
+  min-width: 40px;
+  flex-shrink: 0;
+}
+
+.weekday-labels > div {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 12px;
+  color: #656d76;
+  font-weight: 500;
+  padding-right: 4px;
+}
+
+/* The contribution grid */
+.streak-grid {
+  display: grid;
+  /* Columns will be set dynamically by JavaScript */
+  grid-template-rows: repeat(7, 12px);
+  grid-auto-flow: column;
+  grid-auto-columns: 12px;
+  gap: 3px;
+}
+
+/* Individual day cell */
 .streak-day {
   aspect-ratio: 1 / 1;
+  width: 12px;
+  height: 12px;
   background-color: #ebedf0;
-  border-radius: 3px;
-  transition: all 0.2s ease;
+  border-radius: 2px;
+  transition: all 0.15s ease;
   cursor: pointer;
-  min-width: 12px;
-  min-height: 12px;
-  position: relative;
 }
 
 .streak-day:hover {
-  transform: scale(1.15);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: scale(1.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   z-index: 10;
 }
 
+/* Empty/placeholder cells (for future dates or alignment) */
+.streak-day.empty {
+  visibility: hidden;
+}
+
+/* Contribution levels - GitHub green shades */
 .streak-day[data-level="0"] {
   background-color: #ebedf0;
 }
 
 .streak-day[data-level="1"] {
-  background-color: #9be9a8;
+  background-color: #30a14e;
 }
 
 .streak-day[data-level="2"] {
@@ -58,161 +112,25 @@
   background-color: #216e39;
 }
 
-.month-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  padding-left: 2rem;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
-  gap: 4px;
-  position: relative;
-}
-
-.month-labels > div {
-  flex: 1;
-  text-align: center;
-  min-width: 35px;
-  color: #656d76;
-  font-weight: 500;
-}
-
-.weekday-labels {
-  display: grid;
-  grid-template-rows: repeat(7, 1fr);
-  gap: 3px;
-  font-size: 0.75rem;
-  margin-right: 8px;
-  min-width: 40px;
-}
-
-.weekday-labels > div {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  min-height: 12px;
-  color: #656d76;
-  font-weight: 500;
-}
-
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .streak-container {
-    max-width: 100%;
-    padding: 0 10px;
-  }
-
-  .streak-grid {
-    gap: 2px;
-  }
-
-  .streak-day {
-    min-width: 10px;
-    min-height: 10px;
-  }
-
-  .month-labels {
-    font-size: 0.7rem;
-    padding-left: 1.5rem;
-  }
-
-  .weekday-labels {
-    font-size: 0.7rem;
-    margin-right: 6px;
-    min-width: 35px;
-  }
-}
-
-@media (max-width: 768px) {
-  .streak-container {
-    max-width: 100%;
-    padding: 0 8px;
-  }
-
-  .streak-grid {
-    gap: 2px;
-    padding-right: 8px;
-  }
-
-  .streak-day {
-    min-width: 8px;
-    min-height: 8px;
-  }
-
-  .month-labels {
-    font-size: 0.65rem;
-    padding-left: 1.2rem;
-  }
-
-  .weekday-labels {
-    font-size: 0.65rem;
-    margin-right: 4px;
-    min-width: 30px;
-  }
-}
-
-@media (max-width: 480px) {
-  .streak-grid {
-    gap: 1px;
-    padding-right: 4px;
-  }
-
-  .streak-day {
-    min-width: 6px;
-    min-height: 6px;
-  }
-
-  .month-labels {
-    font-size: 0.6rem;
-    padding-left: 1rem;
-  }
-
-  .weekday-labels {
-    font-size: 0.6rem;
-    margin-right: 2px;
-    min-width: 26px;
-  }
-}
-
-@media (max-width: 360px) {
-  .streak-day {
-    min-width: 5px;
-    min-height: 5px;
-  }
-
-  .month-labels {
-    font-size: 0.55rem;
-    padding-left: 0.8rem;
-  }
-
-  .weekday-labels {
-    font-size: 0.55rem;
-    margin-right: 1px;
-    min-width: 22px;
-  }
-}
-
 /* Legend styles */
 .streak-legend {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   margin-top: 12px;
-  font-size: 0.8rem;
-  color: #6c757d;
-  flex-wrap: wrap;
+  font-size: 0.75rem;
+  color: #656d76;
 }
 
 .streak-legend span {
   font-weight: 500;
-  white-space: nowrap;
 }
 
 .streak-legend .streak-day {
   cursor: default;
-  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
 }
 
 .streak-legend .streak-day:hover {
@@ -220,7 +138,168 @@
   box-shadow: none;
 }
 
-/* gif section styles */
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 1200px) {
+  .streak-container {
+    max-width: 100%;
+    padding: 0 10px;
+  }
+
+  .streak-grid {
+    grid-template-columns: repeat(53, minmax(10px, 1fr));
+    gap: 2px;
+  }
+
+  .streak-day {
+    width: 10px;
+    height: 10px;
+  }
+
+  .month-labels {
+    grid-template-columns: repeat(53, minmax(10px, 1fr));
+    font-size: 0.7rem;
+    margin-left: 43px;
+    gap: 2px;
+  }
+
+  .weekday-labels {
+    font-size: 0.65rem;
+    min-width: 35px;
+    gap: 2px;
+  }
+
+  .weekday-labels > div {
+    height: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .streak-container {
+    padding: 0 8px;
+  }
+
+  .streak-container .card {
+    padding: 0.75rem;
+  }
+
+  .streak-grid {
+    grid-template-columns: repeat(53, minmax(8px, 1fr));
+    gap: 2px;
+  }
+
+  .streak-day {
+    width: 8px;
+    height: 8px;
+  }
+
+  .month-labels {
+    grid-template-columns: repeat(53, minmax(8px, 1fr));
+    font-size: 0.6rem;
+    margin-left: 34px;
+    gap: 2px;
+  }
+
+  .weekday-labels {
+    font-size: 0.55rem;
+    min-width: 26px;
+    gap: 2px;
+  }
+
+  .weekday-labels > div {
+    height: 8px;
+  }
+
+  .streak-legend {
+    font-size: 0.65rem;
+    gap: 3px;
+  }
+
+  .streak-legend .streak-day {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .streak-container {
+    padding: 0 5px;
+  }
+
+  .streak-container .card {
+    padding: 0.5rem;
+  }
+
+  .streak-grid {
+    grid-template-columns: repeat(53, minmax(5px, 1fr));
+    gap: 1px;
+  }
+
+  .streak-day {
+    width: 5px;
+    height: 5px;
+    border-radius: 1px;
+  }
+
+  .month-labels {
+    grid-template-columns: repeat(53, minmax(5px, 1fr));
+    font-size: 0.5rem;
+    margin-left: 22px;
+    gap: 1px;
+  }
+
+  .weekday-labels {
+    font-size: 0.45rem;
+    min-width: 18px;
+    gap: 1px;
+  }
+
+  .weekday-labels > div {
+    height: 5px;
+  }
+
+  .streak-legend {
+    font-size: 0.55rem;
+  }
+
+  .streak-legend .streak-day {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+@media (max-width: 360px) {
+  .streak-grid {
+    grid-template-columns: repeat(53, minmax(4px, 1fr));
+  }
+
+  .streak-day {
+    width: 4px;
+    height: 4px;
+  }
+
+  .month-labels {
+    grid-template-columns: repeat(53, minmax(4px, 1fr));
+    font-size: 0.45rem;
+    margin-left: 16px;
+  }
+
+  .weekday-labels {
+    font-size: 0.4rem;
+    min-width: 14px;
+  }
+
+  .weekday-labels > div {
+    height: 4px;
+  }
+}
+
+/* ============================================
+   MOTIVATIONAL SECTION
+   ============================================ */
+
 .motivational-section {
   margin: 0 auto;
   padding: 1rem 0.5rem;
@@ -256,7 +335,6 @@
   color: #6c757d !important;
 }
 
-/* Responsive styles for motivational section */
 @media (max-width: 768px) {
   .motivational-section {
     padding: 0.75rem 0.25rem;
@@ -312,5 +390,3 @@ main {
     padding-bottom: 1rem !important;
   }
 }
-
-/* Header styling is inherited from styles-theme.css for consistency */

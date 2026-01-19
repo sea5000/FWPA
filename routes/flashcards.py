@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, g, request, abort, redirect, url_for
 from utils.auth import get_current_user_from_token
 from model.login_model import get_all_users
-from model.studyData_model import get_user_permissions, get_user_decks, get_user_study_data, get_deck, update_card, add_card, delete_card, record_review, create_deck, add_deck_to_user, get_deck_by_id, update_deckInfo, delete_deck, add_deck_permissions, rem_deck_permissions, get_friends, get_deck_permissions
+from model.studyData_model import get_user_permissions, get_user_decks, get_user_study_data, get_deck, update_card, add_card, delete_card, record_review, create_deck, add_deck_to_user, get_deck_by_id, update_deckInfo, delete_deck, add_deck_permissions, rem_deck_permissions, get_friends, get_deck_permissions, addTag, remTag
 from flask import jsonify
 from functools import wraps
-
+import re
+import json
 
 flashcards_bp = Blueprint('flashcards', __name__)
 
@@ -182,10 +183,39 @@ def flashcards_edit(deck_id):
     deck_obj = get_deck_by_id(deck_id)
     if not deck_obj:
         return render_template('404.html'), 404
+    
     # get friend profiles via model helper
     friends = get_friends(g.current_user)
     if request.method == 'POST':
         form = request.form
+        #re.findall('\Value')
+        #Tag handeling
+        oldDeckTags = set(deck_obj.get('tags') or [])
+        tags_field = form.get('tags') or '[]'
+        # try to parse JSON array like [{"value":"History"}, ...]
+        try:
+            parsed = json.loads(tags_field) if isinstance(tags_field, str) else tags_field
+            newDeckTags = set()
+            if isinstance(parsed, list):
+                for item in parsed:
+                    if isinstance(item, dict) and 'value' in item:
+                        newDeckTags.add(item['value'])
+                    elif isinstance(item, str):
+                        newDeckTags.add(item)
+            else:
+                newDeckTags = set()
+        except Exception:
+            # fallback to previous regex extraction for malformed strings
+            newDeckTags = set(re.findall(r'"value"\s*:\s*"([^\"]+?)"', tags_field))
+        
+        removeTags = oldDeckTags.difference(newDeckTags)
+        addTags = newDeckTags.difference(oldDeckTags)
+        for i in removeTags:
+            remTag(deck_id, i)
+        for i in addTags:
+            addTag(deck_id, i)
+            
+        
         # existing cards
         existing_cards = list(deck_obj.get('cards', {}).keys()) if isinstance(deck_obj, dict) else list(getattr(deck_obj, 'cards', {}).keys())
         for cardn in existing_cards:

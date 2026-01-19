@@ -3,13 +3,8 @@
 {% block title %}Bookme - Edit {{ deck.name }}{% endblock %}
 
 {% block head %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles-flashcards.css') }}">
-    <style>
-        .flashcard-page {
-            background-color: #f9f9f9;
-            min-height: 100vh;
-        }
-    </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles-flashcards.css') }}">
+<link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block body_attrs %}class="flashcard-page text-dark"{% endblock %}
@@ -17,130 +12,94 @@
 {% block content %}
 <main>
     <div class="study-page-container">
-        
         <form method="POST" id="edit-deck-form">
-            <!-- Header Section -->
-            <div class="study-header-section align-items-center mb-5">
-                <div style="flex: 1;">
+            <div class="study-header-section align-items-center mb-4 d-flex justify-content-between">
+                <div style="flex:1;">
                     <div class="study-subtitle mb-2">EDITING DECK</div>
-                    <!-- Title Input -->
-                    <input type="text" class="edit-title-input" name="deck_name" 
-                           value="{{ deck.name }}" placeholder="Deck Name">
-                    <!-- Summary Input -->
-                    <textarea class="edit-summary-input auto-expand" name="deck_summary" 
-                              rows="1" placeholder="Add a brief summary...">{{ deck.summary }}</textarea>
+                    <input type="text" class="edit-title-input form-control mb-2" name="deck_name" value="{{ deck.name }}" placeholder="Deck Name">
+                    <textarea class="edit-summary-input auto-expand form-control" name="deck_summary" rows="1" placeholder="Add a brief summary...">{{ deck.summary }}</textarea>
                 </div>
-                
-                <!-- Header Actions -->
-                <div class="d-flex gap-2 ms-4">
-                    <a href="{{ url_for('flashcards.index', deck_id = deck_id) }}" class="btn-study-outline">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
-                        BACK
-                    </a>
-                    
-                    <button type="button" id="shareBtn" class="btn-study-outline">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">share</span>
-                        SHARE
-                    </button>
-                    
-                    <button type="button" id="deleteBtn" class="btn-study-danger">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
-                        DELETE
-                    </button>
+                <div class="d-flex gap-2 ms-4 align-items-start">
+                    <a href="{{ url_for('flashcards.index', deck_id = deck_id) }}" class="btn-study-outline">BACK</a>
+                    <button type="button" id="shareBtn" class="btn-study-outline">SHARE</button>
+                    <button type="button" id="deleteBtn" class="btn-study-danger">DELETE</button>
                 </div>
             </div>
 
-            <!-- Cards List -->
-            <div class="deck-cards-list">
-                <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="mb-3">
+                <label class="form-label">Tags</label>
+                <input class="form-control" name="tags" id="tags" value="">
+            </div>
+
+            <div class="deck-cards-list mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
                     <div class="study-subtitle">CARDS IN DECK</div>
-                    <button type="button" id="add-new-card" class="btn-study-outline" style="font-size: 0.65rem; padding: 0.5rem 1rem;">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
-                        ADD CARD
-                    </button>
+                    <button type="button" id="add-new-card" class="btn-study-outline">ADD CARD</button>
                 </div>
 
-                <!-- Existing Cards -->
-                {% for cardn, card in deck.cards.items() %}
-                <div class="edit-card-item position-relative" id="card-row-{{cardn}}">
-                    <!-- Deleted Overlay -->
-                    <div class="card-deleted-overlay position-absolute top-0 start-0 w-100 h-100 d-none flex-column align-items-center justify-content-center" 
-                         style="background: rgba(255,255,255,0.95); z-index: 10; border-radius: 20px; backdrop-filter: blur(2px);">
-                        <div class="text-danger fw-bold mb-3" style="font-family: 'Inter', sans-serif; letter-spacing: 0.05em;">MARKED FOR DELETION</div>
-                        <button type="button" class="btn-study-outline card-undo-btn" data-target="{{cardn}}" style="border-color: #6b7280; color: #6b7280;">
-                            <span class="material-symbols-outlined" style="font-size: 16px;">undo</span>
-                            UNDO
-                        </button>
-                    </div>
-
-                    <div class="d-flex gap-4 align-items-start">
-                        <div class="flex-grow-1">
-                            <label class="edit-card-label">FRONT</label>
-                            <textarea class="edit-card-textarea auto-expand" name="front_{{cardn}}" rows="1">{{ card.front }}</textarea>
+                <div class="list-group list-group-flush col-12">
+                    {% for cardn, card in deck.cards.items() %}
+                    <div class="edit-card-item position-relative mb-3" id="card-row-{{ cardn }}">
+                        <div class="card-deleted-overlay position-absolute top-0 start-0 w-100 h-100 d-none flex-column align-items-center justify-content-center" style="background: rgba(255,255,255,0.95); z-index: 10; border-radius: 8px;">
+                            <div class="text-danger fw-bold mb-3">MARKED FOR DELETION</div>
+                            <button type="button" class="btn-study-outline card-undo-btn" data-target="{{ cardn }}">UNDO</button>
                         </div>
-                        <div class="flex-grow-1">
-                            <label class="edit-card-label">BACK</label>
-                            <textarea class="edit-card-textarea auto-expand" name="back_{{cardn}}" rows="1">{{ card.back }}</textarea>
-                        </div>
-                        
-                        <!-- Delete Action (Flex Item) -->
-                        <div class="pt-4 mt-1"> <!-- Padding top to align with textareas -->
-                            <input class="form-check-input d-none card-delete-checkbox" type="checkbox" name="delete_{{cardn}}" id="delete_{{cardn}}">
-                            <button type="button" class="btn btn-link text-danger p-0 border-0 card-delete-trigger" data-target="{{cardn}}" title="Delete Card"
-                                    style="opacity: 0.6; transition: all 0.2s ease; text-decoration: none;">
-                                <span class="material-symbols-outlined" style="font-size: 24px;">delete</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-
-                <!-- New Cards Container -->
-                <div id="new-cards-container"></div>
-                
-                <!-- Hidden Template for New Cards -->
-                <div class="d-none" id="new-card-template">
-                    <div class="edit-card-item new-card-row position-relative">
-                        <button type="button" class="btn-close position-absolute remove-new-card" aria-label="Remove" style="top: 1rem; right: 1rem; background-size: 0.8rem;"></button>
-                        <div class="d-flex gap-4">
+                        <div class="d-flex gap-3 align-items-start">
                             <div class="flex-grow-1">
                                 <label class="edit-card-label">FRONT</label>
-                                <textarea class="edit-card-textarea auto-expand" name="new_front[]" rows="1" placeholder="Front text"></textarea>
+                                <textarea class="edit-card-textarea auto-expand form-control" name="front_{{ cardn }}" rows="1">{{ card.front }}</textarea>
                             </div>
                             <div class="flex-grow-1">
                                 <label class="edit-card-label">BACK</label>
-                                <textarea class="edit-card-textarea auto-expand" name="new_back[]" rows="1" placeholder="Back text"></textarea>
+                                <textarea class="edit-card-textarea auto-expand form-control" name="back_{{ cardn }}" rows="1">{{ card.back }}</textarea>
+                            </div>
+                            <div class="pt-2">
+                                <input class="form-check-input d-none card-delete-checkbox" type="checkbox" name="delete_{{ cardn }}" id="delete_{{ cardn }}">
+                                <button type="button" class="btn btn-link text-danger p-0 border-0 card-delete-trigger" data-target="{{ cardn }}" title="Delete Card">
+                                    <span class="material-symbols-outlined">delete</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div id="new-cards-container"></div>
+                <div class="d-none" id="new-card-template">
+                    <div class="edit-card-item new-card-row position-relative">
+                        <button type="button" class="btn-close position-absolute remove-new-card" aria-label="Remove" style="top: 0.5rem; right: 0.5rem;"></button>
+                        <div class="d-flex gap-3">
+                            <div class="flex-grow-1">
+                                <label class="edit-card-label">FRONT</label>
+                                <textarea class="edit-card-textarea auto-expand form-control" name="new_front[]" rows="1" placeholder="Front text"></textarea>
+                            </div>
+                            <div class="flex-grow-1">
+                                <label class="edit-card-label">BACK</label>
+                                <textarea class="edit-card-textarea auto-expand form-control" name="new_back[]" rows="1" placeholder="Back text"></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
 
-            <div style="height: 100px;"></div> <!-- Spacer for fixed footer -->
-
-            <!-- Save Bar (Floating Bottom) -->
-            <div class="save-bar">
-                <span class="material-symbols-outlined text-white">save</span>
-                <button type="submit">SAVE CHANGES</button>
+            <div style="height: 100px;"></div>
+            <div class="save-bar d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-primary">SAVE CHANGES</button>
             </div>
-            
-            <input type="hidden" name="deck_id" value="{{deck.id}}" />
+            <input type="hidden" name="deck_id" value="{{ deck.id }}" />
         </form>
-
     </div>
 
-    <!-- Confirm Delete Modal -->
     <div id="confirmDeleteModal" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="z-index:3000;background:rgba(0,0,0,0.45);">
         <div class="d-flex align-items-center justify-content-center h-100 p-3">
-            <div class="bg-white rounded shadow-sm p-4" style="max-width:480px; width:100%; border-radius: 24px;">
+            <div class="bg-white rounded shadow-sm p-4" style="max-width:480px; width:100%; border-radius: 12px;">
                 <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h5 class="m-0" style="font-family: 'Playfair Display', serif;">Confirm Deletion</h5>
+                    <h5 class="m-0">Confirm Deletion</h5>
                     <button type="button" class="btn-close" id="closeDeleteModal" aria-label="Close"></button>
                 </div>
                 <p class="mb-4 text-muted">Are you sure you want to delete this deck? This action cannot be undone.</p>
                 <div class="d-flex justify-content-end gap-2">
-                    <button type="button" class="btn-study-outline" id="cancelDelete" style="border: none;">CANCEL</button>
+                    <button type="button" class="btn-study-outline" id="cancelDelete">CANCEL</button>
                     <form method="POST" action="{{ url_for('flashcards.delete', deck_id = deck_id) }}" class="m-0">
                         <button type="submit" class="btn-study-danger">DELETE DECK</button>
                     </form>
@@ -148,11 +107,10 @@
             </div>
         </div>
     </div>
-    
-    <!-- Share/Chat/Floater Placeholders (Preserved functionality) -->
+
+</main>
     <!-- Floating chat button -->
-    <button id="floating-chat-button" class="btn btn-primary d-inline-flex align-items-center justify-content-center"
-        aria-label="Open chat" title="Chat">
+    <button id="floating-chat-button" class="btn btn-primary d-inline-flex align-items-center justify-content-center" aria-label="Open chat" title="Chat">
         <span class="material-symbols-outlined" style="font-size:22px;">chat</span>
     </button>
     <!-- Chat panel -->
@@ -195,58 +153,96 @@
             </div>
         </div>
     </div>
-
-</main>
+    <!-- Mobile Footer (small screens) -->
+    <div class="d-md-none" style="height:70px;" id="mobile-footer-spacer"></div>
+    <footer class="d-md-none fixed-bottom bg-white border-top" id="mobile-footer">
+        <nav class="nav justify-content-around py-2">
+            <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('home.index') }}">
+                <span class="material-symbols-outlined fs-4">home</span>
+                <small class="d-block">Home</small>
+            </a>
+            <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('study.index') }}">
+                <span class="material-symbols-outlined fs-4">school</span>
+                <small class="d-block">Study</small>
+            </a>
+            <a class="nav-link d-flex flex-column align-items-center text-muted" href="{{ url_for('community.index') }}">
+                <span class="material-symbols-outlined fs-4">groups</span>
+                <small class="d-block">Community</small>
+            </a>
+        </nav>
+    </footer>
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='flashcards.js') }}"></script>
+<script>
+    window.SHARE_FRIENDS = [
+        {% for friend in friends %}
+        { username: "{{ friend.username }}", id: "{{ friend.id }}" }{% if not loop.last %}, {% endif %}
+        {% endfor %}
+    ];
+    window.CURRENT_DECK_ID = "{{ deck_id }}";
+</script>
+<script src="{{ url_for('static', filename='flashcards.js') }}"></script>
+<script src="{{ url_for('static', filename='flashcards_edit.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
+<script>
+    let tags = {{ deck.tags | tojson }};
+    let input = document.querySelector('input[name=tags]');
+    if (input) {
+        let tagsString = Array.isArray(tags) ? tags.map(t => (typeof t === 'object' && t.value) ? t.value : t).join(', ') : (tags || '');
+        input.value = tagsString;
+        new Tagify(input);
+    }
 
-    <script src="{{ url_for('static', filename='flashcards_edit.js') }}"></script>
-    <script>
-        // Auto-expand textarea
-        document.addEventListener('input', function (e) {
-            if (e.target.classList.contains('auto-expand')) {
-                e.target.style.height = 'auto';
-                e.target.style.height = (e.target.scrollHeight) + 'px';
-            }
-        });
-        
-        // Card Delete Interactions (Design Specific)
-        document.addEventListener('click', function(e) {
-             // Open Delete Overlay
-             if(e.target.closest('.card-delete-trigger')) {
-                 const btn = e.target.closest('.card-delete-trigger');
-                 const cardN = btn.dataset.target;
-                 const row = document.getElementById(`card-row-${cardN}`);
-                 const checkbox = row.querySelector('.card-delete-checkbox');
-                 const overlay = row.querySelector('.card-deleted-overlay');
-                 
-                 checkbox.checked = true;
-                 overlay.classList.remove('d-none');
-                 overlay.classList.add('d-flex');
-             }
-             
-             // Undo Delete
-             if(e.target.closest('.card-undo-btn')) {
-                 const btn = e.target.closest('.card-undo-btn');
-                 const cardN = btn.dataset.target;
-                 const row = document.getElementById(`card-row-${cardN}`);
-                 const checkbox = row.querySelector('.card-delete-checkbox');
-                 const overlay = row.querySelector('.card-deleted-overlay');
-                 
-                 checkbox.checked = false;
-                 overlay.classList.add('d-none');
-                 overlay.classList.remove('d-flex');
-             }
-        });
-        
-        // Globals for external script
-        window.SHARE_FRIENDS = [
-            {% for friend in friends %}
-            { username: "{{ friend.username }}", id: "{{ friend.id }}" }, 
-            {% endfor %}
-        ];
-        window.CURRENT_DECK_ID = "{{ deck_id }}";
-    </script>
+    // Auto-expand textareas with class `auto-expand`.
+    function autoExpand(el) {
+        if (!el) return;
+        try {
+            el.style.overflow = 'hidden';
+            el.style.height = 'auto';
+            el.style.height = (el.scrollHeight) + 'px';
+        } catch (e) { /* ignore */ }
+    }
+
+    // Delegate input events to handle dynamic elements as well.
+    document.addEventListener('input', function (e) {
+        const t = e.target;
+        if (t && t.matches && t.matches('textarea.auto-expand')) {
+            autoExpand(t);
+        }
+    });
+
+    // Initialize existing textareas on load (server-rendered ones).
+    document.addEventListener('DOMContentLoaded', function () {
+        try {
+            Array.from(document.querySelectorAll('textarea.auto-expand')).forEach(autoExpand);
+        } catch (e) { /* ignore */ }
+    });
+
+    document.addEventListener('click', function(e) {
+        const trigger = e.target.closest('.card-delete-trigger');
+        if (trigger) {
+            const cardN = trigger.dataset.target;
+            const row = document.getElementById(`card-row-${cardN}`);
+            if (!row) return;
+            const checkbox = row.querySelector('.card-delete-checkbox');
+            const overlay = row.querySelector('.card-deleted-overlay');
+            if (checkbox) checkbox.checked = true;
+            if (overlay) { overlay.classList.remove('d-none'); overlay.classList.add('d-flex'); }
+            return;
+        }
+        const undo = e.target.closest('.card-undo-btn');
+        if (undo) {
+            const cardN = undo.dataset.target;
+            const row = document.getElementById(`card-row-${cardN}`);
+            if (!row) return;
+            const checkbox = row.querySelector('.card-delete-checkbox');
+            const overlay = row.querySelector('.card-deleted-overlay');
+            if (checkbox) checkbox.checked = false;
+            if (overlay) { overlay.classList.add('d-none'); overlay.classList.remove('d-flex'); }
+            return;
+        }
+    });
+</script>
 {% endblock %}

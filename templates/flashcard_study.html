@@ -3,14 +3,9 @@
 {% block title %}Bookme - Study {{ deck.name }}{% endblock %}
 
 {% block head %}
-    <!-- Load Flashcard Specific Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles-flashcards.css') }}">
     <style>
-        /* Local overrides if needed, but styles-flashcards.css should handle it */
-        .flashcard-page {
-            background-color: #f9f9f9;
-            min-height: 100vh;
-        }
+        .flashcard-page { background-color: #f9f9f9; min-height: 100vh; }
     </style>
 {% endblock %}
 
@@ -20,78 +15,57 @@
     <main>
         <div class="study-page-container">
             <!-- Header Section -->
-            <div class="study-header-section">
+            <div class="study-header-section d-flex justify-content-between align-items-center">
                 <div>
                     <h1 class="study-title">{{ deck.name }}</h1>
                     <div class="study-subtitle">{{ deck.summary|default('No summary', true) }}</div>
                 </div>
-                <!-- Back Button -->
-                <a href="{{ url_for('flashcards.index', deck_id=deck_id) }}" class="btn-study-outline">
-                    <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
-                    BACK TO DECKS
-                </a>
+
+                <div class="d-flex gap-2 align-items-center">
+                    <a href="{{ url_for('flashcards.index', deck_id=deck_id) }}" class="btn-study-outline">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
+                        BACK TO DECKS
+                    </a>
+                    {% if permissions and deck.id in permissions.get('editor', []) %}
+                        <a href="{{ url_for('flashcards.edit', deck_id = deck_id) }}" class="btn btn-success">Edit</a>
+                    {% endif %}
+                </div>
             </div>
 
             <!-- Flashcard -->
-            <div class="study-card">
+            <div class="study-card mt-4">
                 <!-- Card Top Meta -->
-                <div class="card-meta-top">
+                <div class="card-meta-top d-flex justify-content-between">
                     <span class="card-label">CARD <span id="current-index">1</span> / <span id="total-cards">--</span></span>
                     <span class="card-label" id="card-state-label">FRONT</span>
                 </div>
 
                 <!-- Card Content -->
                 <div class="card-content">
-                    
-                    <!-- Front Text -->
                     <div id="card-front-text" class="card-text-display">Loading...</div>
 
-                    <!-- Answer Area (Hidden initially) -->
                     <div id="answer-area" class="answer-reveal d-none">
                         <div class="card-type-label">ANSWER</div>
                         <div id="card-back-text" class="answer-text"></div>
                     </div>
 
-                    <!-- Controls in Center/Bottom -->
                     <div class="mt-5 d-flex flex-column align-items-center gap-3 w-100">
-                        
-                        <!-- Show Answer Button -->
                         <button id="show-answer" class="btn-study-primary">SHOW ANSWER</button>
-
-                        <!-- Rating Buttons (Hidden initially) -->
                         <div class="d-flex gap-3 justify-content-center w-100">
-                            <!-- We wrap these to toggle visibility together easily via correct/incorrect IDs -->
-                            <!-- Note: The JS toggles correct-btn and incorrect-btn visibility directly -->
-                            <button id="incorrect-btn" class="btn-study-outline d-none" style="border-color: #ef4444; color: #ef4444;">
-                                INCORRECT
-                            </button>
-                            <button id="correct-btn" class="btn-study-outline d-none" style="border-color: #22c55e; color: #22c55e;">
-                                CORRECT
-                            </button>
+                            <button id="incorrect-btn" class="btn-study-outline d-none" style="border-color: #ef4444; color: #ef4444;">INCORRECT</button>
+                            <button id="correct-btn" class="btn-study-outline d-none" style="border-color: #22c55e; color: #22c55e;">CORRECT</button>
                         </div>
                     </div>
-
                 </div>
             </div>
 
             <!-- Bottom Navigation -->
-            <div class="study-controls">
-                <button id="btn-prev" class="nav-circle-btn">
-                    <span class="material-symbols-outlined">chevron_left</span>
-                </button>
-                
-                <!-- Simple pagination indicator (Visual) -->
-                <div style="display: flex; gap: 8px;">
-                    <div class="pagination-dot" style="width: 6px; height: 6px; background: #d1d5db; border-radius: 50%;"></div>
-                    <div class="pagination-dot" style="width: 6px; height: 6px; background: #1a1a1a; border-radius: 50%;"></div>
-                    <div class="pagination-dot" style="width: 6px; height: 6px; background: #d1d5db; border-radius: 50%;"></div>
-                </div>
-
-                <button id="btn-next" class="nav-circle-btn">
-                    <span class="material-symbols-outlined">chevron_right</span>
-                </button>
+            <div class="study-controls d-flex justify-content-center align-items-center gap-4 mt-4">
+                <button id="btn-prev" class="nav-circle-btn"><span class="material-symbols-outlined">chevron_left</span></button>
+                <div style="display: flex; gap: 8px;"></div>
+                <button id="btn-next" class="nav-circle-btn"><span class="material-symbols-outlined">chevron_right</span></button>
             </div>
-            
+
             <!-- Hidden inputs/data for JS -->
             <script>
                 const STUDY_CARDS = [
@@ -111,7 +85,6 @@
                     const correctBtn = document.getElementById('correct-btn');
                     const incorrectBtn = document.getElementById('incorrect-btn');
                     const stateLabel = document.getElementById('card-state-label');
-                    
                     const btnPrev = document.getElementById('btn-prev');
                     const btnNext = document.getElementById('btn-next');
 
@@ -122,32 +95,26 @@
                         if (STUDY_CARDS.length === 0) {
                             frontText.textContent = 'No cards in this deck.';
                             showBtn.disabled = true;
-                            if(totalEl) totalEl.textContent = '0';
-                            if(currEl) currEl.textContent = '0';
+                            if (totalEl) totalEl.textContent = '0';
+                            if (currEl) currEl.textContent = '0';
                             return;
                         }
-                        
-                        // Safety bounds
-                        if (idx < 0) idx = STUDY_CARDS.length - 1; // Wrap to end
-                        if (idx >= STUDY_CARDS.length) idx = 0;    // Wrap to start
+
+                        if (idx < 0) idx = STUDY_CARDS.length - 1;
+                        if (idx >= STUDY_CARDS.length) idx = 0;
 
                         const c = STUDY_CARDS[idx];
-                        if(totalEl) totalEl.textContent = STUDY_CARDS.length;
-                        if(currEl) currEl.textContent = idx + 1;
-                        
+                        if (totalEl) totalEl.textContent = STUDY_CARDS.length;
+                        if (currEl) currEl.textContent = idx + 1;
                         frontText.textContent = c.front;
                         backText.textContent = c.back;
-                        
-                        // Reset state
+
                         answerArea.classList.add('d-none');
                         showBtn.classList.remove('d-none');
                         correctBtn.classList.add('d-none');
                         incorrectBtn.classList.add('d-none');
-                        
-                        // Update Show Answer button state
                         showBtn.disabled = false;
-                        
-                        if(stateLabel) stateLabel.textContent = "FRONT";
+                        if (stateLabel) stateLabel.textContent = 'FRONT';
                     }
 
                     function postReview(cardId, correct) {
@@ -170,32 +137,14 @@
                         showBtn.classList.add('d-none');
                         correctBtn.classList.remove('d-none');
                         incorrectBtn.classList.remove('d-none');
-                        if(stateLabel) stateLabel.textContent = "BACK";
+                        if (stateLabel) stateLabel.textContent = 'BACK';
                     });
 
-                    correctBtn.addEventListener('click', function () {
-                        const c = STUDY_CARDS[idx];
-                        postReview(c.id, true);
-                    });
-                    incorrectBtn.addEventListener('click', function () {
-                        const c = STUDY_CARDS[idx];
-                        postReview(c.id, false);
-                    });
-                    
-                    // Navigation Button Logic
-                    if(btnPrev) {
-                        btnPrev.addEventListener('click', function() {
-                            idx--;
-                            render();
-                        });
-                    }
-                    
-                    if(btnNext) {
-                        btnNext.addEventListener('click', function() {
-                            idx++;
-                            render();
-                        });
-                    }
+                    correctBtn.addEventListener('click', function () { postReview(STUDY_CARDS[idx].id, true); });
+                    incorrectBtn.addEventListener('click', function () { postReview(STUDY_CARDS[idx].id, false); });
+
+                    if (btnPrev) btnPrev.addEventListener('click', function () { idx = (idx - 1 + STUDY_CARDS.length) % STUDY_CARDS.length; render(); });
+                    if (btnNext) btnNext.addEventListener('click', function () { idx = (idx + 1) % STUDY_CARDS.length; render(); });
 
                     document.addEventListener('DOMContentLoaded', render);
                 })();

@@ -75,7 +75,7 @@
                         
                         {% if deck.id in permissions.editor %}
                         <!-- Edit Button -->
-                        <a href="{{ url_for('flashcards.edit', deck_id=deck.id) }}" class="btn-edit d-none d-md-flex" title="Edit deck">
+                        <a href="{{ url_for('flashcards.edit', deck_id=deck.id) }}" class="btn-edit d-flex" title="Edit deck">
                             <span class="material-symbols-outlined">edit</span>
                         </a>
                         {% endif %}
@@ -96,7 +96,6 @@
             </div>
         </div>
     </main>
-    
     <!-- Mobile Footer -->
     <footer class="d-md-none fixed-bottom bg-white border-top">
         <nav class="nav justify-content-around py-2">
@@ -114,6 +113,7 @@
             </a>
         </nav>
     </footer>
+    
 {% endblock %}
 
 {% block scripts %}
